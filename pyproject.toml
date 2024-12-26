@@ -1,0 +1,145 @@
+[build-system]
+build-backend = "setuptools.build_meta"
+requires = ["setuptools >= 61.0"]
+
+[project]
+name = "ebird-checklists"
+version = "0.0.0"
+description = "eBird Checklists is a reusable Django app for loading data from eBird into a database."
+keywords = ["checklists", "Django", "eBird", "models"]
+license = { file = "LICENSE" }
+authors = [
+  {name = "Stuart MacKay", email = "smackay@flagstonesoftware.com"},
+]
+readme = "README.md"
+requires-python = ">=3.8"
+dependencies = [
+    "django>=4.2",
+    "ebird-api>=3.0.7",
+    "python-dateutil>=2.9.0.post0",
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Science/Research",
+    "Framework :: Django",
+    "Framework :: Django :: 4.2",
+    "Framework :: Django :: 5",
+    "License :: OSI Approved :: MIT License",
+    "Natural Language :: English",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering",
+    "Topic :: Scientific/Engineering :: Information Analysis",
+]
+
+[tool.uv]
+dev-dependencies = [
+    "bump-my-version>=0.29.0",
+    "django-debug-toolbar>=4.4.6",
+    "django-environ>=0.11.2",
+    "factory-boy>=3.3.1",
+    "furo>=2024.8.6",
+    "isort>=5.13.2",
+    "pre-commit>=3.5.0",
+    "pygraphviz>=1.11",
+    "pytest-django>=4.9.0",
+    "pytest>=8.3.4",
+    "ruff>=0.8.4",
+    "sphinx>=7.1.2",
+    "tox-uv>=1.13.1",
+    "tox>=4.23.2",
+    "python-json-logger>=3.2.1",
+]
+
+[tool.bumpversion]
+current_version = "0.0.0"
+parse = "(?P<major>\\d+)\\.(?P<minor>\\d+)\\.(?P<patch>\\d+)"
+serialize = ["{major}.{minor}.{patch}"]
+ignore_missing_version = false
+tag = true
+sign_tags = true
+tag_name = "v{new_version}"
+tag_message = "New version: {current_version} → {new_version}"
+allow_dirty = false
+commit = true
+commit_args = "--no-verify"
+message = "New version: {current_version} → {new_version}"
+pre_commit_hooks = ["uv sync --upgrade", "git add uv.lock"]
+
+[[tool.bumpversion.files]]
+filename = "src/ebird/checklists/__init__.py"
+search = '__version__ = "{current_version}"'
+replace = '__version__ = "{new_version}"'
+
+[[tool.bumpversion.files]]
+filename = "docs/conf.py"
+search = 'release = "{current_version}"'
+replace = 'release = "{new_version}"'
+
+[[tool.bumpversion.files]]
+filename = "CHANGELOG.rst"
+search = "Unreleased"
+replace = "[{new_version}] - {now:%Y-%m-%d}"
+
+[[tool.bumpversion.files]]
+filename = "pyproject.toml"
+search = 'version = "{current_version}"'
+replace = 'version = "{new_version}"'
+
+[[tool.bumpversion.files]]
+filename = "CITATION.cff"
+search = "version: {current_version}"
+replace = "version: {new_version}"
+
+[[tool.bumpversion.files]]
+filename = "CITATION.cff"
+search = "^date-released: \\d{{4}}-\\d{{2}}-\\d{{2}}$"
+replace = "date-released: {now:%Y-%m-%d}"
+regex = true
+
+[tool.coverage.run]
+branch = true
+
+[tool.isort]
+multi_line_output = 3
+include_trailing_comma = true
+
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "demo.settings"
+pythonpath = [
+    "."
+]
+testpaths = [
+    "tests/unit"
+]
+
+[tool.tox]
+legacy_tox_ini = """
+[tox]
+requires =
+    tox>=4.2
+    tox-uv>=1.11.3
+envlist =
+    {py38,py39,py310,py311,py312}-django42
+    {py310,py311,py312}-django50
+    {py310,py311,py312, py313}-django51
+
+[testenv]
+commands = pytest
+deps =
+    pytest
+    pytest-django
+    django42: Django>=4.2,<4.3
+    django50: Django>=5.0,<5.1
+    django51: Django>=5.1,<5.2
+    django-debug-toolbar
+    django-environ
+    factory-boy
+setenv =
+    DJANGO_SETTINGS_MODULE = demo.settings
+    PYTHONPATH = src
+"""

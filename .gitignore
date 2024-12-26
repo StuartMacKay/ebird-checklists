@@ -1,0 +1,30 @@
+# Python
+__pycache__/
+*.py[co]
+*.egg*
+
+# Editor temp files
+*~
+
+# Ignore dot files except those required for the project
+.*
+!.editorconfig
+!.env.example
+!.envrc
+!.gitignore
+!.gitkeep
+!.pre-commit-config.yaml
+!.readthedocs.yaml
+
+# data
+*.sqlite3
+*.csv
+
+!ebird_basic_dataset_sample.csv
+!MyEBirdData.csv
+
+#docs
+_build/
+
+# directories
+logs/
