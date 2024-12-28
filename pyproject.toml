@@ -36,6 +36,9 @@ classifiers = [
     "Topic :: Scientific/Engineering :: Information Analysis",
 ]
 
+[tool.setuptools]
+license-files = []
+
 [tool.uv]
 dev-dependencies = [
     "bump-my-version>=0.29.0",
