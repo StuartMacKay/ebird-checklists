@@ -4,7 +4,7 @@ import re
 from typing import Any, Optional
 from urllib.error import HTTPError, URLError
 
-from ebird.api import get_checklist, get_visits
+from ebird.api import get_checklist, get_regions, get_visits
 
 from .utils import str2date, str2datetime, str2int, str2decimal
 from ..models import Checklist, Location, Observation, Observer, Species
@@ -31,6 +31,28 @@ class APILoader:
             extra={"number_of_visits": num_visits},
         )
         return data
+
+    def get_subregions(self, region: str) -> list[str]:
+        region_types = ["subnational1", "subnational2", None]
+        levels: int = len(region.split("-", 2))
+        region_type = region_types[levels - 1]
+
+        if region_type:
+            items = get_regions(self.api_key, region_type, region)
+            sub_regions = [item["code"] for item in items]
+            logger.warning(
+                "eBird API: loading sub-regions",
+                extra={"sub_regions": sub_regions},
+            )
+        else:
+            sub_regions = []
+            logger.warning(
+                "eBird API: result limit exceeded: %s",
+                region,
+                extra={"region": region, "region_type": region_type},
+            )
+
+        return sub_regions
 
     def get_checklist(self, identifier: str) -> dict[str, Any]:
         data = get_checklist(self.api_key, identifier)
@@ -246,7 +268,15 @@ class APILoader:
         )
 
         try:
-            for visit in self.get_visits(region, date):
+            visits = self.get_visits(region, date)
+
+            if len(visits) == 200:
+                logger.warning("eBird API: result limit exceeded: %s", region)
+
+                for sub_region in self.get_subregions(region):
+                    self.load(sub_region, date)
+
+            for visit in visits:
                 self.create_or_update_checklist(visit)
 
             logger.info("eBird API: loading succeeded")
