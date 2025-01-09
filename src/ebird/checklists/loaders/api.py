@@ -275,9 +275,9 @@ class APILoader:
 
                 for sub_region in self.get_subregions(region):
                     self.load(sub_region, date)
-
-            for visit in visits:
-                self.create_or_update_checklist(visit)
+            else:
+                for visit in visits:
+                    self.create_or_update_checklist(visit)
 
             logger.info("eBird API: loading succeeded")
 
