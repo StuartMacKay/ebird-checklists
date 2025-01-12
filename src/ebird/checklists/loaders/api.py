@@ -26,7 +26,7 @@ class APILoader:
         data: list = get_visits(self.api_key, region, date=date, max_results=200)
         num_visits = len(data)
         logger.info(
-            "eBird API: checklists submitted: %d",
+            "Checklists submitted: %d",
             num_visits,
             extra={"number_of_visits": num_visits},
         )
@@ -41,13 +41,13 @@ class APILoader:
             items = get_regions(self.api_key, region_type, region)
             sub_regions = [item["code"] for item in items]
             logger.warning(
-                "eBird API: loading sub-regions",
+                "Loading sub-regions",
                 extra={"sub_regions": sub_regions},
             )
         else:
             sub_regions = []
             logger.warning(
-                "eBird API: result limit exceeded: %s",
+                "Result limit exceeded: %s",
                 region,
                 extra={"region": region, "region_type": region_type},
             )
@@ -57,7 +57,7 @@ class APILoader:
     def get_checklist(self, identifier: str) -> dict[str, Any]:
         data = get_checklist(self.api_key, identifier)
         logger.info(
-            "eBird API: loading checklist: %s",
+            "Loading checklist: %s",
             identifier,
             extra={"identifier": identifier},
         )
@@ -128,7 +128,7 @@ class APILoader:
         species, created = Species.objects.get_or_create(species_code=code)
         if created:
             logger.warning(
-                "eBird API: species added: %s",
+                "Species added: %s",
                 code,
                 extra={"species_code": code},
             )
@@ -232,7 +232,7 @@ class APILoader:
 
         if modified:
             logger.info(
-                "eBird API: checklist updated: %s",
+                "Checklist updated: %s",
                 identifier,
                 extra={"identifier": identifier},
             )
@@ -242,7 +242,7 @@ class APILoader:
             if count := queryset.count():
                 checklist.observations.filter(edited__lt=edited).delete()
                 logger.info(
-                    "eBird API: orphaned observations deleted: %d",
+                    "Orphaned observations deleted: %d",
                     count,
                     extra={"number_deleted": count},
                 )
@@ -261,7 +261,7 @@ class APILoader:
 
         """
         logger.info(
-            "eBird API: loading checklists: %s, %s",
+            "Loading checklists: %s, %s",
             region,
             date,
             extra={"region": region, "date": date},
@@ -271,7 +271,7 @@ class APILoader:
             visits = self.get_visits(region, date)
 
             if len(visits) == 200:
-                logger.warning("eBird API: result limit exceeded: %s", region)
+                logger.warning("Max results exceeded: %s", region)
 
                 for sub_region in self.get_subregions(region):
                     self.load(sub_region, date)
@@ -279,7 +279,7 @@ class APILoader:
                 for visit in visits:
                     self.create_or_update_checklist(visit)
 
-            logger.info("eBird API: loading succeeded")
+            logger.info("Loading succeeded")
 
         except (URLError, HTTPError):
-            logger.exception("eBird API: loading failed")
+            logger.exception("Loading failed")
