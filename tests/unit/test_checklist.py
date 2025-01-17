@@ -52,14 +52,15 @@ def test_for_county__unsupported_code(location):
         Checklist.objects.for_county(location.county_code.lower())
 
 
-def test_for_location__unknown_code_raises_error():
-    with pytest.raises(ValueError):
-        Checklist.objects.for_location("unknown")
+def test_for_location__checklists_fetched(location):
+    identifier = location.identifier
+    obj = Checklist.objects.for_location(identifier).first()
+    assert obj.location.identifier == identifier
 
 
-def test_for_location__location_raises_error(location):
+def test_for_location__unsupported_code(location):
     with pytest.raises(ValueError):
-        Checklist.objects.for_location(location)
+        Checklist.objects.for_location(location.identifier.lower())
 
 
 def test_for_date(checklist):
