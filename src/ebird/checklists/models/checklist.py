@@ -1,5 +1,4 @@
 import datetime
-from dateutil import relativedelta
 import re
 
 from django.db import models
@@ -57,8 +56,8 @@ PROTOCOL_TYPE = {
     "P45": _("Yellow-billed Magpie Survey - Traveling Count"),
 }
 
-class ChecklistQuerySet(models.QuerySet):
 
+class ChecklistQuerySet(models.QuerySet):
     def for_country(self, code: str):
         if not re.match(r"[A-Z]{2}", code):
             raise ValueError("Unsupported country code: %s" % code)
@@ -104,7 +103,6 @@ class ChecklistQuerySet(models.QuerySet):
 
 
 class Checklist(models.Model):
-
     class Meta:
         verbose_name = _("checklist")
         verbose_name_plural = _("checklists")
@@ -130,7 +128,7 @@ class Checklist(models.Model):
 
     identifier = models.TextField(
         verbose_name=_("identifier"),
-        help_text=_("The unique identifier for the checklist.")
+        help_text=_("The unique identifier for the checklist."),
     )
 
     location = models.ForeignKey(
@@ -138,7 +136,7 @@ class Checklist(models.Model):
         related_name="checklists",
         on_delete=models.PROTECT,
         verbose_name=_("location"),
-        help_text=_("The location where checklist was made.")
+        help_text=_("The location where checklist was made."),
     )
 
     observer = models.ForeignKey(
@@ -159,26 +157,25 @@ class Checklist(models.Model):
         blank=True,
         null=True,
         verbose_name=_("observer count"),
-        help_text=_("The total number of observers.")
+        help_text=_("The total number of observers."),
     )
 
     species_count = models.IntegerField(
         blank=True,
         null=True,
         verbose_name=_("species count"),
-        help_text=_("The number of species reported.")
+        help_text=_("The number of species reported."),
     )
 
     date = models.DateField(
-        verbose_name=_("date"),
-        help_text=_("The date the checklist was made.")
+        verbose_name=_("date"), help_text=_("The date the checklist was made.")
     )
 
     time = models.TimeField(
         blank=True,
         null=True,
         verbose_name=_("time"),
-        help_text=_("The time the checklist was started.")
+        help_text=_("The time the checklist was started."),
     )
 
     protocol = models.TextField(
@@ -203,7 +200,7 @@ class Checklist(models.Model):
         blank=True,
         null=True,
         verbose_name=_("duration"),
-        help_text=_("The number of minutes spent counting.")
+        help_text=_("The number of minutes spent counting."),
     )
 
     distance = models.DecimalField(
@@ -212,7 +209,7 @@ class Checklist(models.Model):
         decimal_places=3,
         max_digits=6,
         verbose_name=_("distance"),
-        help_text=_("The distance, in metres, covered while travelling.")
+        help_text=_("The distance, in metres, covered while travelling."),
     )
 
     area = models.DecimalField(
@@ -221,13 +218,13 @@ class Checklist(models.Model):
         decimal_places=3,
         max_digits=6,
         verbose_name=_("area"),
-        help_text=_("The area covered, in hectares.")
+        help_text=_("The area covered, in hectares."),
     )
 
     complete = models.BooleanField(
         default=False,
         verbose_name=_("complete"),
-        help_text=_("All species seen are reported.")
+        help_text=_("All species seen are reported."),
     )
 
     comments = models.TextField(
@@ -245,6 +242,4 @@ class Checklist(models.Model):
     objects = ChecklistQuerySet.as_manager()
 
     def __str__(self):
-        return "%s %s, %s" % (
-            self.date, self.time, self.location.name
-        )
+        return "%s %s, %s" % (self.date, self.time, self.location.name)
