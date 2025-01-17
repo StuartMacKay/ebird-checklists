@@ -11,15 +11,23 @@ pytestmark = pytest.mark.django_db
 
 @pytest.fixture
 def checklist():
-    checklist = ChecklistFactory.create()
-    return checklist
+    return ChecklistFactory.create()
 
 
-def test_for_country__checklists_fetched(checklist):
-    country = checklist.location.country
-    obj = Checklist.objects.for_country(country).first()
-    assert obj.id == checklist.id
-    assert obj.location.country == country
+@pytest.fixture
+def location(checklist):
+    return checklist.location
+
+
+def test_for_country__checklists_fetched(location):
+    code = location.country_code
+    obj = Checklist.objects.for_country(code).first()
+    assert obj.location.country_code == code
+
+
+def test_for_country__unsupported_code(location):
+    with pytest.raises(ValueError):
+        Checklist.objects.for_country(location.country_code.lower())
 
 
 def test_for_country_code__checklists_fetched(checklist):
