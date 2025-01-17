@@ -41,25 +41,29 @@ def test_for_state__unsupported_code(location):
         Checklist.objects.for_state(location.state_code.lower())
 
 
-def test_for_country_code__checklists_fetched(checklist):
-    country_code = checklist.location.country_code
-    obj = Checklist.objects.for_country(country_code).first()
-    assert obj.id == checklist.id
-    assert obj.location.country_code == country_code
+def test_for_county__checklists_fetched(location):
+    code = location.county_code
+    obj = Checklist.objects.for_county(code).first()
+    assert obj.location.county_code == code
 
 
-def test_for_state__checklists_fetched(checklist):
-    state = checklist.location.state
-    obj = Checklist.objects.for_state(state).first()
-    assert obj.id == checklist.id
-    assert obj.location.state == state
+def test_for_county__unsupported_code(location):
+    with pytest.raises(ValueError):
+        Checklist.objects.for_county(location.county_code.lower())
 
 
-def test_for_state_code__checklists_fetched(checklist):
-    state_code = checklist.location.state_code
-    obj = Checklist.objects.for_state(state_code).first()
-    assert obj.id == checklist.id
-    assert obj.location.state_code == state_code
+def test_for_location__unknown_code_raises_error():
+    with pytest.raises(ValueError):
+        Checklist.objects.for_location("unknown")
+
+
+def test_for_location__location_raises_error(location):
+    with pytest.raises(ValueError):
+        Checklist.objects.for_location(location)
+
+
+def test_for_date(checklist):
+    Checklist.objects.for_date(checklist.date)
 
 
 def test_for_county__checklists_fetched(checklist):
