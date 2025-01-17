@@ -1,6 +1,7 @@
 import datetime as dt
 
 import pytest
+from dateutil.relativedelta import relativedelta
 
 from ebird.checklists.models import Checklist
 from tests.unit.factories import ChecklistFactory
@@ -67,3 +68,17 @@ def test_for_date__checklists_fetched(checklist):
     date = checklist.date
     obj = Checklist.objects.for_date(date).first()
     assert obj.date == date
+
+
+def test_for_dates__start_date_checklists_fetched(checklist):
+    start = checklist.date
+    end = checklist.date + relativedelta(days=+1)
+    obj = Checklist.objects.for_dates(start, end).first()
+    assert obj is not None
+
+
+def test_for_dates__end_date_checklists_not_fetched(checklist):
+    start = checklist.date + relativedelta(days=-1)
+    end = checklist.date
+    obj = Checklist.objects.for_dates(start, end).first()
+    assert obj is None

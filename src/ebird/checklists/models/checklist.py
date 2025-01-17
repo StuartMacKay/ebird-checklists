@@ -82,6 +82,9 @@ class ChecklistQuerySet(models.QuerySet):
     def for_date(self, date: datetime.date):
         return self.filter(date=date)
 
+    def for_dates(self, start: datetime.date, end: datetime.date):
+        return self.filter(date__gte=start).filter(date__lt=end)
+
 
 class Checklist(models.Model):
 
