@@ -85,6 +85,11 @@ class ChecklistQuerySet(models.QuerySet):
     def for_dates(self, start: datetime.date, end: datetime.date):
         return self.filter(date__gte=start).filter(date__lt=end)
 
+    def for_protocol(self, code: str):
+        if not re.match(r"P\d{2}", code):
+            raise ValueError("Unsupported protocol: %s" % code)
+        return self.filter(protocol_code=code)
+
 
 class Checklist(models.Model):
 

@@ -82,3 +82,14 @@ def test_for_dates__end_date_checklists_not_fetched(checklist):
     end = checklist.date
     obj = Checklist.objects.for_dates(start, end).first()
     assert obj is None
+
+
+def test_for_protocol__checklists_fetched(checklist):
+    code = checklist.protocol_code
+    obj = Checklist.objects.for_protocol(code).first()
+    assert obj.protocol_code == code
+
+
+def test_for_protocol__unsupported_code(checklist):
+    with pytest.raises(ValueError):
+        Checklist.objects.for_location(checklist.protocol_code.lower())
