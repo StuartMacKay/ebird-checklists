@@ -93,3 +93,21 @@ def test_for_protocol__checklists_fetched(checklist):
 def test_for_protocol__unsupported_code(checklist):
     with pytest.raises(ValueError):
         Checklist.objects.for_location(checklist.protocol_code.lower())
+
+
+def test_for_observer__identifier__checklists_fetched(checklist):
+    identifier = checklist.observer.identifier
+    obj = Checklist.objects.for_observer(identifier).first()
+    assert obj.observer.identifier == identifier
+
+
+def test_for_observer__name_exact_match__checklists_fetched(checklist):
+    name = checklist.observer.name
+    obj = Checklist.objects.for_observer(name).first()
+    assert obj.observer.name == name
+
+
+def test_for_observer__name_no_match__checklists_fetched(checklist):
+    name = checklist.observer.name
+    obj = Checklist.objects.for_observer(name.lower()).first()
+    assert obj is None

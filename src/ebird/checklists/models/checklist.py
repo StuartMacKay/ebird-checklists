@@ -90,6 +90,12 @@ class ChecklistQuerySet(models.QuerySet):
             raise ValueError("Unsupported protocol: %s" % code)
         return self.filter(protocol_code=code)
 
+    def for_observer(self, value: str):
+        if re.match(r"obsr\d+", value):
+            return self.filter(observer__identifier=value)
+        else:
+            return self.filter(observer__name__exact=value)
+
 
 class Checklist(models.Model):
 
