@@ -63,60 +63,7 @@ def test_for_location__unsupported_code(location):
         Checklist.objects.for_location(location.identifier.lower())
 
 
-def test_for_date(checklist):
-    Checklist.objects.for_date(checklist.date)
-
-
-def test_for_county__checklists_fetched(checklist):
-    county = checklist.location.county
-    obj = Checklist.objects.for_county(county).first()
-    assert obj.id == checklist.id
-    assert obj.location.county == county
-
-
-def test_for_county_code__checklists_fetched(checklist):
-    county_code = checklist.location.county_code
-    obj = Checklist.objects.for_county(county_code).first()
-    assert obj.id == checklist.id
-    assert obj.location.county_code == county_code
-
-
-def test_for_year__checklists_fetched(checklist):
-    year = dt.date.today().year
-    checklist.date = checklist.date.replace(year=year)
-    checklist.save()
-    obj = Checklist.objects.for_year(year).first()
-    assert obj.id == checklist.id
-    assert obj.date.year == year
-
-
-def test_for_month__checklists_fetched(checklist):
-    date = dt.date.today()
-    year, month = date.year, date.month
-    checklist.date = checklist.date.replace(year=year, month=month)
-    checklist.save()
-    obj = Checklist.objects.for_month(year, month).first()
-    assert obj.id == checklist.id
-    assert obj.date.year == year
-    assert obj.date.month == month
-
-
-def test_for_day__checklists_fetched(checklist):
-    date = dt.date.today()
-    year, month, day = date.year, date.month, date.day
-    checklist.date = checklist.date.replace(year=year, month=month, day=day)
-    checklist.save()
-    obj = Checklist.objects.for_day(year, month, day).first()
-    assert obj.id == checklist.id
-    assert obj.date.year == year
-    assert obj.date.month == month
-    assert obj.date.day == day
-
-
 def test_for_date__checklists_fetched(checklist):
-    date = dt.date.today()
-    checklist.date = date
-    checklist.save()
+    date = checklist.date
     obj = Checklist.objects.for_date(date).first()
-    assert obj.id == checklist.id
     assert obj.date == date

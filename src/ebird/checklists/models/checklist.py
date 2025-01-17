@@ -79,20 +79,6 @@ class ChecklistQuerySet(models.QuerySet):
             raise ValueError("Unsupported location identifier: %s" % identifier)
         return self.filter(location__identifier=identifier)
 
-    def for_year(self, year: int):
-        start = datetime.date(year, 1, 1)
-        until = datetime.date(year + 1, 1, 1)
-        return self.filter(date__gte=start).filter(date__lt=until)
-
-    def for_month(self, year: int, month: int):
-        start = datetime.date(year, month, 1)
-        until = start + relativedelta.relativedelta(months=1)
-        return self.filter(date__gte=start).filter(date__lt=until)
-
-    def for_day(self, year: int, month: int, day: int):
-        date = datetime.date(year, month, day)
-        return self.filter(date=date)
-
     def for_date(self, date: datetime.date):
         return self.filter(date=date)
 
