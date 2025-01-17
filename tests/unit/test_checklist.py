@@ -125,3 +125,17 @@ def test_for_hotspot__checklists_not_fetched(location):
     location.save()
     obj = Checklist.objects.for_hotspots().first()
     assert obj is None
+
+
+def test_complete__checklists_fetched(checklist):
+    checklist.complete = True
+    checklist.save()
+    obj = Checklist.objects.complete().first()
+    assert obj is not None
+
+
+def test_complete__checklists_not_fetched(checklist):
+    checklist.complete = False
+    checklist.save()
+    obj = Checklist.objects.complete().first()
+    assert obj is None

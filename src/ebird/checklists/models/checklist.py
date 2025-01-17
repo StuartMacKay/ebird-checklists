@@ -99,6 +99,9 @@ class ChecklistQuerySet(models.QuerySet):
     def for_hotspots(self):
         return self.filter(location__hotspot=True)
 
+    def complete(self):
+        return self.filter(complete=True)
+
 
 class Checklist(models.Model):
 
