@@ -111,3 +111,17 @@ def test_for_observer__name_no_match__checklists_fetched(checklist):
     name = checklist.observer.name
     obj = Checklist.objects.for_observer(name.lower()).first()
     assert obj is None
+
+
+def test_for_hotspot__checklists_fetched(location):
+    location.hotspot = True
+    location.save()
+    obj = Checklist.objects.for_hotspots().first()
+    assert obj is not None
+
+
+def test_for_hotspot__checklists_not_fetched(location):
+    location.hotspot = False
+    location.save()
+    obj = Checklist.objects.for_hotspots().first()
+    assert obj is None

@@ -96,6 +96,9 @@ class ChecklistQuerySet(models.QuerySet):
         else:
             return self.filter(observer__name__exact=value)
 
+    def for_hotspots(self):
+        return self.filter(location__hotspot=True)
+
 
 class Checklist(models.Model):
 
