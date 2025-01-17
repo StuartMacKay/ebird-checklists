@@ -30,6 +30,17 @@ def test_for_country__unsupported_code(location):
         Checklist.objects.for_country(location.country_code.lower())
 
 
+def test_for_state__checklists_fetched(location):
+    code = location.state_code
+    obj = Checklist.objects.for_state(code).first()
+    assert obj.location.state_code == code
+
+
+def test_for_state__unsupported_code(location):
+    with pytest.raises(ValueError):
+        Checklist.objects.for_state(location.state_code.lower())
+
+
 def test_for_country_code__checklists_fetched(checklist):
     country_code = checklist.location.country_code
     obj = Checklist.objects.for_country(country_code).first()
