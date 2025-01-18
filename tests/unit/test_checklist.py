@@ -64,6 +64,11 @@ def test_for_location__unsupported_code(location):
         Checklist.objects.for_location(location.identifier.lower())
 
 
+def test_for_identifier__checklist_fetched(checklist):
+    identifier = checklist.identifier
+    Checklist.objects.for_identifier(identifier)
+
+
 def test_for_date__checklists_fetched(checklist):
     date = checklist.date
     obj = Checklist.objects.for_date(date).first()
