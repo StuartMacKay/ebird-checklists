@@ -23,6 +23,11 @@ class ObservationQuerySet(models.QuerySet):
             raise ValueError("Unsupported county code: %s" % code)
         return self.filter(location__county_code=code)
 
+    def for_location(self, identifier: str):
+        if not re.match(r"L\d+", identifier):
+            raise ValueError("Unsupported location identifier: %s" % identifier)
+        return self.filter(location__identifier=identifier)
+
     def for_year(self, year: int):
         start = datetime.date(year, 1, 1)
         until = datetime.date(year + 1, 1, 1)

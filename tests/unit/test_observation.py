@@ -52,6 +52,17 @@ def test_for_county__unsupported_code(location):
         Observation.objects.for_county(location.county_code.lower())
 
 
+def test_for_location__observations_fetched(location):
+    identifier = location.identifier
+    obj = Observation.objects.for_location(identifier).first()
+    assert obj.location.identifier == identifier
+
+
+def test_for_location__unsupported_code(location):
+    with pytest.raises(ValueError):
+        Observation.objects.for_location(location.identifier.lower())
+
+
 def test_for_year__observations_fetched(observation):
     year = dt.date.today().year
     observation.checklist.date = observation.checklist.date.replace(year=year)
