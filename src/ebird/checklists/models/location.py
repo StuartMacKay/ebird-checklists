@@ -31,6 +31,9 @@ class LocationQuerySet(models.QuerySet):
             raise ValueError("Unsupported county code: %s" % code)
         return self.filter(county_code=code)
 
+    def for_identifier(self, identifier: str):
+        return self.get(identifier=identifier)
+
     def for_year(self, year: int):
         start = datetime.date(year, 1, 1)
         until = datetime.date(year + 1, 1, 1)

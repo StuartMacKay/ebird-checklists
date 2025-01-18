@@ -43,3 +43,8 @@ def test_for_county__locations_fetched(location):
 def test_for_county__unsupported_code(location):
     with pytest.raises(ValueError):
         Location.objects.for_county(location.county_code.lower())
+
+
+def test_for_identifier__location_fetched(location):
+    identifier = location.identifier
+    Location.objects.for_identifier(identifier)
