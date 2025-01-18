@@ -1,10 +1,9 @@
 import datetime
-from dateutil import relativedelta
 import re
 
+from dateutil import relativedelta
 from django.db import models
 from django.utils.translation import gettext_lazy as _
-
 
 LOCATION_TYPE = {
     "C": _("County"),
@@ -15,9 +14,9 @@ LOCATION_TYPE = {
     "T": _("Town"),
 }
 
-class LocationQuerySet(models.QuerySet):
 
-    def for_country(self, value:str):
+class LocationQuerySet(models.QuerySet):
+    def for_country(self, value: str):
         if re.match(r"[A-Z]{2,3}", value):
             return self.filter(location__country_code=value)
         else:
@@ -54,7 +53,6 @@ class LocationQuerySet(models.QuerySet):
 
 
 class Location(models.Model):
-
     class Meta:
         verbose_name = _("location")
         verbose_name_plural = _("locations")
@@ -73,74 +71,71 @@ class Location(models.Model):
 
     identifier = models.TextField(
         verbose_name=_("identifier"),
-        help_text=_("The unique identifier for the location")
+        help_text=_("The unique identifier for the location"),
     )
 
     type = models.TextField(
         blank=True,
         verbose_name=_("type"),
-        help_text=_("The location type, e.g. personal, hotspot, town, etc.")
+        help_text=_("The location type, e.g. personal, hotspot, town, etc."),
     )
 
     name = models.TextField(
-        verbose_name=_("name"),
-        help_text=_("The name of the location")
+        verbose_name=_("name"), help_text=_("The name of the location")
     )
 
     county = models.TextField(
         blank=True,
         verbose_name=_("county"),
-        help_text=_("The name of the county (subnational2).")
+        help_text=_("The name of the county (subnational2)."),
     )
 
     county_code = models.TextField(
         blank=True,
         verbose_name=_("county code"),
-        help_text=_("The code used to identify the county.")
+        help_text=_("The code used to identify the county."),
     )
 
     state = models.TextField(
-        verbose_name = _("state"),
-        help_text = _("The name of the state (subnational1).")
+        verbose_name=_("state"), help_text=_("The name of the state (subnational1).")
     )
 
     state_code = models.TextField(
-        verbose_name = _("state code"),
-        help_text = _("The code used to identify the state.")
+        verbose_name=_("state code"),
+        help_text=_("The code used to identify the state."),
     )
 
     country = models.TextField(
-        verbose_name=_("country"),
-        help_text=_("The name of the country.")
+        verbose_name=_("country"), help_text=_("The name of the country.")
     )
 
     country_code = models.TextField(
         verbose_name=_("country code"),
-        help_text=_("The code used to identify the country.")
+        help_text=_("The code used to identify the country."),
     )
 
     iba_code = models.TextField(
         blank=True,
         verbose_name=_("IBA code"),
-        help_text=_("The code used to identify an Important Bird Area.")
+        help_text=_("The code used to identify an Important Bird Area."),
     )
 
     bcr_code = models.TextField(
         blank=True,
         verbose_name=_("BCR code"),
-        help_text=_("The code used to identify a Bird Conservation Region.")
+        help_text=_("The code used to identify a Bird Conservation Region."),
     )
 
     usfws_code = models.TextField(
         blank=True,
         verbose_name=_("USFWS code"),
-        help_text=_("The code used to identify a US Fish & Wildlife Service region.")
+        help_text=_("The code used to identify a US Fish & Wildlife Service region."),
     )
 
     atlas_block = models.TextField(
         blank=True,
         verbose_name=_("atlas block"),
-        help_text=_("The code used to identify an area for an atlas.")
+        help_text=_("The code used to identify an area for an atlas."),
     )
 
     latitude = models.DecimalField(
@@ -159,7 +154,8 @@ class Location(models.Model):
         max_digits=10,
         verbose_name=_("longitude"),
         help_text=_(
-            "The decimal longitude of the location, relative to the prime meridian"),
+            "The decimal longitude of the location, relative to the prime meridian"
+        ),
     )
 
     url = models.URLField(
