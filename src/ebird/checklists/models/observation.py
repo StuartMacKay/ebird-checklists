@@ -31,6 +31,9 @@ class ObservationQuerySet(models.QuerySet):
     def for_date(self, date: datetime.date):
         return self.filter(checklist__date=date)
 
+    def for_dates(self, start: datetime.date, end: datetime.date):
+        return self.filter(checklist__date__gte=start).filter(checklist__date__lt=end)
+
 
 class Observation(models.Model):
     class Meta:

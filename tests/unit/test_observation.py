@@ -1,4 +1,5 @@
 import pytest
+from dateutil.relativedelta import relativedelta
 
 from ebird.checklists.models import Observation
 from tests.unit.factories import ObservationFactory
@@ -70,3 +71,17 @@ def test_for_date__observations_fetched(checklist):
     date = checklist.date
     obj = Observation.objects.for_date(date).first()
     assert obj.checklist.date == date
+
+
+def test_for_dates__start_date_observations_fetched(checklist):
+    start = checklist.date
+    end = checklist.date + relativedelta(days=+1)
+    obj = Observation.objects.for_dates(start, end).first()
+    assert obj is not None
+
+
+def test_for_dates__end_date_observations_not_fetched(checklist):
+    start = checklist.date + relativedelta(days=-1)
+    end = checklist.date
+    obj = Observation.objects.for_dates(start, end).first()
+    assert obj is None
