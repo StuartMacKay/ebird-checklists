@@ -41,18 +41,15 @@ def test_for_state__unsupported_code(location):
         Observation.objects.for_state(location.state_code.lower())
 
 
-def test_for_county__observations_fetched(observation):
-    county = observation.location.county
-    obj = Observation.objects.for_county(county).first()
-    assert obj.id == observation.id
-    assert obj.location.county == county
+def test_for_county__observations_fetched(location):
+    code = location.county_code
+    obj = Observation.objects.for_county(code).first()
+    assert obj.location.county_code == code
 
 
-def test_for_county_code__observations_fetched(observation):
-    county_code = observation.location.county_code
-    obj = Observation.objects.for_county(county_code).first()
-    assert obj.id == observation.id
-    assert obj.location.county_code == county_code
+def test_for_county__unsupported_code(location):
+    with pytest.raises(ValueError):
+        Observation.objects.for_county(location.county_code.lower())
 
 
 def test_for_year__observations_fetched(observation):
