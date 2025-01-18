@@ -67,6 +67,11 @@ def test_for_location__unsupported_code(location):
         Observation.objects.for_location(location.identifier.lower())
 
 
+def test_for_identifier__checklist_fetched(observation):
+    identifier = observation.identifier
+    Observation.objects.for_identifier(identifier)
+
+
 def test_for_date__observations_fetched(checklist):
     date = checklist.date
     obj = Observation.objects.for_date(date).first()

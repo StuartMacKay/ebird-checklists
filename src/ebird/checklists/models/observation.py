@@ -28,6 +28,9 @@ class ObservationQuerySet(models.QuerySet):
             raise ValueError("Unsupported location identifier: %s" % identifier)
         return self.filter(location__identifier=identifier)
 
+    def for_identifier(self, identifier: str):
+        return self.get(identifier=identifier)
+
     def for_date(self, date: datetime.date):
         return self.filter(checklist__date=date)
 
