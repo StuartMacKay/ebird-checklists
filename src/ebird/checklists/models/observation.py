@@ -8,7 +8,6 @@ from django.utils.translation import gettext_lazy as _
 
 
 class ObservationQuerySet(models.QuerySet):
-
     def for_country(self, value: str):
         if re.match(r"[A-Z]{2,3}", value):
             return self.filter(location__country_code=value)
@@ -46,7 +45,6 @@ class ObservationQuerySet(models.QuerySet):
 
 
 class Observation(models.Model):
-
     class Meta:
         verbose_name = _("observation")
         verbose_name_plural = _("observations")
@@ -80,7 +78,7 @@ class Observation(models.Model):
         related_name="observations",
         on_delete=models.CASCADE,
         verbose_name=_("checklist"),
-        help_text=_("The checklist this observation belongs to.")
+        help_text=_("The checklist this observation belongs to."),
     )
 
     species = models.ForeignKey(
@@ -104,7 +102,7 @@ class Observation(models.Model):
         related_name="observations",
         on_delete=models.PROTECT,
         verbose_name=_("location"),
-        help_text=_("The location where the observation was made.")
+        help_text=_("The location where the observation was made."),
     )
 
     count = models.IntegerField(
@@ -143,39 +141,41 @@ class Observation(models.Model):
         blank=True,
         null=True,
         verbose_name=_("has media"),
-        help_text=_("Has audio, photo or video uploaded to the Macaulay library.")
+        help_text=_("Has audio, photo or video uploaded to the Macaulay library."),
     )
 
     approved = models.BooleanField(
         blank=True,
         null=True,
         verbose_name=_("Approved"),
-        help_text=_("Has the observation been accepted by eBird's review process.")
+        help_text=_("Has the observation been accepted by eBird's review process."),
     )
 
     reviewed = models.BooleanField(
         blank=True,
         null=True,
         verbose_name=_("Reviewed"),
-        help_text=_("Was the observation reviewed because it failed automatic checks.")
+        help_text=_("Was the observation reviewed because it failed automatic checks."),
     )
 
     reason = models.TextField(
         blank=True,
         verbose_name=_("Reason"),
-        help_text=_("The reason given for the observation to be marked as not confirmed.")
+        help_text=_(
+            "The reason given for the observation to be marked as not confirmed."
+        ),
     )
 
     comments = models.TextField(
         blank=True,
         verbose_name=_("comments"),
-        help_text=_("Any comments about the observation.")
+        help_text=_("Any comments about the observation."),
     )
 
     urn = models.TextField(
         blank=True,
         verbose_name=_("URN"),
-        help_text=_("The globally unique identifier for the observation")
+        help_text=_("The globally unique identifier for the observation"),
     )
 
     objects = ObservationQuerySet.as_manager()
