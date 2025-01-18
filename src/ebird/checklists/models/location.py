@@ -34,23 +34,6 @@ class LocationQuerySet(models.QuerySet):
     def for_identifier(self, identifier: str):
         return self.get(identifier=identifier)
 
-    def for_year(self, year: int):
-        start = datetime.date(year, 1, 1)
-        until = datetime.date(year + 1, 1, 1)
-        return self.filter(date__gte=start).filter(date_lt=until)
-
-    def for_month(self, year: int, month: int):
-        start = datetime.date(year, month, 1)
-        until = start + relativedelta.relativedelta(months=1)
-        return self.filter(date__gte=start).filter(date_lt=until)
-
-    def for_day(self, year: int, month: int, day: int):
-        date = datetime.date(year, month, day)
-        return self.filter(date=date)
-
-    def for_date(self, date: datetime.date):
-        return self.filter(date=date)
-
 
 class Location(models.Model):
     class Meta:
