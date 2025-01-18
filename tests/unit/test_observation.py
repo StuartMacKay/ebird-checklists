@@ -1,5 +1,3 @@
-import datetime as dt
-
 import pytest
 
 from ebird.checklists.models import Observation
@@ -17,6 +15,11 @@ def observation():
 @pytest.fixture
 def location(observation):
     return observation.location
+
+
+@pytest.fixture
+def checklist(observation):
+    return observation.checklist
 
 
 def test_for_country__checklists_fetched(location):
@@ -63,9 +66,7 @@ def test_for_location__unsupported_code(location):
         Observation.objects.for_location(location.identifier.lower())
 
 
-def test_for_date__observations_fetched(observation):
-    date = dt.date.today()
-    observation.checklist.date = date
-    observation.checklist.save()
+def test_for_date__observations_fetched(checklist):
+    date = checklist.date
     obj = Observation.objects.for_date(date).first()
     assert obj.checklist.date == date
