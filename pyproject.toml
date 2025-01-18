@@ -147,6 +147,7 @@ deps =
     django50: Django>=5.0,<5.1
     django51: Django>=5.1,<5.2
     django-debug-toolbar
+    python-json-logger
     django-environ
     factory-boy
 setenv =
