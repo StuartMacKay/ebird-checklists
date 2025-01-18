@@ -85,3 +85,21 @@ def test_for_dates__end_date_observations_not_fetched(checklist):
     end = checklist.date
     obj = Observation.objects.for_dates(start, end).first()
     assert obj is None
+
+
+def test_for_observer__identifier__observations_fetched(observation):
+    identifier = observation.observer.identifier
+    obj = Observation.objects.for_observer(identifier).first()
+    assert obj.observer.identifier == identifier
+
+
+def test_for_observer__name_exact_match__observations_fetched(observation):
+    name = observation.observer.name
+    obj = Observation.objects.for_observer(name).first()
+    assert obj.observer.name == name
+
+
+def test_for_observer__name_no_match__observations_fetched(observation):
+    name = observation.observer.name
+    obj = Observation.objects.for_observer(name.lower()).first()
+    assert obj is None

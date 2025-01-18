@@ -34,6 +34,12 @@ class ObservationQuerySet(models.QuerySet):
     def for_dates(self, start: datetime.date, end: datetime.date):
         return self.filter(checklist__date__gte=start).filter(checklist__date__lt=end)
 
+    def for_observer(self, value: str):
+        if re.match(r"obsr\d+", value):
+            return self.filter(observer__identifier=value)
+        else:
+            return self.filter(observer__name__exact=value)
+
 
 class Observation(models.Model):
     class Meta:
