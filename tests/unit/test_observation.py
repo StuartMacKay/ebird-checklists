@@ -30,18 +30,15 @@ def test_for_country__unsupported_code(location):
         Observation.objects.for_country(location.country_code.lower())
 
 
-def test_for_state__observations_fetched(observation):
-    state = observation.location.state
-    obj = Observation.objects.for_state(state).first()
-    assert obj.id == observation.id
-    assert obj.location.state == state
+def test_for_state__observations_fetched(location):
+    code = location.state_code
+    obj = Observation.objects.for_state(code).first()
+    assert obj.location.state_code == code
 
 
-def test_for_state_code__observations_fetched(observation):
-    state_code = observation.location.state_code
-    obj = Observation.objects.for_state(state_code).first()
-    assert obj.id == observation.id
-    assert obj.location.state_code == state_code
+def test_for_state__unsupported_code(location):
+    with pytest.raises(ValueError):
+        Observation.objects.for_state(location.state_code.lower())
 
 
 def test_for_county__observations_fetched(observation):
