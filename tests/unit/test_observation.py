@@ -14,18 +14,20 @@ def observation():
     return observation
 
 
-def test_for_country__observations_fetched(observation):
-    country = observation.location.country
-    obj = Observation.objects.for_country(country).first()
-    assert obj.id == observation.id
-    assert obj.location.country == country
+@pytest.fixture
+def location(observation):
+    return observation.location
 
 
-def test_for_country_code__observations_fetched(observation):
-    country_code = observation.location.country_code
-    obj = Observation.objects.for_country(country_code).first()
-    assert obj.id == observation.id
-    assert obj.location.country_code == country_code
+def test_for_country__checklists_fetched(location):
+    code = location.country_code
+    obj = Observation.objects.for_country(code).first()
+    assert obj.location.country_code == code
+
+
+def test_for_country__unsupported_code(location):
+    with pytest.raises(ValueError):
+        Observation.objects.for_country(location.country_code.lower())
 
 
 def test_for_state__observations_fetched(observation):
