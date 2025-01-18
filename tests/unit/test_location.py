@@ -32,3 +32,14 @@ def test_for_state__locations_fetched(location):
 def test_for_state__unsupported_code(location):
     with pytest.raises(ValueError):
         Location.objects.for_state(location.state_code.lower())
+
+
+def test_for_county__locations_fetched(location):
+    code = location.county_code
+    obj = Location.objects.for_county(code).first()
+    assert obj.county_code == code
+
+
+def test_for_county__unsupported_code(location):
+    with pytest.raises(ValueError):
+        Location.objects.for_county(location.county_code.lower())
