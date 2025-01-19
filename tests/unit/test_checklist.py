@@ -20,37 +20,40 @@ def location(checklist):
     return checklist.location
 
 
-def test_for_country__checklists_fetched(location):
+def test_for_country_code__checklists_fetched(location):
     code = location.country_code
     obj = Checklist.objects.for_country(code).first()
     assert obj.location.country_code == code
 
 
-def test_for_country__unsupported_code(location):
-    with pytest.raises(ValueError):
-        Checklist.objects.for_country(location.country_code.lower())
+def test_for_country_name__checklists_fetched(location):
+    name = location.country
+    obj = Checklist.objects.for_country(name).first()
+    assert obj.location.country == name
 
 
-def test_for_state__checklists_fetched(location):
+def test_for_state_code__checklists_fetched(location):
     code = location.state_code
     obj = Checklist.objects.for_state(code).first()
     assert obj.location.state_code == code
 
 
-def test_for_state__unsupported_code(location):
-    with pytest.raises(ValueError):
-        Checklist.objects.for_state(location.state_code.lower())
+def test_for_state_name__checklists_fetched(location):
+    name = location.state
+    obj = Checklist.objects.for_state(name).first()
+    assert obj.location.state == name
 
 
-def test_for_county__checklists_fetched(location):
+def test_for_county_code__checklists_fetched(location):
     code = location.county_code
     obj = Checklist.objects.for_county(code).first()
     assert obj.location.county_code == code
 
 
-def test_for_county__unsupported_code(location):
-    with pytest.raises(ValueError):
-        Checklist.objects.for_county(location.county_code.lower())
+def test_for_county_name__checklists_fetched(location):
+    name = location.county
+    obj = Checklist.objects.for_county(name).first()
+    assert obj.location.county == name
 
 
 def test_for_location__checklists_fetched(location):

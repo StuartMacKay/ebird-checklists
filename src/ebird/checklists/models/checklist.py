@@ -58,20 +58,20 @@ PROTOCOL_TYPE = {
 
 
 class ChecklistQuerySet(models.QuerySet):
-    def for_country(self, code: str):
-        if not re.match(r"[A-Z]{2}", code):
-            raise ValueError("Unsupported country code: %s" % code)
-        return self.filter(location__country_code=code)
+    def for_country(self, value: str):
+        if re.match(r"[A-Z]{2}", value):
+            return self.filter(location__country_code=value)
+        return self.filter(location__country=value)
 
-    def for_state(self, code: str):
-        if not re.match(r"[A-Z]{2}-[A-Z0-9]{2,3}", code):
-            raise ValueError("Unsupported state code: %s" % code)
-        return self.filter(location__state_code=code)
+    def for_state(self, value: str):
+        if re.match(r"[A-Z]{2}-[A-Z0-9]{2,3}", value):
+            return self.filter(location__state_code=value)
+        return self.filter(location__state=value)
 
-    def for_county(self, code: str):
-        if not re.match(r"[A-Z]{2}-[A-Z0-9]{2,3}-[A-Z0-9]{2,3}", code):
-            raise ValueError("Unsupported county code: %s" % code)
-        return self.filter(location__county_code=code)
+    def for_county(self, value: str):
+        if re.match(r"[A-Z]{2}-[A-Z0-9]{2,3}-[A-Z0-9]{2,3}", value):
+            return self.filter(location__county_code=value)
+        return self.filter(location__county=value)
 
     def for_location(self, identifier: str):
         if not re.match(r"L\d+", identifier):
