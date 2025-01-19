@@ -9,6 +9,9 @@ Latest
 * Changed ChecklistQuerySet methods for_country(), for_state() and for_county()
   so the argument can be either an eBird code or a name.
 
+* Added LocationManager with methods to return lists of choice for country, state,
+  and county names to make it easy to build autocomplete fields.
+
 0.4.0 (2025-01-18)
 ------------------
 * Changed QuerySet methods for Checklists, Observations and Locations. These are

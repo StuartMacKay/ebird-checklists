@@ -1,8 +1,6 @@
-import datetime
 import re
 
-from dateutil import relativedelta
-from django.db import models
+from django.db import connection, models
 from django.utils.translation import gettext_lazy as _
 
 LOCATION_TYPE = {
@@ -33,6 +31,47 @@ class LocationQuerySet(models.QuerySet):
 
     def for_identifier(self, identifier: str):
         return self.get(identifier=identifier)
+
+
+class LocationManager(models.Manager):
+    def country_choices(self):
+        vendor = connection.vendor
+        queryset = self.all().values_list("country_code", "country")
+        if vendor == "sqlite":
+            return list({(country_code, country) for country_code, country in queryset})
+        else:
+            return queryset.distinct("country_code")
+
+    def country_choice(self, code):
+        return (
+            self.filter(country_code=code)
+            .values_list("country_code", "country")
+            .first()
+        )
+
+    def state_choices(self, code):
+        vendor = connection.vendor
+        queryset = self.filter(country_code=code).values_list(
+            "state_code", "state"
+        )
+        if vendor == "sqlite":
+            return list({(state_code, state) for state_code, state in queryset})
+        else:
+            return queryset.distinct("state_code")
+
+    def state_choice(self, code):
+        return self.filter(state_code=code).values_list("state_code", "state").first()
+
+    def county_choices(self, code):
+        vendor = connection.vendor
+        queryset = self.filter(state_code=code).values_list("county_code", "county")
+        if vendor == "sqlite":
+            return list({(county_code, county) for county_code, county in queryset})
+        else:
+            return queryset.distinct("county_code")
+
+    def county_choice(self, code):
+        return self.filter(county_code=code).values_list("county_code", "county").first()
 
 
 class Location(models.Model):
@@ -154,7 +193,7 @@ class Location(models.Model):
         help_text=_("Is the location a hotspot"),
     )
 
-    objects = LocationQuerySet.as_manager()
+    objects = LocationManager.from_queryset(LocationQuerySet)()
 
     def __str__(self):
         return self.name
