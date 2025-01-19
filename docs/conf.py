@@ -9,7 +9,7 @@
 project = "eBird Checklists"
 copyright = "2024, Stuart MacKay"
 author = "Stuart MacKay"
-release = "0.4.0"
+release = "0.4.1"
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration

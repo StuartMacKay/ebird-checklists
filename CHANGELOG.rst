@@ -6,6 +6,9 @@ and this project adheres to `Semantic Versioning <https://semver.org/spec/v2.0.0
 
 Latest
 ------
+
+0.4.1 (2025-01-19)
+------------------
 * Changed ChecklistQuerySet methods for_country(), for_state() and for_county()
   so the argument can be either an eBird code or a name.
 
