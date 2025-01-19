@@ -6,41 +6,32 @@ and this project adheres to `Semantic Versioning <https://semver.org/spec/v2.0.0
 
 Latest
 ------
+* Changed ChecklistQuerySet methods for_country(), for_state() and for_county()
+  so the argument can be either an eBird code or a name.
 
 0.4.0 (2025-01-18)
 ------------------
-Changed
-^^^^^^^
-Breaking Changes: Refactored QuerySet methods for Checklists, Observations and Locations.
+* Changed QuerySet methods for Checklists, Observations and Locations. These are
+  breaking changes.
 
 [0.3.1] - 2025-01-08
 --------------------
-Changed
-^^^^^^^
-Fixed bug where checklists would be downloaded twice if checklists were fetched
-from sub-regions.
+* Fixed bug where checklists would be downloaded twice if checklists were fetched
+  from sub-regions.
 
 [0.3.0] - 2025-01-08
 --------------------
-Added
-^^^^^
-Updated APILoader to load the checklists for a sub-region if the number of results
-returned matches the API's result limit.
+* Changed APILoader to load the checklists for a sub-region if the number of results
+  returned matches the API's result limit.
 
-Changed
-^^^^^^^
-Refactored APILoader to make it easier to reuse.
+* Refactored APILoader to make it easier to reuse.
 
 [0.2.0] - 2025-01-06
 --------------------
-Deleted
-^^^^^^^
-Removed APILoader.recent() - it's simply to call the ebird.api.get_visits() method,
-extract the dates and then call APILoader.load()
+* Removed APILoader.recent() - it's simply to call the ebird.api.get_visits() method,
+  extract the dates and then call APILoader.load()
 
 [0.1.0] - 2024-12-28
 --------------------
-Added
-^^^^^
-Initial release with loaders and models for the database and a Django Admin module
-for viewing the data downloaded from eBird.
+* Initial release with loaders and models for the database and a Django Admin module
+  for viewing the data downloaded from eBird.
