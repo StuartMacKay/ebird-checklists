@@ -48,33 +48,3 @@ def test_for_county__unsupported_code(location):
 def test_for_identifier__location_fetched(location):
     identifier = location.identifier
     Location.objects.for_identifier(identifier)
-
-
-def test_country_choices__list_returned(location):
-    result = Location.objects.country_choices()
-    assert result == [(location.country_code, location.country)]
-
-
-def test_country_choice__choice_returned(location):
-    result = Location.objects.country_choice(location.country_code)
-    assert result == (location.country_code, location.country)
-
-
-def test_state_choices__list_returned(location):
-    result = Location.objects.state_choices(location.country_code)
-    assert result == [(location.state_code, location.state)]
-
-
-def test_state_choice__choice_returned(location):
-    result = Location.objects.state_choice(location.state_code)
-    assert result == (location.state_code, location.state)
-
-
-def test_county_choices__list_returned(location):
-    result = Location.objects.county_choices(location.state_code)
-    assert result == [(location.county_code, location.county)]
-
-
-def test_county_choice__choice_returned(location):
-    result = Location.objects.county_choice(location.county_code)
-    assert result == (location.county_code, location.county)

@@ -12,6 +12,9 @@ Latest
 * Changed APILoader to round decimal values for distance and area to three decimal
   places to address any precision issues when converted from floats.
 
+* Removed LocationManager with methods to return lists of choices. This was really
+  the wrong place to put code like this.
+
 0.4.1 (2025-01-19)
 ------------------
 * Changed ChecklistQuerySet methods for_country(), for_state() and for_county()
