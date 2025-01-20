@@ -6,6 +6,11 @@ and this project adheres to `Semantic Versioning <https://semver.org/spec/v2.0.0
 
 Latest
 ------
+* Changed APILoader to handle the fields for distance and area which were renamed
+  by eBird, but the change was not documented.
+
+* Changed APILoader to round decimal values for distance and area to three decimal
+  places to address any precision issues when converted from floats.
 
 0.4.1 (2025-01-19)
 ------------------

@@ -1,4 +1,5 @@
 import datetime as dt
+import decimal
 import logging
 import re
 from typing import Any, Optional
@@ -196,7 +197,7 @@ class APILoader:
         values = {
             "identifier": identifier,
             "edited": edited,
-            "observer_count": str2int(data.get("numObservers")),
+            "observer_count": str2int(data["numObservers"]),
             "group": "",
             "species_count": data["numSpecies"],
             "date": str2date(data["obsDt"]),
@@ -205,12 +206,17 @@ class APILoader:
             "protocol_code": data["protocolId"],
             "project_code": data["projId"],
             "duration": duration,
-            "distance": str2decimal(data.get("distKm")),
-            "area": str2decimal(data.get("areaHa")),
-            "complete": data.get("allObsReported", False),
+            "complete": data["allObsReported"],
             "comments": "",
             "url": "https://ebird.org/checklist/%s" % identifier,
         }
+
+        if data["protocolId"] == "P22":
+            dist = data["effortDistanceKm"]
+            values["distance"] = round(decimal.Decimal(dist), 3)
+        elif data["protocolId"] == "P23":
+            area = data["effortAreaHa"]
+            values["area"] = round(decimal.Decimal(area), 3)
 
         modified = False
 
