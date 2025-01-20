@@ -22,8 +22,9 @@ class APILoader:
 
     def __init__(self, api_key: str):
         self.api_key: str = api_key
+        self.locations = {}
 
-    def get_visits(self, region: str, date: dt.date = None) -> list:
+    def fetch_visits(self, region: str, date: dt.date = None) -> list:
         data: list = get_visits(self.api_key, region, date=date, max_results=200)
         num_visits = len(data)
         logger.info(
@@ -33,7 +34,7 @@ class APILoader:
         )
         return data
 
-    def get_subregions(self, region: str) -> list[str]:
+    def fetch_subregions(self, region: str) -> list[str]:
         region_types = ["subnational1", "subnational2", None]
         levels: int = len(region.split("-", 2))
         region_type = region_types[levels - 1]
@@ -55,7 +56,7 @@ class APILoader:
 
         return sub_regions
 
-    def get_checklist(self, identifier: str) -> dict[str, Any]:
+    def fetch_checklist(self, identifier: str) -> dict[str, Any]:
         data = get_checklist(self.api_key, identifier)
         logger.info(
             "Loading checklist: %s",
@@ -65,12 +66,16 @@ class APILoader:
         return data
 
     @staticmethod
-    def get_observation_global_identifier(row: dict[str, str]) -> str:
+    def get_urn(row: dict[str, str]) -> str:
         return f"URN:CornellLabOfOrnithology:{row['projId']}:{row['obsId']}"
 
-    @staticmethod
-    def create_or_update_location(data: dict[str, Any]) -> Location:
-        identifier: str = data["locId"]
+    def load_location(self, identifier: str) -> Location:
+
+        if identifier in self.locations:
+            data = self.locations[identifier]
+        else:
+            visits = get_visits(self.api_key, identifier, max_results=1)
+            data = visits[0]["loc"]
 
         values: dict[str, Any] = {
             "identifier": identifier,
@@ -101,10 +106,7 @@ class APILoader:
         return location
 
     @staticmethod
-    def create_or_update_observer(data: dict[str, Any]) -> Observer:
-        # The observer's name is used as the unique identifier, even
-        # though it is not necessarily unique. However this works until
-        # better solution is found.
+    def get_observer(data: dict[str, Any]) -> Observer:
         name: str = data["userDisplayName"]
         timestamp: dt.datetime = dt.datetime.now()
         observer: Observer
@@ -135,7 +137,7 @@ class APILoader:
             )
         return species
 
-    def create_or_update_observation(
+    def get_observation(
         self, data: dict[str, Any], checklist: Checklist
     ) -> Observation:
         identifier: str = data["obsId"]
@@ -166,7 +168,7 @@ class APILoader:
             "reviewed": None,
             "reason": "",
             "comments": "",
-            "urn": self.get_observation_global_identifier(data),
+            "urn": self.get_urn(data),
         }
 
         if observation := Observation.objects.filter(identifier=identifier).first():
@@ -178,10 +180,8 @@ class APILoader:
             observation = Observation.objects.create(**values)
         return observation
 
-    def create_or_update_checklist(self, visit: dict[str, Any]) -> Checklist:
-        identifier: str = visit["subId"]
-
-        data = self.get_checklist(identifier)
+    def load_checklist(self, identifier: str) -> Checklist:
+        data = self.fetch_checklist(identifier)
 
         edited: dt.datetime = str2datetime(data["lastEditedDt"])
 
@@ -222,19 +222,19 @@ class APILoader:
 
         if checklist := Checklist.objects.filter(identifier=identifier).first():
             if checklist.edited < edited:
-                values["location"] = self.create_or_update_location(visit["loc"])
-                values["observer"] = self.create_or_update_observer(visit)
+                values["location"] = self.load_location(data["locId"])
+                values["observer"] = self.get_observer(data)
                 for key, value in values.items():
                     setattr(checklist, key, value)
                 checklist.save()
                 modified = True
         else:
-            values["location"] = self.create_or_update_location(visit["loc"])
-            values["observer"] = self.create_or_update_observer(visit)
+            values["location"] = self.load_location(data["locId"])
+            values["observer"] = self.get_observer(data)
             checklist = Checklist.objects.create(**values)
 
         for observation_data in data["obs"]:
-            self.create_or_update_observation(observation_data, checklist)
+            self.get_observation(observation_data, checklist)
 
         if modified:
             logger.info(
@@ -255,7 +255,7 @@ class APILoader:
 
         return checklist
 
-    def load(self, region: str, date: dt.date) -> None:
+    def load_checklists(self, region: str, date: dt.date) -> None:
         """
         Load all the checklists submitted for a region for a given date.
 
@@ -274,16 +274,18 @@ class APILoader:
         )
 
         try:
-            visits = self.get_visits(region, date)
+            visits = self.fetch_visits(region, date)
 
             if len(visits) == 200:
                 logger.warning("Max results exceeded: %s", region)
 
-                for sub_region in self.get_subregions(region):
-                    self.load(sub_region, date)
+                for sub_region in self.fetch_subregions(region):
+                    self.load_checklists(sub_region, date)
             else:
+                self.locations = {}
                 for visit in visits:
-                    self.create_or_update_checklist(visit)
+                    self.locations[visit["locId"]] = visit["loc"]
+                    self.load_checklist(visit["subId"])
 
             logger.info("Loading succeeded")
 

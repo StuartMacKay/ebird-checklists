@@ -101,4 +101,4 @@ class Command(BaseCommand):
 
         for region in options["regions"]:
             for date in dates:
-                loader.load(region, date)
+                loader.load_checklists(region, date)

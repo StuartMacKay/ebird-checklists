@@ -6,6 +6,8 @@ and this project adheres to `Semantic Versioning <https://semver.org/spec/v2.0.0
 
 Latest
 ------
+* Added load_checklist() to APILoader so individual checklists can be updated.
+* Changed APILoader method names; load becomes load_checklists, etc.
 
 0.4.2 (2025-01-20)
 ------------------

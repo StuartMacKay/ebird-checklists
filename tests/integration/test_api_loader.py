@@ -6,6 +6,6 @@ from ebird.checklists.loaders import APILoader
 pytestmark = pytest.mark.django_db
 
 
-def test_load_for_date(api_key, country):
+def test_load_checklists(api_key, country):
     loader = APILoader(api_key)
-    loader.load(country, datetime.date.today())
+    loader.load_checklists(country, datetime.date.today())
