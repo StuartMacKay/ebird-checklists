@@ -6,6 +6,9 @@ and this project adheres to `Semantic Versioning <https://semver.org/spec/v2.0.0
 
 Latest
 ------
+
+0.4.2 (2025-01-20)
+------------------
 * Changed APILoader to handle the fields for distance and area which were renamed
   by eBird, but the change was not documented.
 
