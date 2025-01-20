@@ -20,12 +20,13 @@ Options:
                       yesterday and the day before.
 
 Examples:
-    python manage.py load_api <apikey> US
-    python manage.py load_api <apikey> US-NY
-    python manage.py load_api <apikey> US-NY-109
-    python manage.py load_api <apikey> L1379126
-    python manage.py load_api <apikey> US-NY-109 US-NY-110
-    python manage.py --days 5 <apikey> US-NY-109
+    python manage.py load_api US
+    python manage.py load_api US-NY
+    python manage.py load_api US-NY-109
+    python manage.py load_api L1379126
+    python manage.py load_api US-NY-109 US-NY-110
+    python manage.py --days 5 US-NY-109
+    python manage.py --key <apikey> US-NY-109
 
 Notes:
     1. The eBird API returns a maximum of 200 results. Downloading checklists
