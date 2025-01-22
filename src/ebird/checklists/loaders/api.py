@@ -20,8 +20,9 @@ class APILoader:
 
     """
 
-    def __init__(self, api_key: str):
+    def __init__(self, api_key: str, force_update: bool = False):
         self.api_key: str = api_key
+        self.force_update = force_update
         self.locations = {}
 
     def fetch_visits(self, region: str, date: dt.date = None) -> list:
@@ -221,7 +222,7 @@ class APILoader:
         modified = False
 
         if checklist := Checklist.objects.filter(identifier=identifier).first():
-            if checklist.edited < edited:
+            if self.force_update or checklist.edited < edited:
                 values["location"] = self.load_location(data["locId"])
                 values["observer"] = self.get_observer(data)
                 for key, value in values.items():
