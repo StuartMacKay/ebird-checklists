@@ -48,7 +48,7 @@ class MyDataLoader:
         timestamp: dt.datetime = dt.datetime.now()
         observer: Observer
 
-        values = {"modified": timestamp, "identifier": "", "name": name}
+        values = {"identifier": "", "name": name}
 
         if obj := Observer.objects.filter(name=name).first():
             observer = update_object(obj, values)

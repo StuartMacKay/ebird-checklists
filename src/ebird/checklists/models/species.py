@@ -31,18 +31,6 @@ class Species(models.Model):
         verbose_name = _("species")
         verbose_name_plural = _("species")
 
-    created = models.DateTimeField(
-        auto_now_add=True,
-        help_text=_("The date and time the species was created"),
-        verbose_name=_("created"),
-    )
-
-    modified = models.DateTimeField(
-        auto_now=True,
-        help_text=_("The date and time the species was modified"),
-        verbose_name=_("modified"),
-    )
-
     taxon_order = models.IntegerField(
         blank=True,
         null=True,

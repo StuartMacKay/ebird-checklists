@@ -110,18 +110,6 @@ class Checklist(models.Model):
         verbose_name = _("checklist")
         verbose_name_plural = _("checklists")
 
-    created = models.DateTimeField(
-        auto_now_add=True,
-        help_text=_("The date and time the checklist was created"),
-        verbose_name=_("created"),
-    )
-
-    modified = models.DateTimeField(
-        auto_now=True,
-        help_text=_("The date and time the checklist was modified"),
-        verbose_name=_("modified"),
-    )
-
     edited = models.DateTimeField(
         blank=True,
         null=True,

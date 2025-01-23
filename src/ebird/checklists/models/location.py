@@ -38,18 +38,6 @@ class Location(models.Model):
         verbose_name = _("location")
         verbose_name_plural = _("locations")
 
-    created = models.DateTimeField(
-        auto_now_add=True,
-        help_text=_("The date and time the location was created"),
-        verbose_name=_("created"),
-    )
-
-    modified = models.DateTimeField(
-        auto_now=True,
-        help_text=_("The date and time the location was modified"),
-        verbose_name=_("modified"),
-    )
-
     identifier = models.TextField(
         verbose_name=_("identifier"),
         help_text=_("The unique identifier for the location"),

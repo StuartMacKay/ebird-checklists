@@ -72,8 +72,6 @@ class LocationFactory(factory.django.DjangoModelFactory):
         model = Location
         django_get_or_create = ("identifier", )
 
-    created = factory.LazyFunction(dt.datetime.now)
-    modified = factory.LazyFunction(dt.datetime.now)
     identifier = factory.LazyAttribute(lambda _: random_code(6, "L"))
     type = ""
     name = factory.Faker("street_name")
@@ -98,8 +96,6 @@ class ObserverFactory(factory.django.DjangoModelFactory):
         model = Observer
         django_get_or_create = ("name",)
 
-    created = factory.LazyFunction(dt.datetime.now)
-    modified = factory.LazyFunction(dt.datetime.now)
     identifier = factory.LazyAttribute(lambda _: random_code(7, "obsr"))
     name = factory.Faker("name")
 
@@ -109,8 +105,6 @@ class SpeciesFactory(factory.django.DjangoModelFactory):
         model = Species
         django_get_or_create = ("taxon_order", )
 
-    created = factory.LazyFunction(dt.datetime.now)
-    modified = factory.LazyFunction(dt.datetime.now)
     taxon_order = factory.LazyAttribute(lambda _: random.randint(100000, 1000000))
     species_code = factory.LazyAttribute(lambda _: random_lowercase(6))
     family_code = factory.LazyAttribute(lambda _: random_lowercase(6))
@@ -128,8 +122,6 @@ class ChecklistFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = Checklist
 
-    created = factory.LazyFunction(dt.datetime.now)
-    modified = factory.LazyFunction(dt.datetime.now)
     identifier = factory.LazyAttribute(lambda _: random_code(9, "S"))
     location = factory.SubFactory(LocationFactory)
     observer = factory.SubFactory(ObserverFactory)
@@ -148,8 +140,6 @@ class ObservationFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = Observation
 
-    created = factory.LazyFunction(dt.datetime.now)
-    modified = factory.LazyFunction(dt.datetime.now)
     identifier = factory.LazyAttribute(lambda _: random_code(10, "OBS"))
     species = factory.SubFactory(SpeciesFactory)
     checklist = factory.SubFactory(ChecklistFactory)

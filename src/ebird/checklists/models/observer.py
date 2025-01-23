@@ -11,18 +11,6 @@ class Observer(models.Model):
         verbose_name = _("observer")
         verbose_name_plural = _("observers")
 
-    created = models.DateTimeField(
-        auto_now_add=True,
-        help_text=_("The date and time the observer was created"),
-        verbose_name=_("created"),
-    )
-
-    modified = models.DateTimeField(
-        auto_now=True,
-        help_text=_("The date and time the observer was modified"),
-        verbose_name=_("modified"),
-    )
-
     identifier = models.TextField(
         verbose_name=_("identifier"),
         help_text=_("The code for the person submitted the checklist."),

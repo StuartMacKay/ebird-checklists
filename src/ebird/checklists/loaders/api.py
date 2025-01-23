@@ -2,7 +2,7 @@ import datetime as dt
 import decimal
 import logging
 import re
-from typing import Any, Optional
+from typing import Any, Optional  # TODO is this still needed? Only for < python 3.10
 from urllib.error import HTTPError, URLError
 
 from ebird.api import get_checklist, get_regions, get_visits
@@ -71,7 +71,6 @@ class APILoader:
         return f"URN:CornellLabOfOrnithology:{row['projId']}:{row['obsId']}"
 
     def load_location(self, identifier: str) -> Location:
-
         if identifier in self.locations:
             data = self.locations[identifier]
         else:
@@ -113,7 +112,6 @@ class APILoader:
         observer: Observer
 
         values: dict[str, Any] = {
-            "modified": timestamp,
             "identifier": "",
             "name": name,
         }

@@ -49,18 +49,6 @@ class Observation(models.Model):
         verbose_name = _("observation")
         verbose_name_plural = _("observations")
 
-    created = models.DateTimeField(
-        auto_now_add=True,
-        help_text=_("The date and time the observation was created"),
-        verbose_name=_("created"),
-    )
-
-    modified = models.DateTimeField(
-        auto_now_add=True,
-        help_text=_("The date and time the observation was modified"),
-        verbose_name=_("modified"),
-    )
-
     edited = models.DateTimeField(
         blank=True,
         null=True,

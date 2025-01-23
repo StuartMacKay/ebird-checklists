@@ -9,6 +9,8 @@ Latest
 * Added flag to APILoader so checklists can be updated even if the edited
   timestamp is unchanged.
 
+* Removed created and modified timestamp fields from models.
+
 0.5.0 (2025-01-20)
 ------------------
 * Added load_checklist() to APILoader so individual checklists can be updated.
