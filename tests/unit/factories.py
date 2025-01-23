@@ -1,4 +1,3 @@
-import datetime as dt
 import random
 import string
 
@@ -122,9 +121,12 @@ class ChecklistFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = Checklist
 
+    created = factory.Faker("date_time")
+    edited = factory.Faker("date_time")
     identifier = factory.LazyAttribute(lambda _: random_code(9, "S"))
     location = factory.SubFactory(LocationFactory)
     observer = factory.SubFactory(ObserverFactory)
+    observer_count = random.randint(1, 5)
     date = factory.Faker("date_object")
     time = factory.Faker("time_object")
     group = ""
