@@ -171,10 +171,9 @@ class APILoader:
         }
 
         if observation := Observation.objects.filter(identifier=identifier).first():
-            if observation.edited < checklist.edited:
-                for key, value in values.items():
-                    setattr(observation, key, value)
-                observation.save()
+            for key, value in values.items():
+                setattr(observation, key, value)
+            observation.save()
         else:
             observation = Observation.objects.create(**values)
         return observation
@@ -219,6 +218,7 @@ class APILoader:
             area = data["effortAreaHa"]
             values["area"] = round(decimal.Decimal(area), 3)
 
+        new = False
         modified = False
 
         if checklist := Checklist.objects.filter(identifier=identifier).first():
@@ -233,9 +233,11 @@ class APILoader:
             values["location"] = self.load_location(data["locId"])
             values["observer"] = self.get_observer(data)
             checklist = Checklist.objects.create(**values)
+            new = True
 
-        for observation_data in data["obs"]:
-            self.get_observation(observation_data, checklist)
+        if new or modified:
+            for observation_data in data["obs"]:
+                self.get_observation(observation_data, checklist)
 
         if modified:
             logger.info(
