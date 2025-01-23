@@ -9,6 +9,9 @@ Latest
 * Added flag to APILoader so checklists can be updated even if the edited
   timestamp is unchanged.
 
+* Added field to Checklist for recording the date and time the checklist
+  added to eBird.
+
 * Removed created and modified timestamp fields from models.
 
 0.5.0 (2025-01-20)

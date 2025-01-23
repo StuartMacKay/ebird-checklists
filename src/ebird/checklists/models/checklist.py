@@ -110,6 +110,13 @@ class Checklist(models.Model):
         verbose_name = _("checklist")
         verbose_name_plural = _("checklists")
 
+    created = models.DateTimeField(
+        blank=True,
+        null=True,
+        help_text=_("The date and time the checklist was added to eBird"),
+        verbose_name=_("created"),
+    )
+
     edited = models.DateTimeField(
         blank=True,
         null=True,

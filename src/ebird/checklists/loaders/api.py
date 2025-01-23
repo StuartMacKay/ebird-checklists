@@ -182,6 +182,7 @@ class APILoader:
     def load_checklist(self, identifier: str) -> Checklist:
         data = self.fetch_checklist(identifier)
 
+        created: dt.datetime = str2datetime(data["creationDt"])
         edited: dt.datetime = str2datetime(data["lastEditedDt"])
 
         time: Optional[dt.time] = None
@@ -194,8 +195,9 @@ class APILoader:
             duration = str2int(data["durationHrs"] * 60.0)
 
         values = {
-            "identifier": identifier,
+            "created": created,
             "edited": edited,
+            "identifier": identifier,
             "observer_count": str2int(data["numObservers"]),
             "group": "",
             "species_count": data["numSpecies"],
