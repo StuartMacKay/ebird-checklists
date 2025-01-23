@@ -102,6 +102,13 @@ class Species(models.Model):
         help_text=_("The code used if the species is non-native."),
     )
 
+    data = models.JSONField(
+        verbose_name=_("Data"),
+        help_text=_("Data describing a Species."),
+        default=dict,
+        blank=True,
+    )
+
     objects = SpeciesQuerySet.as_manager()
 
     def __str__(self):

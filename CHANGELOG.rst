@@ -12,6 +12,9 @@ Latest
 * Added field to Checklist for recording the date and time the checklist
   added to eBird.
 
+* Added JSON fields to each model so projects using this app can add their
+  own features.
+
 * Removed created and modified timestamp fields from models.
 
 0.5.0 (2025-01-20)

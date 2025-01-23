@@ -22,6 +22,13 @@ class Observer(models.Model):
         help_text=_("The observer's name."),
     )
 
+    data = models.JSONField(
+        verbose_name=_("Data"),
+        help_text=_("Data describing an Observer."),
+        default=dict,
+        blank=True,
+    )
+
     objects = ObserverQuerySet.as_manager()
 
     def __str__(self):

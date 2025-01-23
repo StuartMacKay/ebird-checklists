@@ -76,6 +76,7 @@ class ChecklistAdmin(admin.ModelAdmin):
         "distance",
         "area",
         "comments",
+        "data",
     )
 
     def formfield_for_dbfield(self, db_field, **kwargs):
@@ -146,6 +147,7 @@ class ObservationAdmin(admin.ModelAdmin):
         "approved",
         "reviewed",
         "reason",
+        "data",
     )
 
     def formfield_for_dbfield(self, db_field, **kwargs):
@@ -188,4 +190,5 @@ class SpeciesAdmin(admin.ModelAdmin):
         "family_common_name",
         "family_scientific_name",
         "family_code",
+        "data",
     )

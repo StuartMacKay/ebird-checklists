@@ -140,6 +140,13 @@ class Location(models.Model):
         help_text=_("Is the location a hotspot"),
     )
 
+    data = models.JSONField(
+        verbose_name=_("Data"),
+        help_text=_("Data describing a Location"),
+        default=dict,
+        blank=True,
+    )
+
     objects = LocationQuerySet.as_manager()
 
     def __str__(self):

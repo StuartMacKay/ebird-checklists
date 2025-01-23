@@ -166,6 +166,13 @@ class Observation(models.Model):
         help_text=_("The globally unique identifier for the observation"),
     )
 
+    data = models.JSONField(
+        verbose_name=_("Data"),
+        help_text=_("Data describing an Observation."),
+        default=dict,
+        blank=True,
+    )
+
     objects = ObservationQuerySet.as_manager()
 
     def __str__(self):

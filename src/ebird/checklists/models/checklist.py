@@ -237,6 +237,13 @@ class Checklist(models.Model):
         help_text=_("URL where the original checklist can be viewed."),
     )
 
+    data = models.JSONField(
+        verbose_name=_("Data"),
+        help_text=_("Data describing a Checklist."),
+        default=dict,
+        blank=True,
+    )
+
     objects = ChecklistQuerySet.as_manager()
 
     def __str__(self):
