@@ -248,8 +248,8 @@ class APILoader:
 
             queryset = checklist.observations.filter(edited__lt=edited)
 
-            if count := queryset.count():
-                checklist.observations.filter(edited__lt=edited).delete()
+            if queryset.exists():
+                count, deletions = queryset.delete()
                 logger.info(
                     "Orphaned observations deleted: %d",
                     count,
