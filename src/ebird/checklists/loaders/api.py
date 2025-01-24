@@ -197,7 +197,6 @@ class APILoader:
             "created": created,
             "edited": edited,
             "identifier": identifier,
-            "observer_count": str2int(data["numObservers"]),
             "group": "",
             "species_count": data["numSpecies"],
             "date": str2date(data["obsDt"]),
@@ -210,6 +209,9 @@ class APILoader:
             "comments": "",
             "url": "https://ebird.org/checklist/%s" % identifier,
         }
+
+        if "numObservers" in data:
+            values["observer_count"] = int(data["numObservers"])
 
         if data["protocolId"] == "P22":
             dist = data["effortDistanceKm"]
