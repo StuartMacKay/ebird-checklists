@@ -2,6 +2,7 @@ import random
 import string
 
 import factory
+from django.utils.timezone import get_default_timezone
 
 from ebird.checklists.models import (Checklist, Location, Observation, Observer,
                                      Species)
@@ -121,8 +122,8 @@ class ChecklistFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = Checklist
 
-    created = factory.Faker("date_time")
-    edited = factory.Faker("date_time")
+    created = factory.Faker("date_time", tzinfo=get_default_timezone())
+    edited = factory.Faker("date_time", tzinfo=get_default_timezone())
     identifier = factory.LazyAttribute(lambda _: random_code(9, "S"))
     location = factory.SubFactory(LocationFactory)
     observer = factory.SubFactory(ObserverFactory)
