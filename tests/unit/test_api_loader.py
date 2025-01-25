@@ -88,20 +88,20 @@ def mock_api_calls(monkeypatch, visits, checklist, date):
     monkeypatch.setattr(APILoader, "fetch_checklist", mock_fetch_checklist)
 
 
-def test_checklist_added(mock_api_calls, settings, visits, checklist, date):
+def test_load_checklists__checklist_added(mock_api_calls, settings, visits, checklist, date):
     loader = APILoader(settings.EBIRD_API_KEY)
     loader.load_checklists("US-NY", date)
     Checklist.objects.get(identifier=checklist["subId"])
 
 
-def test_observations_added(mock_api_calls, settings, visits, checklist, date):
+def test_load_checklists__observations_added(mock_api_calls, settings, visits, checklist, date):
     loader = APILoader(settings.EBIRD_API_KEY)
     loader.load_checklists("US-NY", date)
     Observation.objects.get(identifier=checklist["obs"][0]["obsId"])
     Observation.objects.get(identifier=checklist["obs"][1]["obsId"])
 
 
-def test_checklist_updated(mock_api_calls, settings, visits, checklist, date):
+def test_load_checklists__checklist_updated(mock_api_calls, settings, visits, checklist, date):
     """If the lastEditedDt is later than the Checklist's edited field
     then the checklist is updated."""
     loader = APILoader(settings.EBIRD_API_KEY)
@@ -115,20 +115,7 @@ def test_checklist_updated(mock_api_calls, settings, visits, checklist, date):
     assert obj.observer_count == 2
 
 
-def test_checklist_unchanged(mock_api_calls, settings, visits, checklist, date):
-    """If the lastEditedDt is the same as the Checklist's edited field
-    then the checklist is not updated."""
-    loader = APILoader(settings.EBIRD_API_KEY)
-    loader.load_checklists("US-NY", date)
-
-    checklist["numObservers"] = 2
-
-    loader.load_checklists("US-NY", date)
-    obj = Checklist.objects.get(identifier=checklist["subId"])
-    assert obj.observer_count == 1
-
-
-def test_observation_updated(mock_api_calls, settings, visits, checklist, date):
+def test_load_checklists__observation_updated(mock_api_calls, settings, visits, checklist, date):
     """If the lastEditedDt is later than the Checklist's edited field
     then the checklist is updated."""
     loader = APILoader(settings.EBIRD_API_KEY)
@@ -142,7 +129,7 @@ def test_observation_updated(mock_api_calls, settings, visits, checklist, date):
     assert observation.count == 2
 
 
-def test_orphaned_observation_deleted(mock_api_calls, settings, visits, checklist, date):
+def test_load_checklists__orphaned_observation_deleted(mock_api_calls, settings, visits, checklist, date):
     """If an observation is deleted from the eBird checklist then it is
     also deleted from the database."""
     loader = APILoader(settings.EBIRD_API_KEY)
@@ -154,3 +141,17 @@ def test_orphaned_observation_deleted(mock_api_calls, settings, visits, checklis
     loader.load_checklists("US-NY", date)
     obj = Checklist.objects.get(identifier=checklist["subId"])
     assert obj.observations.count() == 1
+
+
+def test_load_checklist__checklist_unchanged(mock_api_calls, settings, visits, checklist, date):
+    """If the lastEditedDt is the same as the Checklist's edited field
+    then the checklist is not updated."""
+    identifier = checklist["subId"]
+    loader = APILoader(settings.EBIRD_API_KEY)
+    loader.load_checklists("US-NY", date)
+
+    checklist["numObservers"] = 2
+
+    loader.load_checklist(identifier)
+    obj = Checklist.objects.get(identifier=identifier)
+    assert obj.observer_count == 1

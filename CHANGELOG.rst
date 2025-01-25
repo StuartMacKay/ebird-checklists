@@ -6,10 +6,11 @@ and this project adheres to `Semantic Versioning <https://semver.org/spec/v2.0.0
 
 Latest
 ------
-* Added check for number of observers, which is optional for incidental checklists.
+* Reorganised the APILoader to simplify adding new features - stay tuned.
 
 0.6.1 (2025-01-24)
 ------------------
+* Added check for number of observers, which is optional for incidental checklists.
 
 0.6.0 (2025-01-23)
 ------------------
