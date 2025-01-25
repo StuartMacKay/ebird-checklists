@@ -6,6 +6,9 @@ and this project adheres to `Semantic Versioning <https://semver.org/spec/v2.0.0
 
 Latest
 ------
+
+0.6.2 (2025-01-25)
+------------------
 * Reorganised the APILoader to simplify adding new features - stay tuned.
 
 0.6.1 (2025-01-24)
