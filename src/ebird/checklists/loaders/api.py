@@ -41,7 +41,7 @@ class APILoader:
     def __init__(self, api_key: str, force_update: bool = False):
         self.api_key: str = api_key
         self.force_update = force_update
-        self.visits: dict = {}
+        self.visits: list = []
         self.created: list[str] = []
         self.updated: list[str] = []
         self.unchanged: list[str] = []
@@ -311,13 +311,13 @@ class APILoader:
             items = get_regions(self.api_key, region_type, region)
             sub_regions = [item["code"] for item in items]
             logger.warning(
-                "Loading sub-regions",
-                extra={"sub_regions": sub_regions},
+                "Loading visits for sub-regions",
+                extra={"region": region, "sub_regions": sub_regions},
             )
         else:
             sub_regions = []
             logger.error(
-                "No more sub-regions: %s",
+                "Region has no sub-regions: %s",
                 region,
                 extra={"region": region, "region_type": region_type},
             )
@@ -334,11 +334,18 @@ class APILoader:
                 num_visits,
                 extra={"region": region, "date": date, "number_of_visits": num_visits},
             )
-            for sub_region in self.fetch_subregions(region):
-                self.fetch_visits(sub_region, date)
+
+            if sub_regions := self.fetch_subregions(region):
+                for sub_region in sub_regions:
+                    self.fetch_visits(sub_region, date)
+            else:
+                # No more sub-regions, just add the 200 visits
+                for visit in visits:
+                    self.visits.append(visit)
+
         else:
             for visit in visits:
-                self.visits[visit["subId"]] = visit
+                self.visits.append(visit)
             logger.info(
                 "Visits fetched: %s, %s, %d",
                 region,
@@ -384,7 +391,7 @@ class APILoader:
         try:
             self.fetch_visits(region, date)
 
-            for visit in self.visits.values():
+            for visit in self.visits:
                 self.add_visit(visit)
 
             for identifier in self.created:
@@ -408,10 +415,12 @@ class APILoader:
             )
 
         except (URLError, HTTPError):
-            logger.exception("Loading failed: %s, %s",
+            logger.exception(
+                "Loading failed: %s, %s",
                 region,
                 date,
                 extra={
                     "region": region,
                     "date": date,
-                })
+                },
+            )
