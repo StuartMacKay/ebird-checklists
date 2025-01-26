@@ -29,3 +29,39 @@ Notes
    was shared or other people in the group also submitted a checklist then the `group`
    attribute on `Checklist` will contain an identifier which can be used to link
    them together.
+
+4. Each models has a JSONField for adding features without having to extend the
+   models. Some examples:
+
+   * On the Species model you can store a table of translations for the species
+     common name
+
+     .. code-block:: json
+
+        {
+           "en": "Gray Plover",
+           "en-UK": "Grey Plover",
+           "en-US": "Black-bellied Plover",
+           "es": "Chorlito gris",
+           "es-MX": "Chorlo Gris",
+           "es-CL": "Chorlo ártico",
+        }
+
+   * Often the eBird site names have extra information added to help identify
+     identify all the sites in a given area, and also indicate any access
+     restrictions. For example:
+
+     .. code-block:: console
+
+        RN Estuário do Tejo--Ponta da Erva (acesso condicionado).
+
+     You can add a display name value to the JSONField to show a shortened
+     version instead of the "official" name:
+
+     .. code-block:: json
+
+        {
+          "display-name": "Ponta da Erva"
+        }
+
+     The task pf processing the name is left as an exercise for the reader.
