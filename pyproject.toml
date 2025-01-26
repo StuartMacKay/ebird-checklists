@@ -11,7 +11,7 @@ license = { file = "LICENSE" }
 authors = [
   {name = "Stuart MacKay", email = "smackay@flagstonesoftware.com"},
 ]
-readme = "README.md"
+readme = "README.rst"
 requires-python = ">=3.8"
 dependencies = [
     "django>=4.2",
