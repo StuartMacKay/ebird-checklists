@@ -8,6 +8,9 @@ Latest
 ------
 * Updated docs to include all recent changes.
 
+* Fixed an error/oversight where the observations were always updated
+  when a checklist was downloaded.
+
 0.6.2 (2025-01-25)
 ------------------
 * Reorganised the APILoader to simplify adding new features - stay tuned.

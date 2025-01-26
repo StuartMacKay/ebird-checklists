@@ -70,7 +70,8 @@ class APILoader:
             area = data["effortAreaHa"]
             values["area"] = round(decimal.Decimal(area), 3)
 
-        modified = False
+        new: bool = False
+        modified: bool = False
 
         if checklist := Checklist.objects.filter(identifier=identifier).first():
             if self.force_update or checklist.edited < edited:
@@ -85,14 +86,16 @@ class APILoader:
                 )
         else:
             checklist = Checklist.objects.create(**values)
+            new = True
 
-        for observation_data in data["obs"]:
-            self.add_observation(observation_data, checklist)
-            logger.info(
-                "Checklist added: %s",
-                identifier,
-                extra={"identifier": identifier},
-            )
+        if new or modified:
+            for observation_data in data["obs"]:
+                self.add_observation(observation_data, checklist)
+                logger.info(
+                    "Checklist added: %s",
+                    identifier,
+                    extra={"identifier": identifier},
+                )
 
         if modified:
             queryset = checklist.observations.filter(edited__lt=edited)
