@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "django_extensions",
     "debug_toolbar",
     "ebird.checklists",
 ]
@@ -187,6 +188,10 @@ LOGGING = {
 # #####################
 
 SHELL_PLUS = "ipython"
+
+GRAPH_MODELS = {
+  'app_labels': ["checklists"],
+}
 
 # ####################
 #   EBIRD CHECKLISTS
