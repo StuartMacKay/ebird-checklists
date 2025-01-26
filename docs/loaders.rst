@@ -97,8 +97,10 @@ As with the ``local_species`` command you can pass the API key on the command-li
 
 The API returns a maximum of 200 results for any call. For countries or regions where
 there are a lot of birders you may have to schedule downloads multiple times a day.
-However it's important to remember that servers and bandwidth cost money. The API is
-best used as a local news service. If you want to analyse observations for large areas
-then using the eBird Basic Dataset is your best option.
+Similarly the load window of 'n' days means that checklist submitted after that time
+will be missed. However it's important to remember that servers and bandwidth cost
+money. The API is best used as a local news service. If you want to analyse
+observations for large areas then using the eBird Basic Dataset is your best option.
+
 
 .. _sign up: https://ebird.org/api/keygen
