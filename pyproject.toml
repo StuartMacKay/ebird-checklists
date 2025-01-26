@@ -4,7 +4,7 @@ requires = ["setuptools >= 61.0"]
 
 [project]
 name = "ebird-checklists"
-version = "0.6.2"
+version = "0.6.3"
 description = "eBird Checklists is a reusable Django app for loading data from eBird into a database."
 keywords = ["checklists", "Django", "eBird", "models"]
 license = { file = "LICENSE" }
@@ -60,7 +60,7 @@ dev-dependencies = [
 ]
 
 [tool.bumpversion]
-current_version = "0.6.2"
+current_version = "0.6.3"
 parse = "(?P<major>\\d+)\\.(?P<minor>\\d+)\\.(?P<patch>\\d+)"
 serialize = ["{major}.{minor}.{patch}"]
 ignore_missing_version = false
