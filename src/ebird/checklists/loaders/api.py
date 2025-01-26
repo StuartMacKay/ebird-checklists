@@ -17,6 +17,25 @@ class APILoader:
     The APILoader downloads checklists from the eBird API and saves
     them to the database.
 
+    Arguments:
+
+        api_key: Your key to access the eBird API.
+            Your can request a key at https://ebird.org/data/download.
+            You will need an eBird account to do so.
+
+        force_update: always update the checklist database, even if the edited
+            date has not changed. This is used to fix the data when a bug is
+            discovered. You should not need this.
+
+    The eBird API limits the number of records returned to 200. When downloading
+    the visits for a given region if 200 hundred records are returned then it is
+    assumed there are more and the loader will fetch the sub-regions and download
+    the visits for each, repeating the process if necessary. To give an extreme
+    example if you download the visits for the United State, "US" then the API
+    will always return 200 results and the loader then download the visits to
+    each of the 50 states and then each of the 3143 counties. DON'T DO THIS.
+    Even if you don't get banned, karma will ensure bad things happen to you.
+
     """
 
     def __init__(self, api_key: str, force_update: bool = False):
@@ -329,6 +348,17 @@ class APILoader:
             )
 
     def load_checklist(self, identifier: str) -> Checklist:
+        """
+        Load the checklist with the given identifier.
+
+        If the checklist already exists in the database, the force_update
+        attribute, set when the loader is instantiated, will ensure the
+        checklist and all the observations are updated.
+
+        Arguments:
+            identifier: the eBird identifier for the checklist, e.g. "L901738"
+
+        """
         data = self.fetch_checklist(identifier)
         return self.add_checklist(data)
 
@@ -336,11 +366,12 @@ class APILoader:
         """
         Load all the checklists submitted for a region for a given date.
 
-        :param region: The code for a national, subnational1, subnational2
-                       area or hotspot identifier. For example, US, US-NY,
-                       US-NY-109, or L1379126, respectively.
+        Arguments:
+            region: The code for a national, subnational1, subnational2
+                 area or hotspot identifier. For example, US, US-NY,
+                 US-NY-109, or L1379126, respectively.
 
-        :param date: The date the observations were made.
+            date: The date the observations were made.
 
         """
         logger.info(
