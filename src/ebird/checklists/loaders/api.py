@@ -391,6 +391,12 @@ class APILoader:
         )
 
         try:
+            self.visits = []
+            self.checklists = []
+            self.added = 0
+            self.updated = 0
+            self.unchanged = 0
+
             self.fetch_visits(region, date)
 
             for visit in self.visits:
