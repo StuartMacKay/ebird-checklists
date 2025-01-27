@@ -42,9 +42,9 @@ class APILoader:
         self.api_key: str = api_key
         self.force_update = force_update
         self.visits: list = []
-        self.created: list[str] = []
-        self.updated: list[str] = []
-        self.unchanged: list[str] = []
+        self.added: int = 0
+        self.updated: int = 0
+        self.unchanged: int = 0
 
     def add_checklist(self, data: dict) -> Checklist:
         identifier = data["subId"]
@@ -98,14 +98,18 @@ class APILoader:
                     setattr(checklist, key, value)
                 checklist.save()
                 modified = True
+                self.updated += 1
                 logger.info(
                     "Checklist updated: %s",
                     identifier,
                     extra={"identifier": identifier},
                 )
+            else:
+                self.unchanged += 1
         else:
             checklist = Checklist.objects.create(**values)
             new = True
+            self.added += 1
 
         if new or modified:
             for observation_data in data["obs"]:
@@ -247,18 +251,13 @@ class APILoader:
                 for key, value in values.items():
                     setattr(checklist, key, value)
                 checklist.save()
-                self.updated.append(identifier)
                 logger.info(
                     "Visit updated: %s",
                     identifier,
                     extra={"identifier": identifier},
                 )
-            else:
-                self.unchanged.append(identifier)
-
         else:
             checklist = Checklist.objects.create(**values)
-            self.created.append(identifier)
             logger.info(
                 "Visit added: %s",
                 identifier,
@@ -408,9 +407,9 @@ class APILoader:
                     "region": region,
                     "date": date,
                     "visits": len(self.visits),
-                    "added": len(self.created),
-                    "updated": len(self.updated),
-                    "unchanged": len(self.unchanged),
+                    "added": self.added,
+                    "updated": self.updated,
+                    "unchanged": self.unchanged,
                 },
             )
 
