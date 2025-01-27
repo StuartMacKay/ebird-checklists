@@ -258,7 +258,7 @@ class APILoader:
                     extra={"identifier": identifier},
                 )
         else:
-            checklist = Checklist.objects.create(**values)
+            checklist = Checklist.objects.create(identifier=identifier, **values)
             logger.info(
                 "Visit added: %s",
                 identifier,
