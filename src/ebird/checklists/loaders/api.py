@@ -285,7 +285,12 @@ class APILoader:
     @staticmethod
     def get_observer(data: dict) -> Observer:
         name: str = data["userDisplayName"]
-        return Observer.objects.get(name=name)
+        observer, created = Observer.objects.get_or_create(name=name)
+        if created:
+            # A person person could change their eBird name after
+            # submitting a checklist. This should not happen often.
+            logger.warning("Observer did not exist", extra={"observer": name})
+        return observer
 
     @staticmethod
     def get_species(data: dict) -> Species:
