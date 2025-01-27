@@ -94,7 +94,7 @@ class APILoader:
         modified: bool = False
 
         if checklist := Checklist.objects.filter(identifier=identifier).first():
-            if self.force_update or checklist.edited < edited:
+            if self.force_update or checklist.edited is None or checklist.edited < edited:
                 for key, value in values.items():
                     setattr(checklist, key, value)
                 checklist.save()
