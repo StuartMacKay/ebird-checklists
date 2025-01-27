@@ -90,7 +90,7 @@ class APILoader:
             area = data["effortAreaHa"]
             values["area"] = round(decimal.Decimal(area), 3)
 
-        new: bool = False
+        added: bool = False
         modified: bool = False
 
         if checklist := Checklist.objects.filter(identifier=identifier).first():
@@ -109,10 +109,10 @@ class APILoader:
                 self.unchanged += 1
         else:
             checklist = Checklist.objects.create(**values)
-            new = True
+            added = True
             self.added += 1
 
-        if new or modified:
+        if added or modified:
             for observation_data in data["obs"]:
                 self.add_observation(observation_data, checklist)
                 logger.info(
