@@ -125,11 +125,6 @@ class APILoader:
         if added or modified:
             for observation_data in data["obs"]:
                 self.add_observation(observation_data, checklist)
-                logger.info(
-                    "Checklist added: %s",
-                    identifier,
-                    extra={"identifier": identifier},
-                )
 
         if modified:
             queryset = checklist.observations.filter(edited__lt=edited)
