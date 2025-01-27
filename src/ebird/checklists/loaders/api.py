@@ -107,10 +107,20 @@ class APILoader:
                 )
             else:
                 self.unchanged += 1
+                logger.info(
+                    "Checklist unchanged: %s",
+                    identifier,
+                    extra={"identifier": identifier},
+                )
         else:
             checklist = Checklist.objects.create(**values)
             added = True
             self.added += 1
+            logger.info(
+                "Checklist added: %s",
+                identifier,
+                extra={"identifier": identifier},
+            )
 
         if added or modified:
             for observation_data in data["obs"]:
