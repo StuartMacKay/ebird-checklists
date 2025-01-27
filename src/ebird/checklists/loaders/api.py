@@ -42,6 +42,7 @@ class APILoader:
         self.api_key: str = api_key
         self.force_update = force_update
         self.visits: list = []
+        self.checklists: list = []
         self.added: int = 0
         self.updated: int = 0
         self.unchanged: int = 0
@@ -264,6 +265,8 @@ class APILoader:
                 extra={"identifier": identifier},
             )
 
+        self.checklists.append(identifier)
+
         return checklist
 
     @staticmethod
@@ -393,10 +396,7 @@ class APILoader:
             for visit in self.visits:
                 self.add_visit(visit)
 
-            for identifier in self.created:
-                self.load_checklist(identifier)
-
-            for identifier in self.updated:
+            for identifier in self.checklists:
                 self.load_checklist(identifier)
 
             logger.info(
