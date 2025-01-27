@@ -6,7 +6,7 @@ from urllib.error import HTTPError, URLError
 
 from ebird.api import get_checklist, get_regions, get_visits
 
-from .utils import str2date, str2datetime, str2int, str2decimal
+from .utils import str2date, str2datetime, float2int, str2decimal
 from ..models import Checklist, Location, Observation, Observer, Species
 
 logger = logging.getLogger(__name__)
@@ -59,7 +59,7 @@ class APILoader:
 
         duration: str | None = None
         if "durationHrs" in data:
-            duration = str2int(data["durationHrs"] * 60.0)
+            duration = float2int(data["durationHrs"] * 60.0)
 
         values = {
             "created": created,
@@ -171,7 +171,7 @@ class APILoader:
         observation: Observation
 
         if re.match(r"\d+", data["howManyStr"]):
-            count = str2int(data["howManyStr"])
+            count = float2int(data["howManyStr"])
             if count == 0:
                 count = None
         else:

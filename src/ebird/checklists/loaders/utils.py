@@ -14,6 +14,10 @@ def str2int(value: Optional[str]) -> Optional[int]:
     return int(value) if value else None
 
 
+def float2int(value: Optional[float]) -> Optional[int]:
+    return int(value) if value else None
+
+
 def str2decimal(value: Optional[str]) -> Optional[decimal.Decimal]:
     return decimal.Decimal(value) if value else None
 
