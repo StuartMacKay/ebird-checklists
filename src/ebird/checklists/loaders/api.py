@@ -231,15 +231,10 @@ class APILoader:
             "url": "https://ebird.org/checklist/%s" % identifier,
         }
 
-        if "numObservers" in data:
-            values["observer_count"] = int(data["numObservers"])
-        else:
-            values["observer_count"] = None
-
         if checklist := Checklist.objects.filter(identifier=identifier).first():
             modified: bool = False
 
-            for attr in ["date", "time", "observer_count", "species_count"]:
+            for attr in ["date", "time", "species_count"]:
                 if getattr(checklist, attr) != values[attr]:
                     modified = True
 
