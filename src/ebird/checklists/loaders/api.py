@@ -368,9 +368,17 @@ class APILoader:
         """
         Load the checklist with the given identifier.
 
-        If the checklist already exists in the database, the force_update
-        attribute, set when the loader is instantiated, will ensure the
-        checklist and all the observations are updated.
+        IMPORTANT: If the Location does not exist then it will be created,
+        and a warning is logged. The data returned by the API  only contains
+        the identifier and the state code. You can update the location record
+        using the load_location() method, but this only works for hotspots.
+        If the location is private then you will have to add the information
+        in the Django Admin or shell.
+
+        The Observer is also created if it does not exist. However, since the
+        API only ever returns the observer's name, this is not a problem. A
+        warning is still logged, in case the frequency at which this occurs
+        becomes useful at some point.
 
         Arguments:
             identifier: the eBird identifier for the checklist, e.g. "L901738"
