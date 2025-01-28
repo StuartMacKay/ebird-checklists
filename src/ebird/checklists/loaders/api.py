@@ -276,14 +276,9 @@ class APILoader:
     @staticmethod
     def get_location(data: dict) -> Location:
         identifier: str = data["locId"]
-        defaults = {
-            "state_code": data["subnational1Code"],
-            "country_code": data["subnational1Code"].split("-")[0],
-        }
-        location, created = Location.objects.get_or_create(identifier=identifier, defaults=defaults)
-        if created:
-            # The location should have been created when get_visits()
-            # was called, but we don't want to fail if it doesn't exist.
+        location = Location.objects.filter(identifier=identifier).first()
+        if location is None:
+            location = Location.objects.create(identifier=identifier)
             logger.warning("Location did not exist", extra={"identifier": identifier})
         return location
 
