@@ -4,7 +4,7 @@ import logging
 import re
 from urllib.error import HTTPError, URLError
 
-from ebird.api import get_checklist, get_regions, get_visits
+from ebird.api import get_checklist, get_hotspot, get_regions, get_visits
 
 from .utils import str2date, str2datetime, float2int, str2decimal
 from ..models import Checklist, Location, Observation, Observer, Species
@@ -364,6 +364,42 @@ class APILoader:
                 extra={"region": region, "date": date, "number_of_visits": num_visits},
             )
 
+    def fetch_location(self, identifier: str) -> dict | None:
+        try:
+            data = get_hotspot(self.api_key, identifier)
+            logger.info(
+                "Location fetched: %s",
+                identifier,
+                extra={"identifier": identifier},
+            )
+        except HTTPError:
+            data = None
+            logger.info(
+                "Location not available: %s",
+                identifier,
+                extra={"identifier": identifier},
+            )
+        return data
+
+    def load_location(self, identifier: str) -> Location | None:
+        """
+        Load the location with the given identifier.
+
+        IMPORTANT: This only works for hotpots. If the location is private
+        then eBird returns a status HTTP 410 GONE, and this method returns
+        None.
+
+        Arguments:
+            identifier; the eBird identifier for the location, e.g. "L901738".
+
+        Returns:
+            The Location, created or updated with the data from the API call,
+            or None if the location is private.
+
+        """
+        if data := self.fetch_location(identifier):
+            return self.add_location(data)
+
     def load_checklist(self, identifier: str) -> Checklist:
         """
         Load the checklist with the given identifier.
@@ -381,7 +417,7 @@ class APILoader:
         becomes useful at some point.
 
         Arguments:
-            identifier: the eBird identifier for the checklist, e.g. "L901738"
+            identifier: the eBird identifier for the checklist, e.g. "S318722167"
 
         """
         data = self.fetch_checklist(identifier)
