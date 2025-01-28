@@ -138,7 +138,7 @@ def test_add_checklist__checklist_updated(loader, submitted, checklist):
     assert chk1.observer_count != chk2.observer_count
 
 
-def test_add_visit__loader_updated(loader, submitted, checklist):
+def test_add_checklist__loader_updated(loader, submitted, checklist):
     """The updated checklist's identifier is recorded by the loader"""
     loader.add_checklist(checklist)
     edited = datetime2str(submitted + relativedelta(hours=2))
@@ -305,6 +305,20 @@ def test_add_checklist__orphaned_observations_deleted(loader, submitted, checkli
     obs = chk.observations.all()
     assert obs.count() == 1
     assert obs.first().identifier == observations[0]["obsId"]
+
+
+def test_add_checklist__location_added(loader, checklist):
+    """The location is created if it does not exist."""
+    identifier = checklist["locId"]
+    loader.add_checklist(checklist)
+    Location.objects.get(identifier=identifier)
+
+
+def test_add_checklist__observer_added(loader, checklist):
+    """The observer is created if it does not exist."""
+    name = checklist["userDisplayName"]
+    loader.add_checklist(checklist)
+    Observer.objects.get(name=name)
 
 
 def test_add_location__location_added(loader, location):
