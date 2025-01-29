@@ -121,8 +121,15 @@ def test_add_checklist__checklist_added(loader, checklist):
     Checklist.objects.get(identifier=identifier)
 
 
-def test_add_visit__loader_created(loader, checklist):
-    """The added checklist's identifier is recorded by the loader"""
+def test_add_checklist__loader_added(loader, checklist):
+    """The added checklist is recorded by the loader"""
+    loader.add_checklist(checklist)
+    assert loader.added == 1
+
+
+def test_add_visit__loader_added(loader, visit, checklist):
+    """The added checklist is recorded by the loader"""
+    loader.add_visit(visit)
     loader.add_checklist(checklist)
     assert loader.added == 1
 
@@ -139,7 +146,7 @@ def test_add_checklist__checklist_updated(loader, submitted, checklist):
 
 
 def test_add_checklist__loader_updated(loader, submitted, checklist):
-    """The updated checklist's identifier is recorded by the loader"""
+    """The updated checklist is recorded by the loader"""
     loader.add_checklist(checklist)
     edited = datetime2str(submitted + relativedelta(hours=2))
     checklist["lastEditedDt"] = edited
@@ -158,7 +165,7 @@ def test_add_checklist__checklist_unchanged(loader, submitted, checklist):
 
 
 def test_add_checklist__loader_unchanged(loader, checklist):
-    """The unchanged checklist's identifier is recorded by the loader"""
+    """The unchanged checklist is recorded by the loader"""
     loader.add_checklist(checklist)
     loader.add_checklist(checklist)
     assert loader.unchanged == 1

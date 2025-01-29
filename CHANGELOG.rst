@@ -7,6 +7,7 @@ and this project adheres to `Semantic Versioning <https://semver.org/spec/v2.0.0
 Latest
 ------
 * Added APILoader.load_location() for adding or updating database records.
+* Changed APILoader so it accurately counts the number of checklists added.
 
 0.6.4 (2025-01-27)
 ------------------

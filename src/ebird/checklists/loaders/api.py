@@ -94,19 +94,31 @@ class APILoader:
         modified: bool = False
 
         if checklist := Checklist.objects.filter(identifier=identifier).first():
-            if self.force_update or checklist.edited is None or checklist.edited < edited:
+            if checklist.edited is None:
                 for key, value in values.items():
                     setattr(checklist, key, value)
-                checklist.save()
+                modified = True
+                self.added += 1
+            elif checklist.edited < edited:
+                for key, value in values.items():
+                    setattr(checklist, key, value)
                 modified = True
                 self.updated += 1
+            elif self.force_update:
+                for key, value in values.items():
+                    setattr(checklist, key, value)
+                modified = True
+            else:
+                self.unchanged += 1
+
+            if modified:
+                checklist.save()
                 logger.info(
                     "Checklist updated: %s",
                     identifier,
                     extra={"identifier": identifier},
                 )
             else:
-                self.unchanged += 1
                 logger.info(
                     "Checklist unchanged: %s",
                     identifier,
