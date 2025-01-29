@@ -232,7 +232,10 @@ class APILoader:
         identifier = data["subId"]
 
         date: dt.date = dt.datetime.strptime(data["obsDt"], "%d %b %Y").date()
-        time: dt.time = dt.datetime.strptime(data["obsTime"], "%H:%M").time()
+        time: dt.time | None = None
+
+        if "obsTime" in data:
+            time = dt.datetime.strptime(data["obsTime"], "%H:%M").time()
 
         values = {
             "location": self.add_location(data["loc"]),

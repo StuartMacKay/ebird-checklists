@@ -8,6 +8,7 @@ Latest
 ------
 * Added APILoader.load_location() for adding or updating database records.
 * Changed APILoader so it accurately counts the number of checklists added.
+* Changed APILoader so it handles checklists where the time is not set.
 
 0.6.4 (2025-01-27)
 ------------------

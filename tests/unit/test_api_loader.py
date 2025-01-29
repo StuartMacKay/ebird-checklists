@@ -411,3 +411,10 @@ def test_add_visit__checklist_updated(loader, visit):
     chk2 = loader.add_visit(visit)
     assert chk1.pk == chk2.pk
     assert chk1.species_count != chk2.species_count
+
+
+def test_add_visit__time_optional(loader, visit):
+    """Incidental or historical visits may not include time."""
+    del visit["obsTime"]
+    chk = loader.add_visit(visit)
+    assert chk.time is None
