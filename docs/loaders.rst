@@ -45,29 +45,14 @@ Django settings:
 
     EBIRD_API_KEY = <your api key>
 
-The first step is to initialize the Species table. You need to do this because
-the data from the API identifies the species seen using a simple code, e.g.
-'horlar1' (Horned Lark). By downloading the complete taxonomy you initialize
-the Species table with the common name, and scientific name, along with subspecies
-names and other useful taxonomic information:
+Next, select which locale (language) you want to use for the Species' common
+name, and add it to the Django settings:
 
-.. code-block:: console
+.. code-block:: python
 
-    python manage.py load_species
+    EBIRD_LOCALE = <language code>
 
-By default, the command will load the English common names for each species.
-If you want to load any other language supported by eBird, using the ``--locale``
-option:
-
-.. code-block:: console
-
-    python manage.py load_species --locale es
-
-You can also specify the API key on the command line:
-
-.. code-block:: console
-
-    python manage.py load_species --key <your api key>
+A complete list of locales is returned by ebird.api.get_taxonomy_locales().
 
 Now load some checklists:
 

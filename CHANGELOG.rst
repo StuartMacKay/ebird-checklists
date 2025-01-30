@@ -8,6 +8,7 @@ Latest
 ------
 * Added APILoader.load_species() for adding Species records to the database.
 * Changed APILoader to load species from the eBird taxonomy when loading a checklist.
+* Removed SpeciesLoader. It is no longer needed.
 
 0.6.5 (2025-01-29)
 ------------------
