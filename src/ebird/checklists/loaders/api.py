@@ -23,6 +23,11 @@ class APILoader:
             Your can request a key at https://ebird.org/data/download.
             You will need an eBird account to do so.
 
+        locale: The language to load for Species common names.
+            The default is English.. ebird.api.get_taxonomy_locales returns
+            the complete list of languages supported by eBird.
+
+
         force_update: always update the checklist database, even if the edited
             date has not changed. This is used to fix the data when a bug is
             discovered. You should not need this.
@@ -38,8 +43,9 @@ class APILoader:
 
     """
 
-    def __init__(self, api_key: str, force_update: bool = False):
+    def __init__(self, api_key: str, locale: str, force_update: bool = False):
         self.api_key: str = api_key
+        self.locale: str = locale
         self.force_update = force_update
         self.visits: list = []
         self.checklists: list = []

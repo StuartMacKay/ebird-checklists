@@ -129,7 +129,7 @@ def checklist(start, submitted, observer, observations):
 
 @pytest.fixture
 def loader(settings):
-    return APILoader(settings.EBIRD_API_KEY)
+    return APILoader(settings.EBIRD_API_KEY, settings.EBIRD_LOCALE)
 
 
 def test_add_checklist__checklist_added(loader, checklist):

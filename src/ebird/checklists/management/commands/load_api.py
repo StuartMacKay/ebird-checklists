@@ -96,7 +96,8 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         today = datetime.date.today()
         key = getattr(settings, "EBIRD_API_KEY") or options["key"]
-        loader = APILoader(key)
+        locale = getattr(settings, "EBIRD_LOCALE")
+        loader = APILoader(key, locale)
         dates = [today - datetime.timedelta(days=n) for n in range(options["days"])]
 
         for region in options["regions"]:
