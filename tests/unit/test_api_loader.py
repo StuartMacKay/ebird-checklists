@@ -27,20 +27,46 @@ def submitted(start):
 
 
 @pytest.fixture
-def species():
+def webowl():
     return {
-        "sciName": "Eremophila alpestris",
-        "comName": "Horned Lark",
-        "speciesCode": "horlar",
+         "sciName": "Tyto alba",
+         "comName": "Western Barn Owl",
+         "speciesCode": "webowl",
+         "category": "species",
+         "taxonOrder": 8516.0,
+         "bandingCodes": [],
+         "comNameCodes": ["CBOW", "EBOW", "WBOW"],
+         "sciNameCodes": ["TYAL"],
+         "order": "Strigiformes",
+         "familyCode": "tytoni1",
+         "familyComName": "Barn-Owls",
+         "familySciName": "Tytonidae",
+    }
+
+
+@pytest.fixture
+def grhowl():
+    return {
+        "sciName": "Bubo virginianus",
+        "comName": "Great Horned Owl",
+        "speciesCode": "grhowl",
         "category": "species",
-        "taxonOrder": 22484.0,
-        "bandingCodes": ["HOLA"],
-        "comNameCodes": ["SHLA"],
-        "sciNameCodes": ["ERAL"],
-        "order": "Passeriformes",
-        "familyCode": "alaudi1",
-        "familyComName": "Larks",
-        "familySciName": "Alaudidae"
+        "taxonOrder": 8811.0,
+        "bandingCodes": ["GHOW"],
+        "comNameCodes": [],
+        "sciNameCodes": ["BUVI"],
+        "order": "Strigiformes",
+        "familyCode": "strigi1",
+        "familyComName": "Owls",
+        "familySciName": "Strigidae"
+    }
+
+
+@pytest.fixture
+def species(webowl, grhowl):
+    return {
+        webowl["speciesCode"]: webowl,
+        grhowl["speciesCode"]: grhowl,
     }
 
 
@@ -48,7 +74,7 @@ def species():
 def observation():
     return {
         "projId": "EBIRD",
-        "speciesCode": "webowl1",
+        "speciesCode": "webowl",
         "present": False,
         "obsId": "OBS0000000001",
         "howManyStr": "1",
@@ -130,6 +156,14 @@ def checklist(start, submitted, observer, observations):
 @pytest.fixture
 def loader(settings):
     return APILoader(settings.EBIRD_API_KEY, settings.EBIRD_LOCALE)
+
+
+@pytest.fixture(autouse=True)
+def mock_api_calls(monkeypatch, species):
+    def mock_fetch_species(self, code, locale):
+        return species[code]
+
+    monkeypatch.setattr(APILoader, "fetch_species", mock_fetch_species)
 
 
 def test_add_checklist__checklist_added(loader, checklist):
@@ -438,7 +472,7 @@ def test_add_visit__time_optional(loader, visit):
     assert chk.time is None
 
 
-def test_add_species__species_added(loader, species):
+def test_add_species__species_added(loader, webowl):
     """The Species is added to the database."""
     obj = loader.add_species(webowl)
     assert obj.species_code == webowl["speciesCode"]
