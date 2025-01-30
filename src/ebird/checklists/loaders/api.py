@@ -119,26 +119,10 @@ class APILoader:
 
             if modified:
                 checklist.save()
-                logger.info(
-                    "Checklist updated: %s",
-                    identifier,
-                    extra={"identifier": identifier},
-                )
-            else:
-                logger.info(
-                    "Checklist unchanged: %s",
-                    identifier,
-                    extra={"identifier": identifier},
-                )
         else:
             checklist = Checklist.objects.create(**values)
             added = True
             self.added += 1
-            logger.info(
-                "Checklist added: %s",
-                identifier,
-                extra={"identifier": identifier},
-            )
 
         if added or modified:
             for observation_data in data["obs"]:
@@ -149,11 +133,6 @@ class APILoader:
 
             if queryset.exists():
                 count, deletions = queryset.delete()
-                logger.info(
-                    "Orphaned observations deleted: %d",
-                    count,
-                    extra={"number_deleted": count},
-                )
 
         return checklist
 
@@ -273,18 +252,8 @@ class APILoader:
                 for key, value in values.items():
                     setattr(checklist, key, value)
                 checklist.save()
-                logger.info(
-                    "Visit updated: %s",
-                    identifier,
-                    extra={"identifier": identifier},
-                )
         else:
             checklist = Checklist.objects.create(identifier=identifier, **values)
-            logger.info(
-                "Visit added: %s",
-                identifier,
-                extra={"identifier": identifier},
-            )
 
         self.checklists.append(identifier)
 
@@ -311,10 +280,8 @@ class APILoader:
             for key, value in values.items():
                 species.setattr(key, value)
             species.save()
-            logger.info("Species updated: %s", code, extra={"code": code})
         else:
             species = Species.objects.create(species_code=code, **values)
-            logger.info("Species added: %s", code, extra={"code": code})
 
         return species
 
@@ -328,7 +295,7 @@ class APILoader:
         location = Location.objects.filter(identifier=identifier).first()
         if location is None:
             location = Location.objects.create(identifier=identifier)
-            logger.warning("Location did not exist", extra={"identifier": identifier})
+            logger.error("Location did not exist", extra={"identifier": identifier})
         return location
 
     @staticmethod
@@ -337,7 +304,7 @@ class APILoader:
         observer = Observer.objects.filter(name=name).first()
         if observer is None:
             observer = Observer.objects.create(name=name)
-            logger.warning("Observer did not exist", extra={"observer": name})
+            logger.error("Observer did not exist", extra={"observer": name})
         return observer
 
     def get_species(self, data: dict) -> Species:
@@ -348,17 +315,17 @@ class APILoader:
 
     def fetch_checklist(self, identifier: str) -> dict:
         data = get_checklist(self.api_key, identifier)
-        logger.info(
-            "Loading checklist: %s",
-            identifier,
-            extra={"identifier": identifier},
-        )
         return data
 
     def fetch_species(self, code: str, locale: str) -> dict:
         return get_taxonomy(self.api_key, locale=locale, species=code)[0]
 
     def fetch_subregions(self, region: str) -> list[str]:
+        logger.info(
+            "Fetching sub-regions: %s",
+            region,
+            extra={"region": region},
+        )
         region_types = ["subnational1", "subnational2", None]
         levels: int = len(region.split("-", 2))
         region_type = region_types[levels - 1]
@@ -366,62 +333,45 @@ class APILoader:
         if region_type:
             items = get_regions(self.api_key, region_type, region)
             sub_regions = [item["code"] for item in items]
-            logger.warning(
-                "Loading visits for sub-regions",
-                extra={"region": region, "sub_regions": sub_regions},
-            )
         else:
             sub_regions = []
-            logger.error(
-                "Region has no sub-regions: %s",
-                region,
-                extra={"region": region, "region_type": region_type},
-            )
 
         return sub_regions
 
     def fetch_visits(self, region: str, date: dt.date = None):
         visits: list = get_visits(self.api_key, region, date=date, max_results=200)
-        if (num_visits := len(visits)) == 200:
-            logger.warning(
-                "Visits limit exceeded: %s, %s, %d",
-                region,
-                date,
-                num_visits,
-                extra={"region": region, "date": date, "number_of_visits": num_visits},
-            )
-
+        if len(visits) == 200:
             if sub_regions := self.fetch_subregions(region):
                 for sub_region in sub_regions:
+                    logger.info(
+                        "Loading checklists for sub-regions: %s, %s",
+                        sub_region,
+                        date,
+                        extra={"region": sub_region, "date": date},
+                    )
                     self.fetch_visits(sub_region, date)
             else:
                 # No more sub-regions, just add the 200 visits
+                logger.warning(
+                    "Loading checklists - API limit reached: %s, %s",
+                    region,
+                    date,
+                    extra={"region": region, "date": date},
+                )
                 for visit in visits:
                     self.visits.append(visit)
 
         else:
             for visit in visits:
                 self.visits.append(visit)
-            logger.info(
-                "Visits fetched: %s, %s, %d",
-                region,
-                date,
-                num_visits,
-                extra={"region": region, "date": date, "number_of_visits": num_visits},
-            )
 
     def fetch_location(self, identifier: str) -> dict | None:
         try:
             data = get_hotspot(self.api_key, identifier)
-            logger.info(
-                "Location fetched: %s",
-                identifier,
-                extra={"identifier": identifier},
-            )
         except HTTPError:
             data = None
-            logger.info(
-                "Location not available: %s",
+            logger.error(
+                "Location not fetched: %s",
                 identifier,
                 extra={"identifier": identifier},
             )
@@ -436,7 +386,12 @@ class APILoader:
             locale: the locale (language) to load.
 
         """
-        logger.info("Loading species", extra={"code": code, "locale": locale})
+        logger.info(
+            "Loading species: %s, %s",
+            code,
+            locale,
+            extra={"code": code, "locale": locale},
+        )
         data = self.fetch_species(code, locale)
         return self.add_species(data)
 
@@ -456,6 +411,9 @@ class APILoader:
             or None if the location is private.
 
         """
+        logger.info(
+            "Loading location: %s", identifier, extra={"identifier": identifier}
+        )
         if data := self.fetch_location(identifier):
             return self.add_location(data)
 
@@ -479,6 +437,9 @@ class APILoader:
             identifier: the eBird identifier for the checklist, e.g. "S318722167"
 
         """
+        logger.info(
+            "Loading checklist: %s", identifier, extra={"identifier": identifier}
+        )
         data = self.fetch_checklist(identifier)
         return self.add_checklist(data)
 
