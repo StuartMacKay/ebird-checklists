@@ -6,6 +6,7 @@ and this project adheres to `Semantic Versioning <https://semver.org/spec/v2.0.0
 
 Latest
 ------
+* Added APILoader.load_species() for adding Species records to the database.
 
 0.6.5 (2025-01-29)
 ------------------

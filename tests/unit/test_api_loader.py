@@ -7,7 +7,7 @@ import pytest
 
 from ebird.checklists.loaders import APILoader
 from ebird.checklists.loaders.utils import str2date
-from ebird.checklists.models import Checklist, Observation, Location, Observer
+from ebird.checklists.models import Checklist, Observation, Location, Observer, Species
 
 pytestmark = pytest.mark.django_db
 
@@ -24,6 +24,24 @@ def start():
 @pytest.fixture
 def submitted(start):
     return start + relativedelta(hours=2)
+
+
+@pytest.fixture
+def species():
+    return {
+        "sciName": "Eremophila alpestris",
+        "comName": "Horned Lark",
+        "speciesCode": "horlar",
+        "category": "species",
+        "taxonOrder": 22484.0,
+        "bandingCodes": ["HOLA"],
+        "comNameCodes": ["SHLA"],
+        "sciNameCodes": ["ERAL"],
+        "order": "Passeriformes",
+        "familyCode": "alaudi1",
+        "familyComName": "Larks",
+        "familySciName": "Alaudidae"
+    }
 
 
 @pytest.fixture
@@ -418,3 +436,9 @@ def test_add_visit__time_optional(loader, visit):
     del visit["obsTime"]
     chk = loader.add_visit(visit)
     assert chk.time is None
+
+
+def test_add_species__species_added(loader, species):
+    """The Species is added to the database."""
+    obj = loader.add_species(webowl)
+    assert obj.species_code == webowl["speciesCode"]

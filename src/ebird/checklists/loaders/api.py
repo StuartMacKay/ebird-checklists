@@ -4,7 +4,7 @@ import logging
 import re
 from urllib.error import HTTPError, URLError
 
-from ebird.api import get_checklist, get_hotspot, get_regions, get_visits
+from ebird.api import get_checklist, get_hotspot, get_regions, get_visits, get_taxonomy
 
 from .utils import str2date, str2datetime, float2int, str2decimal
 from ..models import Checklist, Location, Observation, Observer, Species
@@ -284,6 +284,34 @@ class APILoader:
 
         return checklist
 
+    def add_species(self, data: dict) -> Species:
+        code = data["speciesCode"]
+
+        values = {
+            "taxon_order": int(data["taxonOrder"]),
+            "order": data.get("order", ""),
+            "category": data["category"],
+            "family_code": data.get("familyCode", ""),
+            "common_name": data["comName"],
+            "scientific_name": data["sciName"],
+            "family_common_name": data.get("familyComName", ""),
+            "family_scientific_name": data.get("familySciName", ""),
+            "subspecies_common_name": "",
+            "subspecies_scientific_name": "",
+            "exotic_code": "",
+        }
+
+        if species := Species.objects.filter(species_code=code).first():
+            for key, value in values.items():
+                species.setattr(key, value)
+            species.save()
+            logger.info("Species updated: %s", code, extra={"code": code})
+        else:
+            species = Species.objects.create(species_code=code, **values)
+            logger.info("Species added: %s", code, extra={"code": code})
+
+        return species
+
     @staticmethod
     def get_urn(row: dict[str, str]) -> str:
         return f"URN:CornellLabOfOrnithology:{row['projId']}:{row['obsId']}"
@@ -326,6 +354,9 @@ class APILoader:
             extra={"identifier": identifier},
         )
         return data
+
+    def fetch_species(self, code: str, locale: str) -> dict:
+        return get_taxonomy(self.api_key, locale=locale, species=code)[0]
 
     def fetch_subregions(self, region: str) -> list[str]:
         region_types = ["subnational1", "subnational2", None]
@@ -395,6 +426,19 @@ class APILoader:
                 extra={"identifier": identifier},
             )
         return data
+
+    def load_species(self, code: str, locale: str) -> Species:
+        """
+        Load the species with the eBird code.
+
+        Arguments:
+            code: the eBird code for the species, e.g. 'horlar' (Horned Lark).
+            locale: the locale (language) to load.
+
+        """
+        logger.info("Loading species", extra={"code": code, "locale": locale})
+        data = self.fetch_species(code, locale)
+        return self.add_species(data)
 
     def load_location(self, identifier: str) -> Location | None:
         """
