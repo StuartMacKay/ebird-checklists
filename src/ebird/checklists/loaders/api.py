@@ -340,16 +340,10 @@ class APILoader:
             logger.warning("Observer did not exist", extra={"observer": name})
         return observer
 
-    @staticmethod
-    def get_species(data: dict) -> Species:
+    def get_species(self, data: dict) -> Species:
         code = data["speciesCode"]
-        species, created = Species.objects.get_or_create(species_code=code)
-        if created:
-            logger.warning(
-                "Species added: %s",
-                code,
-                extra={"species_code": code},
-            )
+        if (species := Species.objects.filter(species_code=code).first()) is None:
+            species = self.load_species(code, self.locale)
         return species
 
     def fetch_checklist(self, identifier: str) -> dict:
