@@ -198,3 +198,5 @@ GRAPH_MODELS = {
 # ####################
 
 EBIRD_API_KEY = env.str("EBIRD_API_KEY")
+
+EBIRD_LOCALE = env.str("EBIRD_LOCALE", "en")
