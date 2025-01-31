@@ -6,6 +6,9 @@ and this project adheres to `Semantic Versioning <https://semver.org/spec/v2.0.0
 
 Latest
 ------
+
+0.7.0 (2025-01-31)
+------------------
 * Added APILoader.load_species() for adding Species records to the database.
 * Changed APILoader to load species from the eBird taxonomy when loading a checklist.
 * Removed SpeciesLoader. It is no longer needed.
