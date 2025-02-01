@@ -445,11 +445,11 @@ wheels = [
 
 [[package]]
 name = "ebird-api"
-version = "3.2.2"
+version = "3.3.0"
 source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/30/0c/364fe7a2b2d38fce9bf846cef0b1d56b64e956e515eb5559ea98ccadc847/ebird_api-3.2.2.tar.gz", hash = "sha256:ab468d0b86b5c59eaf7914b7765ee537981c15e233d54a6d7cd9a7172aed2412", size = 25225 }
+sdist = { url = "https://files.pythonhosted.org/packages/0e/4b/956a1b01d1743902e6c21df9c2183724788b270110dee5f235b175aca50d/ebird_api-3.3.0.tar.gz", hash = "sha256:7f209f6feb6f41932d636b1f7606225ce9d36aa5c663edff32193e07eb1446d2", size = 26256 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/38/af/5c80dd10c91a0380ed249f703b8a6cad88f766eda21e680e13231beb7cc5/ebird_api-3.2.2-py3-none-any.whl", hash = "sha256:76a89d1bd4b11d14ca1602db3a73ef73a7aa789268c4b6b9402036a3330ecdbc", size = 25060 },
+    { url = "https://files.pythonhosted.org/packages/9c/d8/b9460ab9f536c966ea08874b14c93910d70d13679d9b3bb9135b5769e9e8/ebird_api-3.3.0-py3-none-any.whl", hash = "sha256:5ca256026cc6e2104a3baecb7ba0c7ddb52e9cf2b2d89973c96a1908da95508c", size = 25898 },
 ]
 
 [[package]]
@@ -495,7 +495,7 @@ dev = [
 [package.metadata]
 requires-dist = [
     { name = "django", specifier = ">=4.2" },
-    { name = "ebird-api", specifier = ">=3.0.7" },
+    { name = "ebird-api", specifier = ">=3.3.0" },
     { name = "python-dateutil", specifier = ">=2.9.0.post0" },
 ]
 
