@@ -39,6 +39,7 @@ class Location(models.Model):
         verbose_name_plural = _("locations")
 
     identifier = models.TextField(
+        unique=True,
         verbose_name=_("identifier"),
         help_text=_("The unique identifier for the location"),
     )
@@ -61,6 +62,7 @@ class Location(models.Model):
 
     county_code = models.TextField(
         blank=True,
+        db_index=True,
         verbose_name=_("county code"),
         help_text=_("The code used to identify the county."),
     )
@@ -70,6 +72,7 @@ class Location(models.Model):
     )
 
     state_code = models.TextField(
+        db_index=True,
         verbose_name=_("state code"),
         help_text=_("The code used to identify the state."),
     )
@@ -79,6 +82,7 @@ class Location(models.Model):
     )
 
     country_code = models.TextField(
+        db_index=True,
         verbose_name=_("country code"),
         help_text=_("The code used to identify the country."),
     )

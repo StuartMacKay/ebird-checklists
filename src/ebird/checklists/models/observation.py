@@ -57,6 +57,7 @@ class Observation(models.Model):
     )
 
     identifier = models.TextField(
+        unique=True,
         verbose_name=_("identifier"),
         help_text=_("A global unique identifier for the observation."),
     )

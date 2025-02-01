@@ -125,6 +125,7 @@ class Checklist(models.Model):
     )
 
     identifier = models.TextField(
+        unique=True,
         verbose_name=_("identifier"),
         help_text=_("The unique identifier for the checklist."),
     )
@@ -166,6 +167,7 @@ class Checklist(models.Model):
     )
 
     date = models.DateField(
+        db_index=True,
         verbose_name=_("date"), help_text=_("The date the checklist was started.")
     )
 
@@ -178,6 +180,7 @@ class Checklist(models.Model):
 
     started = models.DateTimeField(
         blank=True,
+        db_index=True,
         null=True,
         verbose_name=_("date & time"),
         help_text=_("The date and time the checklist was started."),

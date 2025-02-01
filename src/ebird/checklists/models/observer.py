@@ -18,6 +18,7 @@ class Observer(models.Model):
 
     name = models.TextField(
         blank=True,
+        unique=True,
         verbose_name=_("name"),
         help_text=_("The observer's name."),
     )
