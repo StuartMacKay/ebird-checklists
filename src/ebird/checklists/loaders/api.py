@@ -27,11 +27,6 @@ class APILoader:
             The default is English.. ebird.api.get_taxonomy_locales returns
             the complete list of languages supported by eBird.
 
-
-        force_update: always update the checklist database, even if the edited
-            date has not changed. This is used to fix the data when a bug is
-            discovered. You should not need this.
-
     The eBird API limits the number of records returned to 200. When downloading
     the visits for a given region if 200 hundred records are returned then it is
     assumed there are more and the loader will fetch the sub-regions and download
@@ -43,15 +38,16 @@ class APILoader:
 
     """
 
-    def __init__(self, api_key: str, locale: str, force_update: bool = False):
+    def __init__(self, api_key: str, locale: str):
         self.api_key: str = api_key
         self.locale: str = locale
-        self.force_update = force_update
         self.visits: list = []
         self.checklists: list = []
         self.added: int = 0
-        self.updated: int = 0
-        self.unchanged: int = 0
+
+    @staticmethod
+    def has_checklist(identifier: str) -> bool:
+        return Checklist.objects.filter(identifier=identifier).exists()
 
     def add_checklist(self, data: dict) -> Checklist:
         identifier = data["subId"]
@@ -70,7 +66,6 @@ class APILoader:
         values = {
             "created": created,
             "edited": edited,
-            "identifier": identifier,
             "location": self.get_location(data),
             "observer": self.get_observer(data),
             "group": "",
@@ -96,43 +91,29 @@ class APILoader:
             area = data["effortAreaHa"]
             values["area"] = round(decimal.Decimal(area), 3)
 
-        added: bool = False
-        modified: bool = False
-
         if checklist := Checklist.objects.filter(identifier=identifier).first():
-            if checklist.edited is None:
-                for key, value in values.items():
-                    setattr(checklist, key, value)
-                modified = True
-                self.added += 1
-            elif checklist.edited < edited:
-                for key, value in values.items():
-                    setattr(checklist, key, value)
-                modified = True
-                self.updated += 1
-            elif self.force_update:
-                for key, value in values.items():
-                    setattr(checklist, key, value)
-                modified = True
-            else:
-                self.unchanged += 1
-
-            if modified:
-                checklist.save()
+            for key, value in values.items():
+                setattr(checklist, key, value)
+            checklist.save()
         else:
-            checklist = Checklist.objects.create(**values)
-            added = True
-            self.added += 1
+            checklist = Checklist.objects.create(identifier=identifier, **values)
 
-        if added or modified:
-            for observation_data in data["obs"]:
-                self.add_observation(observation_data, checklist)
+        self.added += 1
 
-        if modified:
-            queryset = checklist.observations.filter(edited__lt=edited)
+        for observation_data in data["obs"]:
+            self.add_observation(observation_data, checklist)
 
-            if queryset.exists():
-                count, deletions = queryset.delete()
+        for observation in checklist.observations.filter(edited__lt=edited):
+            logger.info(
+                "Deleting observation: %s",
+                identifier,
+                extra={
+                    "identifier": identifier,
+                    "species": observation.species.common_name,
+                    "count": observation.count,
+                },
+            )
+            observation.delete()
 
         return checklist
 
@@ -213,8 +194,11 @@ class APILoader:
         observer, created = Observer.objects.get_or_create(name=name)
         return observer
 
-    def add_visit(self, data: dict) -> Checklist:
+    def add_visit(self, data: dict) -> Checklist | None:
         identifier = data["subId"]
+
+        if self.has_checklist(identifier):
+            return
 
         date: dt.date = dt.datetime.strptime(data["obsDt"], "%d %b %Y").date()
         time: dt.time | None = None
@@ -236,30 +220,13 @@ class APILoader:
             "url": "https://ebird.org/checklist/%s" % identifier,
         }
 
-        if checklist := Checklist.objects.filter(identifier=identifier).first():
-            modified: bool = False
-
-            for attr in ["date", "time", "species_count"]:
-                if getattr(checklist, attr) != values[attr]:
-                    modified = True
-
-            if checklist.location_id != values["location"].id:
-                modified = True
-            if checklist.observer_id != values["observer"].id:
-                modified = True
-
-            if modified:
-                for key, value in values.items():
-                    setattr(checklist, key, value)
-                checklist.save()
-        else:
-            checklist = Checklist.objects.create(identifier=identifier, **values)
-
+        checklist = Checklist.objects.create(identifier=identifier, **values)
         self.checklists.append(identifier)
 
         return checklist
 
-    def add_species(self, data: dict) -> Species:
+    @staticmethod
+    def add_species(data: dict) -> Species:
         code = data["speciesCode"]
 
         values = {
@@ -447,8 +414,6 @@ class APILoader:
             self.visits = []
             self.checklists = []
             self.added = 0
-            self.updated = 0
-            self.unchanged = 0
 
             self.fetch_visits(region, date)
 
@@ -467,8 +432,6 @@ class APILoader:
                     "date": date,
                     "visits": len(self.visits),
                     "added": self.added,
-                    "updated": self.updated,
-                    "unchanged": self.unchanged,
                 },
             )
 
@@ -479,6 +442,45 @@ class APILoader:
                 date,
                 extra={
                     "region": region,
+                    "date": date,
+                },
+            )
+
+    def update_checklist(self, identifier: str) -> Checklist:
+        """
+        Update the checklist with the given identifier.
+
+        Arguments:
+            identifier: the eBird identifier for the checklist, e.g. "S318722167"
+
+        """
+        logger.info(
+            "Updating checklist: %s", identifier, extra={"identifier": identifier}
+        )
+        data = self.fetch_checklist(identifier)
+        return self.add_checklist(data)
+
+    def update_checklists(self, date: dt.date):
+        """
+        Update all the checklists for a given date.
+
+        Arguments:
+            date: The checklist date.
+
+        """
+        logger.info("Updating checklists: %s", date, extra={"date": date})
+
+        try:
+            identifiers = Checklist.objects.filter(date=date).values_list(
+                "identifier", flat=True
+            )
+            for identifier in identifiers:
+                self.update_checklist(identifier)
+        except (URLError, HTTPError):
+            logger.exception(
+                "Updating failed: %s",
+                date,
+                extra={
                     "date": date,
                 },
             )

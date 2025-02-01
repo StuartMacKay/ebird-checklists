@@ -6,10 +6,26 @@ and this project adheres to `Semantic Versioning <https://semver.org/spec/v2.0.0
 
 Latest
 ------
+* Added Added methods update_checklists() and update_checklist() to the APILoader
+  for updating existing checklists.
 * Changed APILoader.get_location() so it always returns a valid Location.
   Previously, if a location did not exist it created a placeholder with only the
   identifier set. It now uses the ebird-api's new get_location() method to always
   returns a valid Location.
+* Changed the APILoader to add two modes: add-checklist and update-checklists. The
+  add-checklists mode only adds new checklists - greatly reducing the load on the
+  eBird servers. The update-checklists mode updates all the checklists for a given
+  date. Generally, less than 1% of checklists are updated, so avoid using this mode
+  unless it's really necessary. However in this case you should consider using the
+  eBird Basic Dataset instead.
+
+.. code-block:: console
+
+    # Load new checklists submitted in the past 7 days
+    python manage.py load_api add-checklists 7 US-NY
+
+    # Update checklists submitted in the past 3 days
+    python manage.py load_api update-checklists 3
 
 0.7.0 (2025-01-31)
 ------------------

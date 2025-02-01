@@ -3,62 +3,55 @@ load_api.py
 
 A Django management command for loading observations from the eBird API.
 
-Usage:
-    python manage.py load_api [--key=<apikey>] [--days=<integer>] <region>+
+Modes:
+
+    add-checklists     Only load new checklists
+    update-checklists  Update existing checklists
 
 Arguments:
+    <days>   Required The number of days to fetch checklists for.
+
     <region> Required. One or more national, subnational1, subnational2, or hotspot
              codes used by eBird. For example, US, US-NY, US-NY-109, L1379126
 
-Options:
-    --key <apikey>    Optional. Your eBird API key. If you do not specify this
-                      option, the key will be taken from the EBIRD_API_KEY
-                      setting.
-
-    --days <integer>  Optional. The number of days to fetch checklists for.
-                      The default is three, starting with today, i.e. today,
-                      yesterday and the day before.
-
 Examples:
-    python manage.py load_api US
-    python manage.py load_api US-NY
-    python manage.py load_api US-NY-109
-    python manage.py load_api L1379126
-    python manage.py load_api US-NY-109 US-NY-110
-    python manage.py --days 5 US-NY-109
-    python manage.py --key <apikey> US-NY-109
+    python manage.py load_api add-checklists 7 US
+    python manage.py load_api add-checklists 7 US-NY
+    python manage.py load_api add-checklists 7 US-NY-109
+    python manage.py load_api add-checklists 7 L1379126
+    python manage.py load_api add-checklists 7 US-NY-109 US-NY-110
+    python manage.py load_api update-checklists 3
 
 Notes:
-    1. The eBird API returns a maximum of 200 results. Downloading checklists
-       once a day should be sufficient for all hotspots or subnational2 areas.
-       For large countries or places with lots of birders downloads will have
-       to be more frequent. For really large area, i.e. the USA you probably
-       shouldn't be using the API at all. Instead use the data from the eBird
-       Basic Dataset.
+    1. The eBird API returns a maximum of 200 results. The APILoader works
+       around this by fetching checklists from sub-regions if necessary.
+       Downloading checklists once a day should be sufficient for all hotspots
+       or subnational2 areas. For large countries or places with lots of birders
+       downloads will have to be more frequent. For really large area, i.e. the
+       USA you shouldn't be using the API at all. Instead use the data from the
+       eBird Basic Dataset.
 
-    2. The default number of three days is a trade-off between getting checklists
-       that were submitted "late" and repeatedly downloading the same, unchanged,
-       checklists multiple times.
+    2. The number of checklists that are updated is relatively small, typically
+       less than 1%. The problem with the eBird API is that you can only find
+       out whether a checklist has changed by downloading it. In order to minimise
+       the load on the eBird servers you should just add checklists and ignore
+       any updates.
 
-    3. You could use a more sophisticated strategy by running a download every day,
-       then once a week, or even once month running a download for each day in the
-       period. That would catch all the late submissions and edits.
-
-    4. The API is really a news service. For accuracy and completeness you should
+    3. The API is really a news service. For accuracy and completeness you should
        really use the eBird Basic Dataset, which is published on the 15th of each
        month.
 
-    5. It's important to note that the data from the API has limitations. Observers
+    4. It's important to note that the data from the API has limitations. Observers
        are only identified by name. So if there are two Juan Garcias birding in a
        region, then all the observations will appear to belong to one person. Also
        the observations will not have been reviewed by moderators, so there are
        likely to be records where the identification is incorrect.
 
-    6. You automate running the command using a scheduler such as cron. If you use
+    5. You automate running the command using a scheduler such as cron. If you use
        the absolute paths to python and the command, then you don't need to deal
        with activating the virtual environment, for example:
 
-       0 0 * * * /home/me/my-project/.venv/bin/python /home/me/my-project/manage.py load_api US-NY
+       0 0 * * * /home/me/my-project/.venv/bin/python /home/me/my-project/manage.py load_api add-checklists 7 US-NY
 
        Downloads all the checklists for US-NY, every day, at midnight.
 
@@ -76,30 +69,58 @@ class Command(BaseCommand):
     help = "Load checklists from the eBird API"
 
     def add_arguments(self, parser):
-        parser.add_argument("regions", nargs="+", type=str)
+        subparsers = parser.add_subparsers(
+            title="sub-commands",
+            required=True,
+        )
 
-        parser.add_argument("--key",
-            action="store",
-            dest="key",
-            default="",
+        add_parser = subparsers.add_parser(
+            "add-checklists",
+            help="Load new checklists.",
+        )
+        add_parser.set_defaults(method=self.add_checklists)
+        add_parser.add_argument(
+            "days", type=int, help="The number of previous days to load"
+        )
+        add_parser.add_argument(
+            "regions",
+            nargs="+",
             type=str,
-            help="Your key to access the eBird API")
+            help="Codes for the eBird regions, e.g US-NY",
+        )
 
-        parser.add_argument("--days",
-            action="store",
-            dest="days",
-            default=3,
-            type=int,
-            help="Load checklists for the past 'n' days")
+        update_parser = subparsers.add_parser(
+            "update-checklists",
+            help="Update existing checklists.",
+        )
+        update_parser.set_defaults(method=self.update_checklists)
+        update_parser.add_argument(
+            "days", nargs=1, type=int, help="The number of previous days to load"
+        )
 
-
-    def handle(self, *args, **options):
-        today = datetime.date.today()
-        key = getattr(settings, "EBIRD_API_KEY") or options["key"]
+    @staticmethod
+    def get_loader():
+        key = getattr(settings, "EBIRD_API_KEY")
         locale = getattr(settings, "EBIRD_LOCALE")
-        loader = APILoader(key, locale)
-        dates = [today - datetime.timedelta(days=n) for n in range(options["days"])]
+        return APILoader(key, locale)
 
+    @staticmethod
+    def get_dates(days):
+        today = datetime.date.today()
+        return [today - datetime.timedelta(days=n) for n in range(days)]
+
+    def handle(self, *args, method, **options):
+        method(*args, **options)
+
+    def add_checklists(self, *args, **options):
+        loader = self.get_loader()
+        dates = self.get_dates(options["days"])
         for region in options["regions"]:
             for date in dates:
                 loader.load_checklists(region, date)
+
+    def update_checklists(self, *args, **options):
+        loader = self.get_loader()
+        dates = self.get_dates(options["days"])
+        for date in dates:
+            loader.update_checklists(date)

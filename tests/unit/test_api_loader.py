@@ -179,56 +179,13 @@ def test_add_checklist__loader_added(loader, checklist):
     assert loader.added == 1
 
 
-def test_add_visit__loader_added(loader, visit, checklist):
-    """The added checklist is recorded by the loader"""
-    loader.add_visit(visit)
-    loader.add_checklist(checklist)
-    assert loader.added == 1
-
-
 def test_add_checklist__checklist_updated(loader, submitted, checklist):
     """If the checklist edited, it is updated."""
     chk1 = loader.add_checklist(checklist)
-    edited = datetime2str(submitted + relativedelta(hours=2))
-    checklist["lastEditedDt"] = edited
     checklist["numObservers"] += 1
     chk2 = loader.add_checklist(checklist)
     assert chk1.pk == chk2.pk
     assert chk1.observer_count != chk2.observer_count
-
-
-def test_add_checklist__loader_updated(loader, submitted, checklist):
-    """The updated checklist is recorded by the loader"""
-    loader.add_checklist(checklist)
-    edited = datetime2str(submitted + relativedelta(hours=2))
-    checklist["lastEditedDt"] = edited
-    checklist["numSpecies"] += 1
-    loader.add_checklist(checklist)
-    assert loader.updated == 1
-
-
-def test_add_checklist__checklist_unchanged(loader, submitted, checklist):
-    """If the checklist not edited, it is not updated."""
-    loader.add_checklist(checklist)
-    observer_count = checklist["numObservers"]
-    checklist["numObservers"] += 1
-    chk = loader.add_checklist(checklist)
-    assert chk.observer_count == observer_count
-
-
-def test_add_checklist__loader_unchanged(loader, checklist):
-    """The unchanged checklist is recorded by the loader"""
-    loader.add_checklist(checklist)
-    loader.add_checklist(checklist)
-    assert loader.unchanged == 1
-
-
-def test_add_checklist__checklist_force_updated(loader, checklist):
-    """Even if the checklist has not been edited, it is still updated."""
-    checklist["numObservers"] += 1
-    loader.force_update = True
-    chk = loader.add_checklist(checklist)
-    assert chk.observer_count == checklist["numObservers"]
 
 
 def test_add_checklist__time_set(loader, checklist, start):
@@ -328,42 +285,23 @@ def test_add_checklist__observations_added(loader, checklist, observation):
 
 
 def test_add_checklist__observations_updated(loader, submitted, checklist, observation):
-    """If the checklist is edited, the observations are updated"""
-    edited = datetime2str(submitted + relativedelta(hours=2))
-    checklist["lastEditedDt"] = edited
+    """Observations are updated."""
+    loader.add_checklist(checklist)
     observation["howManyStr"] = "2"
     loader.add_checklist(checklist)
     obs = Observation.objects.get(identifier=observation["obsId"])
     assert obs.count == 2
 
 
-def test_add_checklist__observations_unchanged(loader, submitted, checklist, observation):
-    """If the checklist is not edited, the observations are not updated"""
-    loader.add_checklist(checklist)
-    observation["howManyStr"] = "2"
-    loader.add_checklist(checklist)
-    obs = Observation.objects.get(identifier=observation["obsId"])
-    assert obs.count == 1
-
-
-def test_add_checklist__observations_force_updated(loader, submitted, checklist, observation):
-    """If the checklist is not edited, the observations are not updated"""
-    observation["howManyStr"] = "2"
-    loader.force_update = True
-    loader.add_checklist(checklist)
-    obs = Observation.objects.get(identifier=observation["obsId"])
-    assert obs.count == 2
-
-
-def test_add_checklist__orphaned_observations_deleted(loader, submitted, checklist, observations):
+def test_add_checklist__observations_deleted(loader, submitted, checklist, observations):
     """If checklist observations are deleted, the records are removed."""
+    loader.add_checklist(checklist)
+    del observations[0]
     edited = datetime2str(submitted + relativedelta(hours=2))
     checklist["lastEditedDt"] = edited
-    del observations[0]
-    chk = loader.add_checklist(checklist)
-    obs = chk.observations.all()
-    assert obs.count() == 1
-    assert obs.first().identifier == observations[0]["obsId"]
+    loader.add_checklist(checklist)
+    ob = Observation.objects.get()
+    assert ob.identifier == observations[0]["obsId"]
 
 
 def test_add_checklist__location_added(loader, checklist):
@@ -456,13 +394,12 @@ def test_add_visit__observer_added(loader, visit):
     Observer.objects.get(name=name)
 
 
-def test_add_visit__checklist_updated(loader, visit):
-    """If the visit is added again, the checklist is updated."""
-    chk1 = loader.add_visit(visit)
+def test_add_visit__checklist_unchanged(loader, visit):
+    """If the visit is added again, the record is not updated."""
+    loader.add_visit(visit)
     visit["numSpecies"] += 1
-    chk2 = loader.add_visit(visit)
-    assert chk1.pk == chk2.pk
-    assert chk1.species_count != chk2.species_count
+    checklist = loader.add_visit(visit)
+    assert checklist is None
 
 
 def test_add_visit__time_optional(loader, visit):
