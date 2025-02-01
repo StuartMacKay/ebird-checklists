@@ -3,10 +3,9 @@ import datetime as dt
 import logging
 import re
 from pathlib import Path
-from typing import Any, Optional
 
 from ..models import Checklist, Location, Observation, Observer, Species
-from .utils import str2int, str2decimal, update_object
+from .utils import str2int, str2decimal
 
 logger = logging.getLogger(__name__)
 
@@ -14,10 +13,11 @@ logger = logging.getLogger(__name__)
 class MyDataLoader:
 
     @staticmethod
-    def _get_location(data: dict[str, Any]) -> Location:
+    def _get_location(data: dict) -> Location:
         identifier: str = data["Location ID"]
+        location: Location
 
-        values: dict[str, Any] = {
+        values: dict = {
             "identifier": identifier,
             "type": "",
             "name": data["Location"],
@@ -36,8 +36,10 @@ class MyDataLoader:
             "url": "https://ebird.org/region/%s" % identifier,
         }
 
-        if obj := Location.objects.filter(identifier=identifier).first():
-            location = update_object(obj, values)
+        if location := Location.objects.filter(identifier=identifier).first():
+            for key, value in values.items():
+                setattr(location, key, value)
+            location.save()
         else:
             location = Location.objects.create(**values)
 
@@ -45,24 +47,25 @@ class MyDataLoader:
 
     @staticmethod
     def _get_observer(name: str) -> Observer:
-        timestamp: dt.datetime = dt.datetime.now()
         observer: Observer
 
         values = {"identifier": "", "name": name}
 
-        if obj := Observer.objects.filter(name=name).first():
-            observer = update_object(obj, values)
+        if observer := Observer.objects.filter(name=name).first():
+            for key, value in values.items():
+                setattr(observer, key, value)
+            observer.save()
         else:
             observer = Observer.objects.create(**values)
 
         return observer
 
     @staticmethod
-    def _get_species(data: dict[str, Any]) -> Species:
-        order = data["Taxonomic Order"]
+    def _get_species(data: dict) -> Species:
+        order: str = data["Taxonomic Order"]
         species: Species
 
-        values: dict[str, Any] = {
+        values: dict = {
             "taxon_order": order,
             "order": "",
             "category": "",
@@ -77,17 +80,19 @@ class MyDataLoader:
             "exotic_code": "",
         }
 
-        if obj := Species.objects.filter(order=order).first():
-            species = update_object(obj, values)
+        if species := Species.objects.filter(order=order).first():
+            for key, value in values.items():
+                setattr(species, key, value)
+            species.save()
         else:
             species = Species.objects.create(**values)
 
         return species
 
     def _get_observation(
-        self, data: dict[str, Any], checklist: Checklist
+        self, data: dict, checklist: Checklist
     ) -> Observation:
-        count: Optional[int]
+        count: int | None
 
         if re.match(r"\d+", data["Count"]):
             count = str2int(data["Count"])
@@ -96,7 +101,7 @@ class MyDataLoader:
         else:
             count = None
 
-        values: dict[str, Any] = {
+        values: dict = {
             "edited": checklist.edited,
             "identifier": "",
             "species": self._get_species(data),
@@ -127,17 +132,18 @@ class MyDataLoader:
 
     @staticmethod
     def _get_checklist(
-        data: dict[str, Any], location: Location, observer: Observer
+        data: dict, location: Location, observer: Observer
     ) -> Checklist:
         identifier: str = data["Submission ID"]
-        time: Optional[dt.time]
+        time: dt.time | None
+        checklist: Checklist
 
         if value := data["Time"]:
             time = dt.datetime.strptime(value, "%H:%M %p").time()
         else:
             time = None
 
-        values: dict[str, Any] = {
+        values: dict = {
             "identifier": identifier,
             "location": location,
             "observer": observer,
@@ -157,8 +163,10 @@ class MyDataLoader:
             "url": "https://ebird.org/checklist/%s" % identifier,
         }
 
-        if obj := Checklist.objects.filter(identifier=identifier).first():
-            checklist = update_object(obj, values)
+        if checklist := Checklist.objects.filter(identifier=identifier).first():
+            for key, value in values.items():
+                setattr(checklist, key, value)
+            checklist.save()
         else:
             checklist = Checklist.objects.create(**values)
 

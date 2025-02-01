@@ -3,19 +3,18 @@ import datetime as dt
 import logging
 import re
 from pathlib import Path
-from typing import Any, Optional
 
 from django.utils.timezone import get_default_timezone
 
 from ..models import Checklist, Location, Observation, Observer, Species
-from .utils import str2bool, str2int, str2decimal, update_object
+from .utils import str2bool, str2int, str2decimal
 
 logger = logging.getLogger(__name__)
 
 
 class BasicDatasetLoader:
     @staticmethod
-    def _get_observation_status(identifier: str, last_edited: str) -> tuple[bool, bool]:
+    def _get_observation_status(identifier: str, last_edited: str) -> (bool, bool):
         last_edited_date: dt.datetime = dt.datetime.fromisoformat(last_edited).replace(
             tzinfo=get_default_timezone()
         )
@@ -37,8 +36,9 @@ class BasicDatasetLoader:
     @staticmethod
     def _get_location(data: dict[str, str]) -> Location:
         identifier: str = data["LOCALITY ID"]
+        location: Location
 
-        values: dict[str, Any] = {
+        values: dict = {
             "identifier": identifier,
             "type": data["LOCALITY TYPE"],
             "name": data["LOCALITY"],
@@ -57,8 +57,10 @@ class BasicDatasetLoader:
             "url": "https://ebird.org/region/%s" % identifier,
         }
 
-        if obj := Location.objects.filter(identifier=identifier).first():
-            location = update_object(obj, values)
+        if location := Location.objects.filter(identifier=identifier).first():
+            for key, value in values.items():
+                setattr(location, key, value)
+            location.save()
         else:
             location = Location.objects.create(**values)
         return location
@@ -66,14 +68,17 @@ class BasicDatasetLoader:
     @staticmethod
     def _get_observer(data: dict[str, str]) -> Observer:
         identifier: str = data["OBSERVER ID"]
+        observer: Observer
 
-        values: dict[str, Any] = {
+        values: dict = {
             "identifier": identifier,
             "name": "",
         }
 
-        if obj := Observer.objects.filter(identifier=identifier).first():
-            observer = update_object(obj, values)
+        if observer := Observer.objects.filter(identifier=identifier).first():
+            for key, value in values.items():
+                setattr(observer, key, value)
+            observer.save()
         else:
             observer = Observer.objects.create(**values)
         return observer
@@ -83,7 +88,7 @@ class BasicDatasetLoader:
         taxon_order = data["TAXONOMIC ORDER"]
         species: Species
 
-        values: dict[str, Any] = {
+        values: dict = {
             "taxon_order": taxon_order,
             "order": "",
             "category": data["CATEGORY"],
@@ -98,8 +103,10 @@ class BasicDatasetLoader:
             "exotic_code": data["EXOTIC CODE"],
         }
 
-        if obj := Species.objects.filter(taxon_order=taxon_order).first():
-            species = update_object(obj, values)
+        if species := Species.objects.filter(taxon_order=taxon_order).first():
+            for key, value in values.items():
+                setattr(species, key, value)
+            species.save()
         else:
             species = Species.objects.create(**values)
         return species
@@ -109,7 +116,7 @@ class BasicDatasetLoader:
         data: dict[str, str], checklist: Checklist, species: Species
     ) -> Observation:
         identifier = data["GLOBAL UNIQUE IDENTIFIER"].split(":")[-1]
-        count: Optional[int]
+        count: int | None
         observation: Observation
 
         if re.match(r"\d+", data["OBSERVATION COUNT"]):
@@ -119,7 +126,7 @@ class BasicDatasetLoader:
         else:
             count = None
 
-        values: dict[str, Any] = {
+        values: dict = {
             "edited": checklist.edited,
             "identifier": identifier,
             "checklist": checklist,
@@ -139,8 +146,10 @@ class BasicDatasetLoader:
             "urn": data["GLOBAL UNIQUE IDENTIFIER"],
         }
 
-        if obj := Observation.objects.filter(identifier=identifier).first():
-            observation = update_object(obj, values)
+        if observation := Observation.objects.filter(identifier=identifier).first():
+            for key, value in values.items():
+                setattr(observation, key, value)
+            observation.save()
         else:
             observation = Observation.objects.create(**values)
 
@@ -156,14 +165,15 @@ class BasicDatasetLoader:
         edited: dt.datetime = dt.datetime.fromisoformat(
             row["LAST EDITED DATE"]
         ).replace(tzinfo=get_default_timezone())
-        time: Optional[dt.time]
+        time: dt.time | None
+        checklist: Checklist
 
         if value := row["TIME OBSERVATIONS STARTED"]:
             time = dt.datetime.strptime(value, "%H:%M:%S").time()
         else:
             time = None
 
-        values: dict[str, Any] = {
+        values: dict = {
             "identifier": identifier,
             "edited": edited,
             "location": location,
@@ -183,8 +193,10 @@ class BasicDatasetLoader:
             "url": "https://ebird.org/checklist/%s" % identifier,
         }
 
-        if obj := Checklist.objects.filter(identifier=identifier).first():
-            checklist = update_object(obj, values)
+        if checklist := Checklist.objects.filter(identifier=identifier).first():
+            for key, value in values.items():
+                setattr(checklist, key, value)
+            checklist.save()
         else:
             checklist = Checklist.objects.create(**values)
 

@@ -22,11 +22,13 @@ Notes:
     2. Conversely, downloads for My eBird Data do not have a unique identifier.
        That means you must delete all the records before you load the latest
        download, otherwise duplicate records will be created.
+
 """
+import os
 
 from django.core.management.base import BaseCommand
 
-from checklists.loaders import BasicDatasetLoader, MyDataLoader
+from ebird.checklists.loaders import BasicDatasetLoader, MyDataLoader
 
 
 class Command(BaseCommand):
@@ -35,15 +37,16 @@ class Command(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument("path", type=str)
 
-    def _is_basic_dataset(self, path: str):
+    @staticmethod
+    def _is_basic_dataset(path: str):
         with open(path) as csv_file:
             headers = csv_file.readline()
             return "GLOBAL UNIQUE IDENTIFIER" in headers
 
     def handle(self, *args, **options):
-        path = options["path"]
+        path: str = options["path"]
 
-        if not path.exists():
+        if not os.path.exists(path):
             raise IOError('File "%s" does not exist' % path)
 
         if self._is_basic_dataset(path):

@@ -57,7 +57,7 @@ Notes:
 
 """
 
-import datetime
+import datetime as dt
 
 from django.conf import settings
 from django.core.management.base import BaseCommand
@@ -99,28 +99,33 @@ class Command(BaseCommand):
         )
 
     @staticmethod
-    def get_loader():
-        key = getattr(settings, "EBIRD_API_KEY")
-        locale = getattr(settings, "EBIRD_LOCALE")
+    def get_loader() -> APILoader:
+        key: str = getattr(settings, "EBIRD_API_KEY")
+        locale: str = getattr(settings, "EBIRD_LOCALE")
         return APILoader(key, locale)
 
     @staticmethod
-    def get_dates(days):
-        today = datetime.date.today()
-        return [today - datetime.timedelta(days=n) for n in range(days)]
+    def get_dates(days) -> list[dt.date]:
+        today: dt.date = dt.date.today()
+        return [today - dt.timedelta(days=n) for n in range(days)]
 
     def handle(self, *args, method, **options):
         method(*args, **options)
 
-    def add_checklists(self, *args, **options):
-        loader = self.get_loader()
-        dates = self.get_dates(options["days"])
+    def add_checklists(self, *args, **options) -> None:
+        loader: APILoader = self.get_loader()
+        dates: list[dt.date] = self.get_dates(options["days"])
+        region: str
+        date: dt.date
+
         for region in options["regions"]:
             for date in dates:
                 loader.load_checklists(region, date)
 
-    def update_checklists(self, *args, **options):
-        loader = self.get_loader()
-        dates = self.get_dates(options["days"])
+    def update_checklists(self, *args, **options) -> None:
+        loader: APILoader = self.get_loader()
+        dates: list[dt.date] = self.get_dates(options["days"])
+        date: dt.date
+
         for date in dates:
             loader.update_checklists(date)

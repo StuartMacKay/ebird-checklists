@@ -1,24 +1,22 @@
 import datetime as dt
 import decimal
-from typing import Any, Optional
 
-from django.db.models import Model
 from django.utils.timezone import get_default_timezone
 
 
-def str2bool(value: Optional[str]) -> Optional[bool]:
+def str2bool(value: str | None) -> bool | None:
     return bool(value) if value else None
 
 
-def str2int(value: Optional[str]) -> Optional[int]:
+def str2int(value: str | None) -> int | None:
     return int(value) if value else None
 
 
-def float2int(value: Optional[float]) -> Optional[int]:
+def float2int(value: float | None) -> int | None:
     return int(value) if value else None
 
 
-def str2decimal(value: Optional[str]) -> Optional[decimal.Decimal]:
+def str2decimal(value: str | None) -> decimal.Decimal | None:
     return decimal.Decimal(value) if value else None
 
 
@@ -28,10 +26,3 @@ def str2datetime(value: str) -> dt.datetime:
 
 def str2date(value: str) -> dt.date:
     return str2datetime(value).date()
-
-
-def update_object(obj: Model, values: dict[str, Any]) -> Model:
-    for key, value in values.items():
-        setattr(obj, key, value)
-    obj.save()
-    return obj

@@ -42,8 +42,8 @@ class APILoader:
     def __init__(self, api_key: str, locale: str):
         self.api_key: str = api_key
         self.locale: str = locale
-        self.visits: list = []
-        self.checklists: list = []
+        self.visits: list[dict] = []
+        self.checklists: list[str] = []
         self.added: int = 0
 
     @staticmethod
@@ -51,10 +51,11 @@ class APILoader:
         return Checklist.objects.filter(identifier=identifier).exists()
 
     def add_checklist(self, data: dict) -> Checklist:
-        identifier = data["subId"]
+        identifier: str = data["subId"]
         created: dt.datetime = str2datetime(data["creationDt"])
         edited: dt.datetime = str2datetime(data["lastEditedDt"])
         started: dt.datetime = str2datetime(data["obsDt"])
+        checklist: Checklist
 
         time: dt.time | None = None
         if data["obsTimeValid"]:
@@ -64,7 +65,7 @@ class APILoader:
         if "durationHrs" in data:
             duration = float2int(data["durationHrs"] * 60.0)
 
-        values = {
+        values: dict = {
             "created": created,
             "edited": edited,
             "location": self.get_location(data),
@@ -87,10 +88,10 @@ class APILoader:
             values["observer_count"] = int(data["numObservers"])
 
         if data["protocolId"] == "P22":
-            dist = data["effortDistanceKm"]
+            dist: str = data["effortDistanceKm"]
             values["distance"] = round(decimal.Decimal(dist), 3)
         elif data["protocolId"] == "P23":
-            area = data["effortAreaHa"]
+            area: str = data["effortAreaHa"]
             values["area"] = round(decimal.Decimal(area), 3)
 
         if checklist := Checklist.objects.filter(identifier=identifier).first():
@@ -122,6 +123,8 @@ class APILoader:
     @staticmethod
     def add_location(data: dict) -> Location:
         identifier: str = data["locId"]
+        location: Location
+
         values: dict = {
             "identifier": identifier,
             "type": "",
@@ -197,7 +200,7 @@ class APILoader:
         return observer
 
     def add_visit(self, data: dict) -> Checklist | None:
-        identifier = data["subId"]
+        identifier: str = data["subId"]
 
         if self.has_checklist(identifier):
             return
@@ -211,7 +214,7 @@ class APILoader:
         if "obsTime" in data:
             time = started.time()
 
-        values = {
+        values: dict = {
             "location": self.add_location(data["loc"]),
             "observer": self.add_observer(data),
             "group": "",
@@ -226,16 +229,17 @@ class APILoader:
             "url": "https://ebird.org/checklist/%s" % identifier,
         }
 
-        checklist = Checklist.objects.create(identifier=identifier, **values)
+        checklist: Checklist = Checklist.objects.create(identifier=identifier, **values)
         self.checklists.append(identifier)
 
         return checklist
 
     @staticmethod
     def add_species(data: dict) -> Species:
-        code = data["speciesCode"]
+        code: str = data["speciesCode"]
+        species: Species
 
-        values = {
+        values: dict = {
             "taxon_order": int(data["taxonOrder"]),
             "order": data.get("order", ""),
             "category": data["category"],
@@ -251,7 +255,7 @@ class APILoader:
 
         if species := Species.objects.filter(species_code=code).first():
             for key, value in values.items():
-                species.setattr(key, value)
+                setattr(species, key, value)
             species.save()
         else:
             species = Species.objects.create(species_code=code, **values)
@@ -264,7 +268,7 @@ class APILoader:
 
     def get_location(self, data: dict) -> Location:
         identifier: str = data["locId"]
-        location = Location.objects.filter(identifier=identifier).first()
+        location: Location = Location.objects.filter(identifier=identifier).first()
         if location is None:
             location = self.load_location(identifier)
         return location
@@ -272,20 +276,21 @@ class APILoader:
     @staticmethod
     def get_observer(data: dict) -> Observer:
         name: str = data["userDisplayName"]
-        observer = Observer.objects.filter(name=name).first()
+        observer: Observer = Observer.objects.filter(name=name).first()
         if observer is None:
             observer = Observer.objects.create(name=name)
             logger.error("Observer did not exist", extra={"observer": name})
         return observer
 
     def get_species(self, data: dict) -> Species:
-        code = data["speciesCode"]
+        code:str = data["speciesCode"]
+        species: Species
         if (species := Species.objects.filter(species_code=code).first()) is None:
             species = self.load_species(code, self.locale)
         return species
 
     def fetch_checklist(self, identifier: str) -> dict:
-        data = get_checklist(self.api_key, identifier)
+        data: dict = get_checklist(self.api_key, identifier)
         return data
 
     def fetch_species(self, code: str, locale: str) -> dict:
@@ -297,12 +302,12 @@ class APILoader:
             region,
             extra={"region": region},
         )
-        region_types = ["subnational1", "subnational2", None]
+        region_types: list = ["subnational1", "subnational2", None]
         levels: int = len(region.split("-", 2))
-        region_type = region_types[levels - 1]
+        region_type: str | None = region_types[levels - 1]
 
         if region_type:
-            items = get_regions(self.api_key, region_type, region)
+            items: list = get_regions(self.api_key, region_type, region)
             sub_regions = [item["code"] for item in items]
         else:
             sub_regions = []
@@ -336,7 +341,7 @@ class APILoader:
             for visit in visits:
                 self.visits.append(visit)
 
-    def fetch_location(self, identifier: str) -> dict | None:
+    def fetch_location(self, identifier: str) -> dict:
         return get_location(self.api_key, identifier)
 
     def load_species(self, code: str, locale: str) -> Species:
@@ -354,7 +359,7 @@ class APILoader:
             locale,
             extra={"code": code, "locale": locale},
         )
-        data = self.fetch_species(code, locale)
+        data: dict = self.fetch_species(code, locale)
         return self.add_species(data)
 
     def load_location(self, identifier: str) -> Location:
@@ -368,7 +373,7 @@ class APILoader:
         logger.info(
             "Loading location: %s", identifier, extra={"identifier": identifier}
         )
-        data = self.fetch_location(identifier)
+        data: dict = self.fetch_location(identifier)
         return self.add_location(data)
 
     def load_checklist(self, identifier: str) -> Checklist:
@@ -394,7 +399,7 @@ class APILoader:
         logger.info(
             "Loading checklist: %s", identifier, extra={"identifier": identifier}
         )
-        data = self.fetch_checklist(identifier)
+        data: dict = self.fetch_checklist(identifier)
         return self.add_checklist(data)
 
     def load_checklists(self, region: str, date: dt.date) -> None:
@@ -463,7 +468,7 @@ class APILoader:
         logger.info(
             "Updating checklist: %s", identifier, extra={"identifier": identifier}
         )
-        data = self.fetch_checklist(identifier)
+        data: dict = self.fetch_checklist(identifier)
         return self.add_checklist(data)
 
     def update_checklists(self, date: dt.date):
