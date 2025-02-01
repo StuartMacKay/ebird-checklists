@@ -4,9 +4,10 @@ import logging
 import re
 from urllib.error import HTTPError, URLError
 
+from django.utils.timezone import get_default_timezone
 from ebird.api import get_checklist, get_location, get_regions, get_visits, get_taxonomy
 
-from .utils import str2date, str2datetime, float2int, str2decimal
+from .utils import str2datetime, float2int, str2decimal
 from ..models import Checklist, Location, Observation, Observer, Species
 
 logger = logging.getLogger(__name__)
@@ -53,11 +54,11 @@ class APILoader:
         identifier = data["subId"]
         created: dt.datetime = str2datetime(data["creationDt"])
         edited: dt.datetime = str2datetime(data["lastEditedDt"])
+        started: dt.datetime = str2datetime(data["obsDt"])
 
         time: dt.time | None = None
         if data["obsTimeValid"]:
-            time_str: str = data["obsDt"].split(" ", 1)[1]
-            time = dt.datetime.strptime(time_str, "%H:%M").time()
+            time = started.time()
 
         duration: str | None = None
         if "durationHrs" in data:
@@ -70,8 +71,9 @@ class APILoader:
             "observer": self.get_observer(data),
             "group": "",
             "species_count": data["numSpecies"],
-            "date": str2date(data["obsDt"]),
+            "date": started.date(),
             "time": time,
+            "started": started,
             "protocol": "",
             "protocol_code": data["protocolId"],
             "project_code": data["projId"],
@@ -200,11 +202,14 @@ class APILoader:
         if self.has_checklist(identifier):
             return
 
-        date: dt.date = dt.datetime.strptime(data["obsDt"], "%d %b %Y").date()
+        started: dt.datetime = dt.datetime.strptime(data["obsDt"], "%d %b %Y").replace(
+            tzinfo=get_default_timezone()
+        )
+        date: dt.date = started.date()
         time: dt.time | None = None
 
         if "obsTime" in data:
-            time = dt.datetime.strptime(data["obsTime"], "%H:%M").time()
+            time = started.time()
 
         values = {
             "location": self.add_location(data["loc"]),
@@ -213,6 +218,7 @@ class APILoader:
             "species_count": data["numSpecies"],
             "date": date,
             "time": time,
+            "started": started,
             "protocol": "",
             "protocol_code": "",
             "project_code": "",

@@ -166,7 +166,7 @@ class Checklist(models.Model):
     )
 
     date = models.DateField(
-        verbose_name=_("date"), help_text=_("The date the checklist was made.")
+        verbose_name=_("date"), help_text=_("The date the checklist was started.")
     )
 
     time = models.TimeField(
@@ -174,6 +174,13 @@ class Checklist(models.Model):
         null=True,
         verbose_name=_("time"),
         help_text=_("The time the checklist was started."),
+    )
+
+    started = models.DateTimeField(
+        blank=True,
+        null=True,
+        verbose_name=_("date & time"),
+        help_text=_("The date and time the checklist was started."),
     )
 
     protocol = models.TextField(
