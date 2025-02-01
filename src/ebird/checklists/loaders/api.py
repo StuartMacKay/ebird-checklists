@@ -482,6 +482,15 @@ class APILoader:
             )
             for identifier in identifiers:
                 self.update_checklist(identifier)
+
+            logger.info(
+                "Updating succeeded: %s",
+                date,
+                extra={
+                    "date": date,
+                    "updated": len(identifiers),
+                },
+            )
         except (URLError, HTTPError):
             logger.exception(
                 "Updating failed: %s",
