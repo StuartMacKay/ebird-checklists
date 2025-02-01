@@ -4,7 +4,7 @@ import logging
 import re
 from urllib.error import HTTPError, URLError
 
-from ebird.api import get_checklist, get_hotspot, get_regions, get_visits, get_taxonomy
+from ebird.api import get_checklist, get_location, get_regions, get_visits, get_taxonomy
 
 from .utils import str2date, str2datetime, float2int, str2decimal
 from ..models import Checklist, Location, Observation, Observer, Species
@@ -289,13 +289,11 @@ class APILoader:
     def get_urn(row: dict[str, str]) -> str:
         return f"URN:CornellLabOfOrnithology:{row['projId']}:{row['obsId']}"
 
-    @staticmethod
-    def get_location(data: dict) -> Location:
+    def get_location(self, data: dict) -> Location:
         identifier: str = data["locId"]
         location = Location.objects.filter(identifier=identifier).first()
         if location is None:
-            location = Location.objects.create(identifier=identifier)
-            logger.error("Location did not exist", extra={"identifier": identifier})
+            location = self.load_location(identifier)
         return location
 
     @staticmethod
@@ -366,16 +364,7 @@ class APILoader:
                 self.visits.append(visit)
 
     def fetch_location(self, identifier: str) -> dict | None:
-        try:
-            data = get_hotspot(self.api_key, identifier)
-        except HTTPError:
-            data = None
-            logger.error(
-                "Location not fetched: %s",
-                identifier,
-                extra={"identifier": identifier},
-            )
-        return data
+        return get_location(self.api_key, identifier)
 
     def load_species(self, code: str, locale: str) -> Species:
         """
@@ -395,27 +384,19 @@ class APILoader:
         data = self.fetch_species(code, locale)
         return self.add_species(data)
 
-    def load_location(self, identifier: str) -> Location | None:
+    def load_location(self, identifier: str) -> Location:
         """
         Load the location with the given identifier.
 
-        IMPORTANT: This only works for hotpots. If the location is private
-        then eBird returns a status HTTP 410 GONE, and this method returns
-        None.
-
         Arguments:
             identifier; the eBird identifier for the location, e.g. "L901738".
-
-        Returns:
-            The Location, created or updated with the data from the API call,
-            or None if the location is private.
 
         """
         logger.info(
             "Loading location: %s", identifier, extra={"identifier": identifier}
         )
-        if data := self.fetch_location(identifier):
-            return self.add_location(data)
+        data = self.fetch_location(identifier)
+        return self.add_location(data)
 
     def load_checklist(self, identifier: str) -> Checklist:
         """
