@@ -1,0 +1,831 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-02-01 17:50+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+#: admin.py:20
+msgid "Common name"
+msgstr ""
+
+#: admin.py:27 models/species.py:95
+msgid "Scientific name"
+msgstr ""
+
+#: apps.py:7
+msgid "eBird Checklists"
+msgstr ""
+
+#: models/checklist.py:11
+msgid "Travelling"
+msgstr ""
+
+#: models/checklist.py:12
+msgid "Stationary"
+msgstr ""
+
+#: models/checklist.py:13
+msgid "Historical"
+msgstr ""
+
+#: models/checklist.py:14
+msgid "Incidental"
+msgstr ""
+
+#: models/checklist.py:15
+msgid "Area"
+msgstr ""
+
+#: models/checklist.py:16
+msgid "Banding"
+msgstr ""
+
+#: models/checklist.py:17
+msgid "Pelagic"
+msgstr ""
+
+#: models/checklist.py:18
+msgid "Nocturnal Flight Call Count"
+msgstr ""
+
+#: models/checklist.py:19
+msgid "Oiled Birds"
+msgstr ""
+
+#: models/checklist.py:20
+msgid "Random"
+msgstr ""
+
+#: models/checklist.py:21
+msgid "TNC California Waterbird Count"
+msgstr ""
+
+#: models/checklist.py:22
+msgid "CWC Point Count"
+msgstr ""
+
+#: models/checklist.py:23
+msgid "CWC Area Search"
+msgstr ""
+
+#: models/checklist.py:24
+msgid "CWC Travelling Count"
+msgstr ""
+
+#: models/checklist.py:25
+msgid "Rusty Blackbird Spring Migration Blitz"
+msgstr ""
+
+#: models/checklist.py:26
+msgid "California Brown Pelican Survey"
+msgstr ""
+
+#: models/checklist.py:27
+msgid "PROALAS Point Count (2 Bands)"
+msgstr ""
+
+#: models/checklist.py:28
+msgid "PROALAS Mini-transect"
+msgstr ""
+
+#: models/checklist.py:29
+msgid "PROALAS Point Count (3 Bands)"
+msgstr ""
+
+#: models/checklist.py:30
+msgid "Orange-breasted Falcon Site Survey"
+msgstr ""
+
+#: models/checklist.py:31
+msgid "Audubon Coastal Bird Survey"
+msgstr ""
+
+#: models/checklist.py:32
+msgid "International Shorebird Survey"
+msgstr ""
+
+#: models/checklist.py:33
+msgid "Migratory Shorebird Protocol"
+msgstr ""
+
+#: models/checklist.py:34
+msgid "BirdLife Australia 20min-2ha survey"
+msgstr ""
+
+#: models/checklist.py:35
+msgid "BirdLife Australia 5 km radius search"
+msgstr ""
+
+#: models/checklist.py:36
+msgid "BirdLife Australia 500m radius search"
+msgstr ""
+
+#: models/checklist.py:37
+msgid "Birds 'n' Bogs Survey"
+msgstr ""
+
+#: models/checklist.py:38
+msgid "Breeding Bird Atlas"
+msgstr ""
+
+#: models/checklist.py:39
+msgid "Common Bird Survey"
+msgstr ""
+
+#: models/checklist.py:40
+msgid "Caribbean Martin Survey"
+msgstr ""
+
+#: models/checklist.py:41
+msgid "Coastal Shorebird Survey"
+msgstr ""
+
+#: models/checklist.py:42
+msgid "Great Texas Birding Classic"
+msgstr ""
+
+#: models/checklist.py:43
+msgid "Greater Gulf Refuge Waterbird Count"
+msgstr ""
+
+#: models/checklist.py:44
+msgid "Heron Area Count"
+msgstr ""
+
+#: models/checklist.py:45
+msgid "Heron Stationary Count"
+msgstr ""
+
+#: models/checklist.py:46
+msgid "IBA Canada"
+msgstr ""
+
+#: models/checklist.py:47
+msgid "LoonWatch"
+msgstr ""
+
+#: models/checklist.py:48
+msgid "My Yard Counts"
+msgstr ""
+
+#: models/checklist.py:49
+msgid "RAM--Iberian Seawatch Network"
+msgstr ""
+
+#: models/checklist.py:50
+msgid "Standardized Yard Count"
+msgstr ""
+
+#: models/checklist.py:51
+msgid "Trail Tracker"
+msgstr ""
+
+#: models/checklist.py:52
+msgid "Tricolored Blackbird Winter Survey"
+msgstr ""
+
+#: models/checklist.py:53
+msgid "Traveling - Property Specific"
+msgstr ""
+
+#: models/checklist.py:54
+msgid "Waterbird Count"
+msgstr ""
+
+#: models/checklist.py:55
+msgid "Yellow-billed Magpie Survey - General Observations"
+msgstr ""
+
+#: models/checklist.py:56
+msgid "Yellow-billed Magpie Survey - Traveling Count"
+msgstr ""
+
+#: models/checklist.py:110 models/observation.py:69
+msgid "checklist"
+msgstr ""
+
+#: models/checklist.py:111
+msgid "checklists"
+msgstr ""
+
+#: models/checklist.py:116
+msgid "The date and time the checklist was added to eBird"
+msgstr ""
+
+#: models/checklist.py:117
+msgid "created"
+msgstr ""
+
+#: models/checklist.py:123 models/observation.py:55
+msgid "The date and time the eBird checklist was last edited"
+msgstr ""
+
+#: models/checklist.py:124 models/observation.py:56
+msgid "edited"
+msgstr ""
+
+#: models/checklist.py:129 models/location.py:43 models/observation.py:61
+#: models/observer.py:15
+msgid "identifier"
+msgstr ""
+
+#: models/checklist.py:130
+msgid "The unique identifier for the checklist."
+msgstr ""
+
+#: models/checklist.py:137 models/location.py:38 models/observation.py:93
+msgid "location"
+msgstr ""
+
+#: models/checklist.py:138
+msgid "The location where checklist was made."
+msgstr ""
+
+#: models/checklist.py:145 models/observation.py:85 models/observer.py:11
+msgid "observer"
+msgstr ""
+
+#: models/checklist.py:146
+msgid "The person who submitted the checklist."
+msgstr ""
+
+#: models/checklist.py:151
+msgid "group"
+msgstr ""
+
+#: models/checklist.py:152
+msgid "The identifier for a group of observers."
+msgstr ""
+
+#: models/checklist.py:158
+msgid "observer count"
+msgstr ""
+
+#: models/checklist.py:159
+msgid "The total number of observers."
+msgstr ""
+
+#: models/checklist.py:165
+msgid "species count"
+msgstr ""
+
+#: models/checklist.py:166
+msgid "The number of species reported."
+msgstr ""
+
+#: models/checklist.py:171
+msgid "date"
+msgstr ""
+
+#: models/checklist.py:171
+msgid "The date the checklist was started."
+msgstr ""
+
+#: models/checklist.py:177
+msgid "time"
+msgstr ""
+
+#: models/checklist.py:178
+msgid "The time the checklist was started."
+msgstr ""
+
+#: models/checklist.py:185
+msgid "date & time"
+msgstr ""
+
+#: models/checklist.py:186
+msgid "The date and time the checklist was started."
+msgstr ""
+
+#: models/checklist.py:191
+msgid "protocol"
+msgstr ""
+
+#: models/checklist.py:192
+msgid "The protocol followed, e.g. travelling, stationary, etc."
+msgstr ""
+
+#: models/checklist.py:197
+msgid "protocol code"
+msgstr ""
+
+#: models/checklist.py:198
+msgid "The code used to identify the protocol."
+msgstr ""
+
+#: models/checklist.py:203
+msgid "project code"
+msgstr ""
+
+#: models/checklist.py:204
+msgid "The code used to identify the project (portal)."
+msgstr ""
+
+#: models/checklist.py:210
+msgid "duration"
+msgstr ""
+
+#: models/checklist.py:211
+msgid "The number of minutes spent counting."
+msgstr ""
+
+#: models/checklist.py:219
+msgid "distance"
+msgstr ""
+
+#: models/checklist.py:220
+msgid "The distance, in metres, covered while travelling."
+msgstr ""
+
+#: models/checklist.py:228
+msgid "area"
+msgstr ""
+
+#: models/checklist.py:229
+msgid "The area covered, in hectares."
+msgstr ""
+
+#: models/checklist.py:234
+msgid "complete"
+msgstr ""
+
+#: models/checklist.py:235
+msgid "All species seen are reported."
+msgstr ""
+
+#: models/checklist.py:240 models/observation.py:160
+msgid "comments"
+msgstr ""
+
+#: models/checklist.py:241
+msgid "Any comments about the checklist."
+msgstr ""
+
+#: models/checklist.py:246 models/location.py:136
+msgid "url"
+msgstr ""
+
+#: models/checklist.py:247
+msgid "URL where the original checklist can be viewed."
+msgstr ""
+
+#: models/checklist.py:251 models/location.py:148 models/observation.py:171
+#: models/observer.py:27 models/species.py:106
+msgid "Data"
+msgstr ""
+
+#: models/checklist.py:252
+msgid "Data describing a Checklist."
+msgstr ""
+
+#: models/location.py:7
+msgid "County"
+msgstr ""
+
+#: models/location.py:8
+msgid "Hotspot"
+msgstr ""
+
+#: models/location.py:9
+msgid "Personal"
+msgstr ""
+
+#: models/location.py:10
+msgid "Postal/Zip Code"
+msgstr ""
+
+#: models/location.py:11
+msgid "State"
+msgstr ""
+
+#: models/location.py:12
+msgid "Town"
+msgstr ""
+
+#: models/location.py:39
+msgid "locations"
+msgstr ""
+
+#: models/location.py:44
+msgid "The unique identifier for the location"
+msgstr ""
+
+#: models/location.py:49
+msgid "type"
+msgstr ""
+
+#: models/location.py:50
+msgid "The location type, e.g. personal, hotspot, town, etc."
+msgstr ""
+
+#: models/location.py:54 models/observer.py:22
+msgid "name"
+msgstr ""
+
+#: models/location.py:54
+msgid "The name of the location"
+msgstr ""
+
+#: models/location.py:59
+msgid "county"
+msgstr ""
+
+#: models/location.py:60
+msgid "The name of the county (subnational2)."
+msgstr ""
+
+#: models/location.py:66
+msgid "county code"
+msgstr ""
+
+#: models/location.py:67
+msgid "The code used to identify the county."
+msgstr ""
+
+#: models/location.py:71
+msgid "state"
+msgstr ""
+
+#: models/location.py:71
+msgid "The name of the state (subnational1)."
+msgstr ""
+
+#: models/location.py:76
+msgid "state code"
+msgstr ""
+
+#: models/location.py:77
+msgid "The code used to identify the state."
+msgstr ""
+
+#: models/location.py:81
+msgid "country"
+msgstr ""
+
+#: models/location.py:81
+msgid "The name of the country."
+msgstr ""
+
+#: models/location.py:86
+msgid "country code"
+msgstr ""
+
+#: models/location.py:87
+msgid "The code used to identify the country."
+msgstr ""
+
+#: models/location.py:92
+msgid "IBA code"
+msgstr ""
+
+#: models/location.py:93
+msgid "The code used to identify an Important Bird Area."
+msgstr ""
+
+#: models/location.py:98
+msgid "BCR code"
+msgstr ""
+
+#: models/location.py:99
+msgid "The code used to identify a Bird Conservation Region."
+msgstr ""
+
+#: models/location.py:104
+msgid "USFWS code"
+msgstr ""
+
+#: models/location.py:105
+msgid "The code used to identify a US Fish & Wildlife Service region."
+msgstr ""
+
+#: models/location.py:110
+msgid "atlas block"
+msgstr ""
+
+#: models/location.py:111
+msgid "The code used to identify an area for an atlas."
+msgstr ""
+
+#: models/location.py:119
+msgid "latitude"
+msgstr ""
+
+#: models/location.py:120
+msgid "The decimal latitude of the location, relative to the equator"
+msgstr ""
+
+#: models/location.py:128
+msgid "longitude"
+msgstr ""
+
+#: models/location.py:130
+msgid "The decimal longitude of the location, relative to the prime meridian"
+msgstr ""
+
+#: models/location.py:137
+msgid "URL of the location page on eBird."
+msgstr ""
+
+#: models/location.py:143
+msgid "is hotspot"
+msgstr ""
+
+#: models/location.py:144
+msgid "Is the location a hotspot"
+msgstr ""
+
+#: models/location.py:149
+msgid "Data describing a Location"
+msgstr ""
+
+#: models/observation.py:49
+msgid "observation"
+msgstr ""
+
+#: models/observation.py:50
+msgid "observations"
+msgstr ""
+
+#: models/observation.py:62
+msgid "A global unique identifier for the observation."
+msgstr ""
+
+#: models/observation.py:70
+msgid "The checklist this observation belongs to."
+msgstr ""
+
+#: models/observation.py:77 models/species.py:31 models/species.py:32
+msgid "species"
+msgstr ""
+
+#: models/observation.py:78
+msgid "The identified species."
+msgstr ""
+
+#: models/observation.py:86
+msgid "The person who made the observation."
+msgstr ""
+
+#: models/observation.py:94
+msgid "The location where the observation was made."
+msgstr ""
+
+#: models/observation.py:101
+msgid "count"
+msgstr ""
+
+#: models/observation.py:102
+msgid "The number of birds seen."
+msgstr ""
+
+#: models/observation.py:107
+msgid "breeding code"
+msgstr ""
+
+#: models/observation.py:108
+msgid "eBird code identifying the breeding status"
+msgstr ""
+
+#: models/observation.py:113
+msgid "breeding category"
+msgstr ""
+
+#: models/observation.py:114
+msgid "eBird code identifying the breeding category"
+msgstr ""
+
+#: models/observation.py:119
+msgid "behaviour code"
+msgstr ""
+
+#: models/observation.py:120
+msgid "eBird code identifying the behaviour"
+msgstr ""
+
+#: models/observation.py:125
+msgid "Age & Sex"
+msgstr ""
+
+#: models/observation.py:126
+msgid "The number of birds seen in each combination of age and sex."
+msgstr ""
+
+#: models/observation.py:132
+msgid "has media"
+msgstr ""
+
+#: models/observation.py:133
+msgid "Has audio, photo or video uploaded to the Macaulay library."
+msgstr ""
+
+#: models/observation.py:139
+msgid "Approved"
+msgstr ""
+
+#: models/observation.py:140
+msgid "Has the observation been accepted by eBird's review process."
+msgstr ""
+
+#: models/observation.py:146
+msgid "Reviewed"
+msgstr ""
+
+#: models/observation.py:147
+msgid "Was the observation reviewed because it failed automatic checks."
+msgstr ""
+
+#: models/observation.py:152
+msgid "Reason"
+msgstr ""
+
+#: models/observation.py:154
+msgid "The reason given for the observation to be marked as not confirmed."
+msgstr ""
+
+#: models/observation.py:161
+msgid "Any comments about the observation."
+msgstr ""
+
+#: models/observation.py:166
+msgid "URN"
+msgstr ""
+
+#: models/observation.py:167
+msgid "The globally unique identifier for the observation"
+msgstr ""
+
+#: models/observation.py:172
+msgid "Data describing an Observation."
+msgstr ""
+
+#: models/observer.py:12
+msgid "observers"
+msgstr ""
+
+#: models/observer.py:16
+msgid "The code for the person submitted the checklist."
+msgstr ""
+
+#: models/observer.py:23
+msgid "The observer's name."
+msgstr ""
+
+#: models/observer.py:28
+msgid "Data describing an Observer."
+msgstr ""
+
+#: models/species.py:6
+msgid "Species"
+msgstr ""
+
+#: models/species.py:7
+msgid "Sub-species"
+msgstr ""
+
+#: models/species.py:8
+msgid "Hybrid"
+msgstr ""
+
+#: models/species.py:9
+msgid "Intergrade"
+msgstr ""
+
+#: models/species.py:10
+msgid "Genus"
+msgstr ""
+
+#: models/species.py:11
+msgid "Species group"
+msgstr ""
+
+#: models/species.py:12
+msgid "Domestic"
+msgstr ""
+
+#: models/species.py:13
+msgid "Form"
+msgstr ""
+
+#: models/species.py:18
+msgid "Naturalized"
+msgstr ""
+
+#: models/species.py:19
+msgid "Provisional"
+msgstr ""
+
+#: models/species.py:20
+msgid "Escapee"
+msgstr ""
+
+#: models/species.py:37
+msgid "taxonomy order"
+msgstr ""
+
+#: models/species.py:38
+msgid "The position in the eBird/Clements taxonomic order."
+msgstr ""
+
+#: models/species.py:43
+msgid "order"
+msgstr ""
+
+#: models/species.py:44
+msgid "The order, e.g. Struthioniformes, from the eBird/Clements taxonomy."
+msgstr ""
+
+#: models/species.py:49
+msgid "category"
+msgstr ""
+
+#: models/species.py:50
+msgid "The category from the eBird/Clements taxonomy."
+msgstr ""
+
+#: models/species.py:55
+msgid "species code"
+msgstr ""
+
+#: models/species.py:56
+msgid "The species code, e.g. ostric2, used in the eBird API."
+msgstr ""
+
+#: models/species.py:61
+msgid "family code"
+msgstr ""
+
+#: models/species.py:62
+msgid "The family code, e.g. struth1, used in the eBird API."
+msgstr ""
+
+#: models/species.py:66
+msgid "common name"
+msgstr ""
+
+#: models/species.py:67
+msgid "The species common name in the eBird/Clements taxonomy."
+msgstr ""
+
+#: models/species.py:71
+msgid "scientific name"
+msgstr ""
+
+#: models/species.py:72
+msgid "The species scientific name in the eBird/Clements taxonomy."
+msgstr ""
+
+#: models/species.py:77
+msgid "family common name"
+msgstr ""
+
+#: models/species.py:78
+msgid "The common name for the species family in the eBird/Clements taxonomy."
+msgstr ""
+
+#: models/species.py:83
+msgid "family scientific name"
+msgstr ""
+
+#: models/species.py:84
+msgid ""
+"The scientific name for the species family in the eBird/Clements taxonomy."
+msgstr ""
+
+#: models/species.py:89
+msgid "subspecies common name"
+msgstr ""
+
+#: models/species.py:90
+msgid ""
+"The subspecies, group or form common name in the eBird/Clements taxonomy."
+msgstr ""
+
+#: models/species.py:96
+msgid ""
+"The subspecies, group or form scientific name in the eBird/Clements taxonomy."
+msgstr ""
+
+#: models/species.py:101
+msgid "exotic code"
+msgstr ""
+
+#: models/species.py:102
+msgid "The code used if the species is non-native."
+msgstr ""
+
+#: models/species.py:107
+msgid "Data describing a Species."
+msgstr ""

@@ -11,6 +11,7 @@ Latest
 * Added Checklist.started to record the date and time the checklist was started.
   This is just the compound value of Checklist.date and Checklist.time.
 * Added indexes to model fields.
+* Added translation strings.
 * Changed APILoader.get_location() so it always returns a valid Location.
   Previously, if a location did not exist it created a placeholder with only the
   identifier set. It now uses the ebird-api's new get_location() method to always
