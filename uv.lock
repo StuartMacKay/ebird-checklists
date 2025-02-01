@@ -68,14 +68,14 @@ wheels = [
 
 [[package]]
 name = "babel"
-version = "2.16.0"
+version = "2.17.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "pytz", marker = "python_full_version < '3.9'" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/2a/74/f1bc80f23eeba13393b7222b11d95ca3af2c1e28edca18af487137eefed9/babel-2.16.0.tar.gz", hash = "sha256:d1f3554ca26605fe173f3de0c65f750f5a42f924499bf134de6423582298e316", size = 9348104 }
+sdist = { url = "https://files.pythonhosted.org/packages/7d/6b/d52e42361e1aa00709585ecc30b3f9684b3ab62530771402248b1b1d6240/babel-2.17.0.tar.gz", hash = "sha256:0c54cffb19f690cdcc52a3b50bcbf71e07a808d1c80d549f2459b9d2cf0afb9d", size = 9951852 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/ed/20/bc79bc575ba2e2a7f70e8a1155618bb1301eaa5132a8271373a6903f73f8/babel-2.16.0-py3-none-any.whl", hash = "sha256:368b5b98b37c06b7daf6696391c3240c938b37767d4584413e8438c5c435fa8b", size = 9587599 },
+    { url = "https://files.pythonhosted.org/packages/b7/b8/3fe70c75fe32afc4bb507f75563d39bc5642255d1d94f1f23604725780bf/babel-2.17.0-py3-none-any.whl", hash = "sha256:4d0b53093fdfb4b21c92b5213dba5a1b23885afa8383709427046b21c366e5f2", size = 10182537 },
 ]
 
 [[package]]
@@ -136,7 +136,7 @@ wheels = [
 
 [[package]]
 name = "bump-my-version"
-version = "0.30.1"
+version = "0.31.0"
 source = { registry = "https://pypi.org/simple" }
 resolution-markers = [
     "python_full_version >= '3.10'",
@@ -152,9 +152,9 @@ dependencies = [
     { name = "tomlkit", marker = "python_full_version >= '3.9'" },
     { name = "wcmatch", marker = "python_full_version >= '3.9'" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/d2/48/fdd8d489ef579d9d72b99593be24995245e30517f875a3c504f4c42679c0/bump_my_version-0.30.1.tar.gz", hash = "sha256:cc1a821c51e387c11484fbef0e2749deb2c320ee9bd7117678f5b648694c1acd", size = 1020785 }
+sdist = { url = "https://files.pythonhosted.org/packages/2e/2b/81307273c0a4767b72c25800871f642bb451d944e66ae5a894f827e4cbcd/bump_my_version-0.31.0.tar.gz", hash = "sha256:6e3b36d2a447bfece9dea0952aa3a5fa6f87d9492fa1a9ecb78b0ee305e96a2b", size = 1021549 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/13/8f/64a8c3c657d2811abec9d3deb4177d28ea8cec391b5be2f171c75efe58a5/bump_my_version-0.30.1-py3-none-any.whl", hash = "sha256:e0774d69871ee2f69d92373b14d8a6e1a4b4ee00cac0e3ec1fedf63ec2fa36e1", size = 55272 },
+    { url = "https://files.pythonhosted.org/packages/77/d0/05cb763964cb425338b6ceebc4b41f66ba66e229532fdbfc5ee11d92f24c/bump_my_version-0.31.0-py3-none-any.whl", hash = "sha256:c304642dc5c17d9a6da7498bf2b331a559f90855c8a96e9dfe83a472406fd47f", size = 55573 },
 ]
 
 [[package]]
@@ -454,7 +454,7 @@ wheels = [
 
 [[package]]
 name = "ebird-checklists"
-version = "0.7.0"
+version = "0.8.0"
 source = { editable = "." }
 dependencies = [
     { name = "django", version = "4.2.18", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.10'" },
@@ -466,7 +466,7 @@ dependencies = [
 [package.dev-dependencies]
 dev = [
     { name = "bump-my-version", version = "0.30.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.9'" },
-    { name = "bump-my-version", version = "0.30.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.9'" },
+    { name = "bump-my-version", version = "0.31.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.9'" },
     { name = "django-debug-toolbar", version = "4.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.9'" },
     { name = "django-debug-toolbar", version = "5.0.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.9'" },
     { name = "django-environ", version = "0.11.2", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.9'" },
