@@ -5,7 +5,7 @@ import re
 from pathlib import Path
 
 from ..models import Checklist, Location, Observation, Observer, Species
-from .utils import str2int, str2decimal
+from .utils import str2int, str2decimal, random_code
 
 logger = logging.getLogger(__name__)
 
@@ -103,7 +103,7 @@ class MyDataLoader:
 
         values: dict = {
             "edited": checklist.edited,
-            "identifier": "",
+            "identifier": random_code(10, "OBS"),
             "species": self._get_species(data),
             "checklist": checklist,
             "location": checklist.location,

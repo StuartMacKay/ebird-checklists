@@ -72,7 +72,7 @@ class BasicDatasetLoader:
 
         values: dict = {
             "identifier": identifier,
-            "name": "",
+            "name": "_%s" % identifier,
         }
 
         if observer := Observer.objects.filter(identifier=identifier).first():
