@@ -6,6 +6,9 @@ and this project adheres to `Semantic Versioning <https://semver.org/spec/v2.0.0
 
 Latest
 ------
+
+0.9.1 (2025-02-03)
+------------------
 * Removed rogue import, ``from tomlkit import datetime`` - thanks PyCharm.
 
 0.9.0 (2025-02-03)
