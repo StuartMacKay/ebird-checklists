@@ -6,6 +6,9 @@ and this project adheres to `Semantic Versioning <https://semver.org/spec/v2.0.0
 
 Latest
 ------
+
+0.9.0 (2025-02-03)
+------------------
 * Changed the APILoader again (sorry), renaming the modes to 'new' and 'all'.
 * Removed update_checklists() and update_checklist(). Instead load_checklists()
   was refactored to handle both cases, by adding ``new_only`` as an argument.
