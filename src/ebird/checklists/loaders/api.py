@@ -6,6 +6,7 @@ from urllib.error import HTTPError, URLError
 
 from django.utils.timezone import get_default_timezone
 from ebird.api import get_checklist, get_location, get_regions, get_visits, get_taxonomy
+from ebird.api.constants import API_MAX_RESULTS
 
 from .utils import str2datetime, float2int, str2decimal
 from ..models import Checklist, Location, Observation, Observer, Species
@@ -32,25 +33,23 @@ class APILoader:
     the visits for a given region if 200 hundred records are returned then it is
     assumed there are more and the loader will fetch the sub-regions and download
     the visits for each, repeating the process if necessary. To give an extreme
-    example if you download the visits for the United State, "US" then the API
+    example if you download the visits for the United States, "US", then the API
     will always return 200 results and the loader then download the visits to
-    each of the 50 states and then each of the 3143 counties. DON'T DO THIS.
-    Even if you don't get banned, karma will ensure bad things happen to you.
+    each of the 50 states and then each of the 3143 counties. DON'T TRY THIS
+    AT HOME. Even if you don't get banned, if you melt the eBird servers, then
+    karma will ensure bad things happen to you.
 
     """
 
     def __init__(self, api_key: str, locale: str):
         self.api_key: str = api_key
         self.locale: str = locale
-        self.visits: list[dict] = []
-        self.checklists: list[str] = []
-        self.added: int = 0
 
     @staticmethod
-    def has_checklist(identifier: str) -> bool:
+    def is_checklist(identifier: str) -> bool:
         return Checklist.objects.filter(identifier=identifier).exists()
 
-    def add_checklist(self, data: dict) -> Checklist:
+    def add_checklist(self, data: dict) -> (Checklist, bool):
         identifier: str = data["subId"]
         created: dt.datetime = str2datetime(data["creationDt"])
         edited: dt.datetime = str2datetime(data["lastEditedDt"])
@@ -94,14 +93,15 @@ class APILoader:
             area: str = data["effortAreaHa"]
             values["area"] = round(decimal.Decimal(area), 3)
 
+        added: bool = False
+
         if checklist := Checklist.objects.filter(identifier=identifier).first():
             for key, value in values.items():
                 setattr(checklist, key, value)
             checklist.save()
         else:
             checklist = Checklist.objects.create(identifier=identifier, **values)
-
-        self.added += 1
+            added = True
 
         for observation_data in data["obs"]:
             self.add_observation(observation_data, checklist)
@@ -118,7 +118,7 @@ class APILoader:
             )
             observation.delete()
 
-        return checklist
+        return checklist, added
 
     @staticmethod
     def add_location(data: dict) -> Location:
@@ -199,41 +199,6 @@ class APILoader:
         observer, created = Observer.objects.get_or_create(name=name)
         return observer
 
-    def add_visit(self, data: dict) -> Checklist | None:
-        identifier: str = data["subId"]
-
-        if self.has_checklist(identifier):
-            return
-
-        started: dt.datetime = dt.datetime.strptime(data["obsDt"], "%d %b %Y").replace(
-            tzinfo=get_default_timezone()
-        )
-        date: dt.date = started.date()
-        time: dt.time | None = None
-
-        if "obsTime" in data:
-            time = started.time()
-
-        values: dict = {
-            "location": self.add_location(data["loc"]),
-            "observer": self.add_observer(data),
-            "group": "",
-            "species_count": data["numSpecies"],
-            "date": date,
-            "time": time,
-            "started": started,
-            "protocol": "",
-            "protocol_code": "",
-            "project_code": "",
-            "comments": "",
-            "url": "https://ebird.org/checklist/%s" % identifier,
-        }
-
-        checklist: Checklist = Checklist.objects.create(identifier=identifier, **values)
-        self.checklists.append(identifier)
-
-        return checklist
-
     @staticmethod
     def add_species(data: dict) -> Species:
         code: str = data["speciesCode"]
@@ -279,11 +244,10 @@ class APILoader:
         observer: Observer = Observer.objects.filter(name=name).first()
         if observer is None:
             observer = Observer.objects.create(name=name)
-            logger.error("Observer did not exist", extra={"observer": name})
         return observer
 
     def get_species(self, data: dict) -> Species:
-        code:str = data["speciesCode"]
+        code: str = data["speciesCode"]
         species: Species
         if (species := Species.objects.filter(species_code=code).first()) is None:
             species = self.load_species(code, self.locale)
@@ -315,8 +279,13 @@ class APILoader:
         return sub_regions
 
     def fetch_visits(self, region: str, date: dt.date = None):
-        visits: list = get_visits(self.api_key, region, date=date, max_results=200)
-        if len(visits) == 200:
+        visits = []
+
+        results: list = get_visits(
+            self.api_key, region, date=date, max_results=API_MAX_RESULTS
+        )
+
+        if len(results) == API_MAX_RESULTS:
             if sub_regions := self.fetch_subregions(region):
                 for sub_region in sub_regions:
                     logger.info(
@@ -325,21 +294,20 @@ class APILoader:
                         date,
                         extra={"region": sub_region, "date": date},
                     )
-                    self.fetch_visits(sub_region, date)
+                    visits.extend(self.fetch_visits(sub_region, date))
             else:
-                # No more sub-regions, just add the 200 visits
+                # No more sub-regions, issue a warning and return the results
+                visits.extend(results)
                 logger.warning(
                     "Loading checklists - API limit reached: %s, %s",
                     region,
                     date,
                     extra={"region": region, "date": date},
                 )
-                for visit in visits:
-                    self.visits.append(visit)
-
         else:
-            for visit in visits:
-                self.visits.append(visit)
+            visits.extend(results)
+
+        return visits
 
     def fetch_location(self, identifier: str) -> dict:
         return get_location(self.api_key, identifier)
@@ -376,7 +344,7 @@ class APILoader:
         data: dict = self.fetch_location(identifier)
         return self.add_location(data)
 
-    def load_checklist(self, identifier: str) -> Checklist:
+    def load_checklist(self, identifier: str) -> (Checklist, bool):
         """
         Load the checklist with the given identifier.
 
@@ -402,7 +370,7 @@ class APILoader:
         data: dict = self.fetch_checklist(identifier)
         return self.add_checklist(data)
 
-    def load_checklists(self, region: str, date: dt.date) -> None:
+    def load_checklists(self, region: str, date: dt.date, new_only: bool) -> None:
         """
         Load all the checklists submitted for a region for a given date.
 
@@ -413,94 +381,86 @@ class APILoader:
 
             date: The date the observations were made.
 
+            new_only: If true, Load only new checklists, otherwise load all.
+
         """
+        scope = "new" if new_only else "all"
+
         logger.info(
-            "Loading checklists: %s, %s",
+            "Loading %s checklists: %s, %s",
+            scope,
             region,
             date,
-            extra={"region": region, "date": date},
+            extra={"region": region, "date": date, "scope": scope},
         )
+        visits: list[dict]
+        number_of_visits: int = 0
+        locations: dict = {}
+        checklists: list[str] = []
+        added: int = 0
+        loaded: int = 0
 
         try:
-            self.visits = []
-            self.checklists = []
-            self.added = 0
+            visits = self.fetch_visits(region, date)
+            number_of_visits = len(visits)
 
-            self.fetch_visits(region, date)
+            for visit in visits:
+                location = visit["loc"]
+                identifier = location["locId"]
+                locations[identifier] = location
 
-            for visit in self.visits:
-                self.add_visit(visit)
+            if new_only:
+                for visit in visits:
+                    identifier = visit["subId"]
+                    if not self.is_checklist(identifier):
+                        checklists.append(identifier)
+            else:
+                for visit in visits:
+                    identifier = visit["subId"]
+                    checklists.append(identifier)
 
-            for identifier in self.checklists:
-                self.load_checklist(identifier)
+            for data in locations.values():
+                self.add_location(data)
+
+            for identifier in checklists:
+                checklist, created = self.load_checklist(identifier)
+                if created:
+                    added += 1
+                loaded += 1
 
             logger.info(
-                "Loading succeeded: %s, %s",
+                "Loading %s checklists succeeded: %s, %s",
+                scope,
                 region,
                 date,
                 extra={
                     "region": region,
                     "date": date,
-                    "visits": len(self.visits),
-                    "added": self.added,
+                    "scope": scope,
+                    "visits": number_of_visits,
+                    "added": added,
+                    "loaded": loaded,
                 },
             )
 
         except (URLError, HTTPError):
             logger.exception(
-                "Loading failed: %s, %s",
+                "Loading %s checklists failed: %s, %s",
+                scope,
                 region,
                 date,
                 extra={
                     "region": region,
                     "date": date,
+                    "scope": scope,
+                    "visits": number_of_visits,
+                    "added": added,
+                    "loaded": loaded,
                 },
             )
 
-    def update_checklist(self, identifier: str) -> Checklist:
-        """
-        Update the checklist with the given identifier.
-
-        Arguments:
-            identifier: the eBird identifier for the checklist, e.g. "S318722167"
-
-        """
-        logger.info(
-            "Updating checklist: %s", identifier, extra={"identifier": identifier}
-        )
-        data: dict = self.fetch_checklist(identifier)
-        return self.add_checklist(data)
-
-    def update_checklists(self, date: dt.date):
-        """
-        Update all the checklists for a given date.
-
-        Arguments:
-            date: The checklist date.
-
-        """
-        logger.info("Updating checklists: %s", date, extra={"date": date})
-
-        try:
-            identifiers = Checklist.objects.filter(date=date).values_list(
-                "identifier", flat=True
-            )
-            for identifier in identifiers:
-                self.update_checklist(identifier)
-
-            logger.info(
-                "Updating succeeded: %s",
-                date,
-                extra={
-                    "date": date,
-                    "updated": len(identifiers),
-                },
-            )
-        except (URLError, HTTPError):
-            logger.exception(
-                "Updating failed: %s",
-                date,
-                extra={
-                    "date": date,
-                },
-            )
+    def load_recent(self, days: int, region: str, new: bool):
+        today: dt.date = dt.date.today()
+        dates: list[dt.date] = [today - dt.timedelta(days=n) for n in range(days)]
+        for date in dates:
+            self.load_checklists(region, date, new)

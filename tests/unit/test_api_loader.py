@@ -5,9 +5,10 @@ from dateutil.relativedelta import relativedelta
 
 import pytest
 
+from ebird.checklists.loaders import api
 from ebird.checklists.loaders import APILoader
 from ebird.checklists.loaders.utils import str2date
-from ebird.checklists.models import Checklist, Observation, Location, Observer, Species
+from ebird.checklists.models import Checklist, Observation, Location, Observer
 
 pytestmark = pytest.mark.django_db
 
@@ -117,20 +118,6 @@ def location():
         "isHotspot": True,
     }
 
-
-@pytest.fixture
-def visit(start, location, observer):
-    return {
-        "locId": "L901738",
-        "subId": "S000000001",
-        "userDisplayName": observer["userDisplayName"],
-        "numSpecies": 2,
-        "obsDt": start.strftime("%d %b %Y"),
-        "obsTime": start.strftime("%H:%M"),
-        "isoObsDate": datetime2str(start),
-        "loc": location
-    }
-
 @pytest.fixture
 def checklist(start, submitted, observer, observations):
     return {
@@ -169,35 +156,31 @@ def mock_api_calls(monkeypatch, species):
 def test_add_checklist__checklist_added(loader, checklist):
     """If the checklist does not exist, it is added to the database."""
     identifier = checklist["subId"]
-    loader.add_checklist(checklist)
+    checklist, added = loader.add_checklist(checklist)
     Checklist.objects.get(identifier=identifier)
-
-
-def test_add_checklist__loader_added(loader, checklist):
-    """The added checklist is recorded by the loader"""
-    loader.add_checklist(checklist)
-    assert loader.added == 1
+    assert added is True
 
 
 def test_add_checklist__checklist_updated(loader, submitted, checklist):
     """If the checklist edited, it is updated."""
-    chk1 = loader.add_checklist(checklist)
+    chk1, _ = loader.add_checklist(checklist)
     checklist["numObservers"] += 1
-    chk2 = loader.add_checklist(checklist)
+    chk2, added = loader.add_checklist(checklist)
     assert chk1.pk == chk2.pk
     assert chk1.observer_count != chk2.observer_count
+    assert added is False
 
 
 def test_add_checklist__time_set(loader, checklist, start):
     """A checklist may contain only a date."""
-    chk = loader.add_checklist(checklist)
+    chk, _ = loader.add_checklist(checklist)
     assert chk.time == start.time()
 
 
 def test_add_checklist__time_is_optional(loader, checklist):
     """A checklist may contain only a date."""
     checklist["obsTimeValid"] = False
-    chk = loader.add_checklist(checklist)
+    chk, _ = loader.add_checklist(checklist)
     assert chk.date == str2date(checklist["obsDt"])
     assert chk.time is None
 
@@ -205,27 +188,27 @@ def test_add_checklist__time_is_optional(loader, checklist):
 def test_add_checklist__duration_minutes(loader, checklist):
     """The duration field converted to minutes"""
     checklist["durationHrs"] = 2.0
-    chk = loader.add_checklist(checklist)
+    chk, _ = loader.add_checklist(checklist)
     assert chk.duration == 120
 
 
 def test_add_checklist__duration_optional(loader, checklist):
     """The duration field is optional"""
     del checklist["durationHrs"]
-    chk = loader.add_checklist(checklist)
+    chk, _ = loader.add_checklist(checklist)
     assert chk.duration is None
 
 
 def test_add_checklist__observers_set(loader, checklist):
     """The numObservers field is optional"""
-    chk = loader.add_checklist(checklist)
+    chk, _ = loader.add_checklist(checklist)
     assert chk.observer_count is checklist["numObservers"]
 
 
 def test_add_checklist__observers_optional(loader, checklist):
     """The numObservers field is optional"""
     del checklist["numObservers"]
-    chk = loader.add_checklist(checklist)
+    chk, _ = loader.add_checklist(checklist)
     assert chk.observer_count is None
 
 
@@ -234,7 +217,7 @@ def test_add_checklist__distance_rounded(loader, checklist):
     Decimal(1.2) actually generates Decimal('1.199999999999999955591079...')
     """
     checklist["effortDistanceKm"] = 1.2
-    chk = loader.add_checklist(checklist)
+    chk, _ = loader.add_checklist(checklist)
     assert chk.distance == decimal.Decimal("1.200")
 
 
@@ -248,7 +231,7 @@ def test_add_checklist__distance_required(loader, checklist):
 def test_add_checklist__distance_optional(loader, checklist):
     """Distance is ignored for checklists not following the travelling protocol."""
     checklist["protocolId"] = "P21"
-    chk = loader.add_checklist(checklist)
+    chk, _ = loader.add_checklist(checklist)
     assert chk.distance is None
 
 
@@ -258,7 +241,7 @@ def test_add_checklist__area_rounded(loader, checklist):
     """
     checklist["protocolId"] = "P23"
     checklist["effortAreaHa"] = 1.1999
-    chk = loader.add_checklist(checklist)
+    chk, _ = loader.add_checklist(checklist)
     assert chk.area == decimal.Decimal("1.200")
 
 
@@ -273,13 +256,13 @@ def test_add_checklist__area_optional(loader, checklist):
     """Area is ignored for checklists not following the area protocol."""
     checklist["protocolId"] = "P21"
     checklist["effortAreaHa"] = 1.2
-    chk = loader.add_checklist(checklist)
+    chk, _ = loader.add_checklist(checklist)
     assert chk.area is None
 
 
 def test_add_checklist__observations_added(loader, checklist, observation):
     """The observations from the checklist are added to the database."""
-    chk = loader.add_checklist(checklist)
+    chk, _ = loader.add_checklist(checklist)
     obs = Observation.objects.get(identifier=observation["obsId"])
     assert obs.checklist == chk
 
@@ -334,17 +317,17 @@ def test_add_location__location_updated(loader, location):
     assert loc1.name != loc2.name
 
 
-def test_add_observation__observation_added(loader, visit, observation):
+def test_add_observation__observation_added(loader, checklist, observation):
     """The observation is added to the database."""
+    chk, _ = loader.add_checklist(checklist)
     identifier = observation["obsId"]
-    chk = loader.add_visit(visit)
     loader.add_observation(observation, chk)
     assert Observation.objects.get(identifier=identifier)
 
 
 def test_add_observation__observation_updated(loader, checklist, observation):
     """The observation is updated. Note this bypasses the edited field check."""
-    chk = loader.add_checklist(checklist)
+    chk, _ = loader.add_checklist(checklist)
     obs1 = loader.add_observation(observation, chk)
     observation["howManyStr"] = str(obs1.count + 1)
     obs2 = loader.add_observation(observation, chk)
@@ -373,43 +356,151 @@ def test_add_observer__existing_observer_returned(loader, observer):
     Observer.objects.get(name=observer["userDisplayName"])
 
 
-def test_add_visit__checklist_added(loader, visit):
-    """If the checklist does not exist, it is added to the database."""
-    identifier = visit["subId"]
-    loader.add_visit(visit)
-    Checklist.objects.get(identifier=identifier)
-
-
-def test_add_visit__location_added(loader, visit):
-    """When a visits is added, the Location is also added."""
-    identifier = visit["loc"]["locId"]
-    loader.add_visit(visit)
-    Location.objects.get(identifier=identifier)
-
-
-def test_add_visit__observer_added(loader, visit):
-    """When a visits is added, the Observer is also added."""
-    name = visit["userDisplayName"]
-    loader.add_visit(visit)
-    Observer.objects.get(name=name)
-
-
-def test_add_visit__checklist_unchanged(loader, visit):
-    """If the visit is added again, the record is not updated."""
-    loader.add_visit(visit)
-    visit["numSpecies"] += 1
-    checklist = loader.add_visit(visit)
-    assert checklist is None
-
-
-def test_add_visit__time_optional(loader, visit):
-    """Incidental or historical visits may not include time."""
-    del visit["obsTime"]
-    chk = loader.add_visit(visit)
-    assert chk.time is None
-
-
 def test_add_species__species_added(loader, webowl):
     """The Species is added to the database."""
     obj = loader.add_species(webowl)
     assert obj.species_code == webowl["speciesCode"]
+
+
+@pytest.mark.parametrize("subregions, visits, expected", [
+    # A region has no subregions
+    (
+        {"AB": []},
+        {"AB": [1, 1, 1, 1], },  # included
+        4
+    ),
+    # A region has subregions, but not all visits fetched
+    (
+        {
+            "AB": ["AB-01", "AB-02"],
+            "AB-01": [],
+            "AB-02": [],
+        },
+        {
+            "AB": [1, 1, 1],  # included
+            "AB-01": [1, 1],  # not fetched
+            "AB-02": [1, 1],  # not fetched
+         },
+        3
+    ),
+    # A region with subregions, but the subregion have no sub-subregions
+    (
+        {
+            "AB": ["AB-01", "AB-02"],
+            "AB-01": [],
+            "AB-02": [],
+        },
+        {
+            "AB": [1, 1, 1, 1],  # excluded
+            "AB-01": [1, 1, 1],  # included
+            "AB-02": [1, 1, 1, 1],  # included
+        },
+        7
+    ),
+    # A region with subregions, and the subregion have sub-subregions
+    (
+        {
+            "AB": ["AB-01", "AB-02"],
+            "AB-01": ["AB-01-01", "AB-01-02"],
+            "AB-02": ["AB-02-01", "AB-02-02"],
+            "AB-01-01": [],
+            "AB-01-02": [],
+            "AB-02-01": [],
+            "AB-02-02": [],
+        },
+        {
+            "AB": [1, 1, 1, 1],  # excluded
+            "AB-01": [1, 1, 1, 1],  # included
+            "AB-02": [1, 1, 1, 1],  # included
+            "AB-01-01": [1],  # included
+            "AB-01-02": [1],  # included
+            "AB-02-01": [1],  # included
+            "AB-02-02": [],  # included, but no visits
+        },
+        3
+    ),
+    # More levels of subregion than eBird supports - only three levels are processed
+    (
+        {
+            "AB": ["AB-01", "AB-02"],
+            "AB-01": ["AB-01-01", "AB-01-02"],
+            "AB-02": ["AB-02-01", "AB-02-02"],
+            "AB-01-01": ["AB-01-01-01"],
+            "AB-01-02": ["AB-01-02-01"],
+            "AB-02-01": ["AB-02-01-01"],
+            "AB-02-02": ["AB-02-02-01"],
+            "AB-01-01-01": [],
+            "AB-01-02-01": [],
+            "AB-02-01-01": [],
+            "AB-02-02-01": [],
+        },
+        {
+            "AB": [1, 1, 1, 1],  # excluded
+            "AB-01": [1, 1, 1, 1],  # included
+            "AB-02": [1, 1, 1, 1],  # excluded
+            "AB-01-01": [1, 1, 1, 1],  # included
+            "AB-01-02": [1, 1, 1, 1],  # included
+            "AB-02-01": [1, 1, 1, 1],  # included
+            "AB-02-02": [1, 1, 1, 1],  # included
+            "AB-01-01-01": [1],  # not fetched
+            "AB-01-02-01": [1],  # not fetched
+            "AB-02-01-01": [],  # not fetched
+            "AB-02-02-01": [1],  # not fetched
+        },
+        16
+    ),
+    # A region with subregions. Not all subregions have sub-subregions
+    (
+        {
+            "AB": ["AB-01", "AB-02", "AB-03"],
+            "AB-01": ["AB-01-01", "AB-01-02"],
+            "AB-02": ["AB-02-01", "AB-02-02"],
+            "AB-03": ["AB-03-01", "AB-03-02"],
+        },
+        {
+            "AB": [1, 1, 1, 1],  # excluded
+            "AB-01": [1, 1, 1, 1],  # excluded
+            "AB-01-01": [1, 1, 1],  # included
+            "AB-01-02": [1, 1],  # included
+            "AB-02": [1, 1, 1],  # included
+            "AB-03": [1, 1, 1, 1],  # excluded
+            "AB-03-01": [1, 1, 1, 1],  # included
+            "AB-03-02": [1, 1],  # included
+        },
+        14
+    ),
+    # All regions and subregions return the maximum number of visits fetched
+    (
+        {
+            "AB": ["AB-01", "AB-02"],
+            "AB-01": ["AB-01-01", "AB-01-02"],
+            "AB-02": ["AB-02-01", "AB-02-02"],
+        },
+        {
+            "AB": [1, 1, 1, 1],  # excluded
+            "AB-01": [1, 1, 1, 1],  # excluded
+            "AB-02": [1, 1, 1, 1],  # excluded
+            "AB-01-01": [1, 1, 1, 1],  # included
+            "AB-01-02": [1, 1, 1, 1],  # included
+            "AB-02-01": [1, 1, 1, 1],  # included
+            "AB-02-02": [1, 1, 1, 1],  # included
+        },
+        16
+    )
+])
+def test__fetch_visits__subregions(monkeypatch, loader, subregions, visits, expected):
+    """Confirm that if the number of visits returned for a region reaches the
+    maximum number for an API call, i.e. there are more visits, then the loader
+    fetches visits from the region's subregions."""
+    def mock_get_visits(api_key, region, date=None, max_results=None):
+        return visits[region]
+
+    def mock_get_regions(api_key, region_type, region):
+        return [ {"code": item} for item in subregions[region]]
+
+    monkeypatch.setattr(api, "API_MAX_RESULTS", 4)
+    monkeypatch.setattr(api, "get_visits", mock_get_visits)
+    monkeypatch.setattr(api, "get_regions", mock_get_regions)
+
+    visits = loader.fetch_visits("AB", dt.date.today())
+    assert len(visits) == expected
