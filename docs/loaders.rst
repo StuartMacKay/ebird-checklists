@@ -117,8 +117,8 @@ most of the submissions:
     0 */4 * * * /home/me/my-project/.venv/bin/python /home/me/my-project/manage.py load_api new 2 US-NY
     # Every day at midnight, load new checklists submitted in the past week
     0 0 * * * /home/me/my-project/.venv/bin/python /home/me/my-project/manage.py load_api new 7 US-NY
-    # Every Sunday at midnight, load all checklists submitted one month ago
-    0 0 * * 0 /home/me/my-project/my-scripts/updates.sh US-NY
+    # Every day at 1am, load all checklists submitted exactly one month ago
+    0 1 * * * /home/me/my-project/my-scripts/updates.sh US-NY
 
 The last command calls a shell script, not the load_api management command. The
 reason that we need to select a specific date. The unix ``date`` command is
