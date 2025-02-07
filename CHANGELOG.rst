@@ -6,6 +6,9 @@ and this project adheres to `Semantic Versioning <https://semver.org/spec/v2.0.0
 
 Latest
 ------
+
+0.9.2 (2025-02-07)
+------------------
 * Added Checklist and Observation comments - newly available from the eBird API.
 
 0.9.1 (2025-02-03)
