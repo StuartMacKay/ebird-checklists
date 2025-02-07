@@ -93,6 +93,9 @@ class APILoader:
             area: str = data["effortAreaHa"]
             values["area"] = round(decimal.Decimal(area), 3)
 
+        if "comments" in data:
+            values["comments"] = data["comments"]
+
         added: bool = False
 
         if checklist := Checklist.objects.filter(identifier=identifier).first():
@@ -184,6 +187,9 @@ class APILoader:
             "comments": "",
             "urn": self.get_urn(data),
         }
+        
+        if "comments" in data:
+            values["comments"] = data["comments"]
 
         if observation := Observation.objects.filter(identifier=identifier).first():
             for key, value in values.items():

@@ -79,6 +79,7 @@ def observation():
         "present": False,
         "obsId": "OBS0000000001",
         "howManyStr": "1",
+        "comments": "This is an observation comment",
     }
 
 
@@ -137,7 +138,8 @@ def checklist(start, submitted, observer, observations):
         "subnational1Code": "US-NY",
         "userDisplayName": observer["userDisplayName"],
         "numSpecies": 1,
-        "obs": observations
+        "obs": observations,
+        "comments": "This is a checklist comment"
     }
 
 @pytest.fixture
@@ -260,6 +262,19 @@ def test_add_checklist__area_optional(loader, checklist):
     assert chk.area is None
 
 
+def test_add_checklist__comments(loader, checklist):
+    """Checklist comments are added"""
+    chk, _ = loader.add_checklist(checklist)
+    assert chk.comments == checklist["comments"]
+
+
+def test_add_checklist__comments_optional(loader, checklist):
+    """Checklist comments are optional"""
+    del checklist["comments"]
+    chk, _ = loader.add_checklist(checklist)
+    assert chk.comments == ""
+
+
 def test_add_checklist__observations_added(loader, checklist, observation):
     """The observations from the checklist are added to the database."""
     chk, _ = loader.add_checklist(checklist)
@@ -341,6 +356,21 @@ def test_add_observation__count_optional(loader, checklist, observation, locatio
     loader.add_checklist(checklist)
     obs = Observation.objects.get(identifier=observation["obsId"])
     assert obs.count is None
+
+
+def test_add_observation__comments(loader, checklist, observation):
+    """Observation comments are added"""
+    loader.add_checklist(checklist)
+    obs = Observation.objects.get(identifier=observation["obsId"])
+    assert obs.comments == observation["comments"]
+
+
+def test_add_observation__comments_optional(loader, checklist, observation):
+    """Observation comments are optional"""
+    del observation["comments"]
+    loader.add_checklist(checklist)
+    obs = Observation.objects.get(identifier=observation["obsId"])
+    assert obs.comments == ""
 
 
 def test_add_observer__observer_created(loader, observer):
