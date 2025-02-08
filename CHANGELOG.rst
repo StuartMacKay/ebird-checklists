@@ -23,7 +23,7 @@ Latest
 
 0.8.0 (2025-02-01)
 ------------------
-* Added Added methods update_checklists() and update_checklist() to the APILoader
+* Added methods update_checklists() and update_checklist() to the APILoader
   for updating existing checklists.
 * Added Checklist.started to record the date and time the checklist was started.
   This is just the compound value of Checklist.date and Checklist.time.
