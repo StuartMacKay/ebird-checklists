@@ -1,5 +1,6 @@
 import csv
 import datetime as dt
+from decimal import Decimal
 import logging
 import re
 from pathlib import Path
@@ -7,7 +8,6 @@ from pathlib import Path
 from django.utils.timezone import get_default_timezone
 
 from ..models import Checklist, Location, Observation, Observer, Species
-from .utils import str2bool, str2int, str2decimal
 
 logger = logging.getLogger(__name__)
 
@@ -48,8 +48,8 @@ class BasicDatasetLoader:
             "state_code": data["STATE CODE"],
             "country": data["COUNTRY"],
             "country_code": data["COUNTRY CODE"],
-            "latitude": str2decimal(data["LATITUDE"]),
-            "longitude": str2decimal(data["LONGITUDE"]),
+            "latitude": Decimal(data["LATITUDE"]),
+            "longitude": Decimal(data["LONGITUDE"]),
             "iba_code": data["IBA CODE"],
             "bcr_code": data["BCR CODE"],
             "usfws_code": data["USFWS CODE"],
@@ -120,7 +120,7 @@ class BasicDatasetLoader:
         observation: Observation
 
         if re.match(r"\d+", data["OBSERVATION COUNT"]):
-            count = str2int(data["OBSERVATION COUNT"])
+            count = int(data["OBSERVATION COUNT"])
             if count == 0:
                 count = None
         else:
@@ -138,9 +138,9 @@ class BasicDatasetLoader:
             "breeding_category": data["BREEDING CATEGORY"],
             "behavior_code": data["BEHAVIOR CODE"],
             "age_sex": data["AGE/SEX"],
-            "media": str2bool(data["HAS MEDIA"]),
-            "approved": str2bool(data["APPROVED"]),
-            "reviewed": str2bool(data["REVIEWED"]),
+            "media": bool(data["HAS MEDIA"]),
+            "approved": bool(data["APPROVED"]),
+            "reviewed": bool(data["REVIEWED"]),
             "reason": data["REASON"] or "",
             "comments": data["SPECIES COMMENTS"] or "",
             "urn": data["GLOBAL UNIQUE IDENTIFIER"],
@@ -185,13 +185,22 @@ class BasicDatasetLoader:
             "protocol": row["PROTOCOL TYPE"],
             "protocol_code": row["PROTOCOL CODE"],
             "project_code": row["PROJECT CODE"],
-            "duration": str2int(row["DURATION MINUTES"]),
-            "distance": str2decimal(row["EFFORT DISTANCE KM"]),
-            "area": str2decimal(row["EFFORT AREA HA"]),
-            "complete": str2bool(row["ALL SPECIES REPORTED"]),
+            "duration": None,
+            "distance": None,
+            "area": None,
+            "complete": bool(row["ALL SPECIES REPORTED"]),
             "comments": row["TRIP COMMENTS"] or "",
             "url": "https://ebird.org/checklist/%s" % identifier,
         }
+
+        if duration := row["DURATION MINUTES"]:
+            values["duration"] = Decimal(duration)
+
+        if distance := row["EFFORT DISTANCE KM"]:
+            values["distance"] = Decimal(distance)
+
+        if area := row["EFFORT AREA HA"]:
+            values["area"] = Decimal(area)
 
         if checklist := Checklist.objects.filter(identifier=identifier).first():
             for key, value in values.items():

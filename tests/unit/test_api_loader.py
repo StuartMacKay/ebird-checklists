@@ -7,7 +7,7 @@ import pytest
 
 from ebird.checklists.loaders import api
 from ebird.checklists.loaders import APILoader
-from ebird.checklists.loaders.utils import str2date
+from ebird.checklists.loaders.api import str2datetime
 from ebird.checklists.models import Checklist, Observation, Location, Observer
 
 pytestmark = pytest.mark.django_db
@@ -183,7 +183,7 @@ def test_add_checklist__time_is_optional(loader, checklist):
     """A checklist may contain only a date."""
     checklist["obsTimeValid"] = False
     chk, _ = loader.add_checklist(checklist)
-    assert chk.date == str2date(checklist["obsDt"])
+    assert chk.date == str2datetime(checklist["obsDt"]).date()
     assert chk.time is None
 
 

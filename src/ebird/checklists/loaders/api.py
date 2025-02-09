@@ -1,5 +1,5 @@
 import datetime as dt
-import decimal
+from decimal import Decimal
 import logging
 import re
 from urllib.error import HTTPError, URLError
@@ -8,10 +8,13 @@ from django.utils.timezone import get_default_timezone
 from ebird.api import get_checklist, get_location, get_regions, get_visits, get_taxonomy
 from ebird.api.constants import API_MAX_RESULTS
 
-from .utils import str2datetime, float2int, str2decimal
 from ..models import Checklist, Location, Observation, Observer, Species
 
 logger = logging.getLogger(__name__)
+
+
+def str2datetime(value: str) -> dt.datetime:
+    return dt.datetime.fromisoformat(value).replace(tzinfo=get_default_timezone())
 
 
 class APILoader:
@@ -60,9 +63,9 @@ class APILoader:
         if data["obsTimeValid"]:
             time = started.time()
 
-        duration: str | None = None
+        duration: int | None = None
         if "durationHrs" in data:
-            duration = float2int(data["durationHrs"] * 60.0)
+            duration = int(data["durationHrs"] * 60.0)
 
         values: dict = {
             "created": created,
@@ -88,10 +91,10 @@ class APILoader:
 
         if data["protocolId"] == "P22":
             dist: str = data["effortDistanceKm"]
-            values["distance"] = round(decimal.Decimal(dist), 3)
+            values["distance"] = round(Decimal(dist), 3)
         elif data["protocolId"] == "P23":
             area: str = data["effortAreaHa"]
-            values["area"] = round(decimal.Decimal(area), 3)
+            values["area"] = round(Decimal(area), 3)
 
         if "comments" in data:
             values["comments"] = data["comments"]
@@ -142,8 +145,8 @@ class APILoader:
             "bcr_code": "",
             "usfws_code": "",
             "atlas_block": "",
-            "latitude": str2decimal(data["latitude"]),
-            "longitude": str2decimal(data["longitude"]),
+            "latitude": Decimal(data["latitude"]),
+            "longitude": Decimal(data["longitude"]),
             "url": "https://ebird.org/region/%s" % identifier,
         }
 
@@ -162,7 +165,7 @@ class APILoader:
         observation: Observation
 
         if re.match(r"\d+", data["howManyStr"]):
-            count = float2int(data["howManyStr"])
+            count = int(data["howManyStr"])
             if count == 0:
                 count = None
         else:
@@ -187,7 +190,7 @@ class APILoader:
             "comments": "",
             "urn": self.get_urn(data),
         }
-        
+
         if "comments" in data:
             values["comments"] = data["comments"]
 

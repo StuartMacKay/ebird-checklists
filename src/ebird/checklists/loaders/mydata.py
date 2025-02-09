@@ -1,11 +1,13 @@
 import csv
 import datetime as dt
+from decimal import Decimal
 import logging
+import random
 import re
+import string
 from pathlib import Path
 
 from ..models import Checklist, Location, Observation, Observer, Species
-from .utils import str2int, str2decimal, random_code
 
 logger = logging.getLogger(__name__)
 
@@ -31,8 +33,8 @@ class MyDataLoader:
             "bcr_code": "",
             "usfws_code": "",
             "atlas_block": "",
-            "latitude": str2decimal(data["Latitude"]),
-            "longitude": str2decimal(data["Longitude"]),
+            "latitude": Decimal(data["Latitude"]),
+            "longitude": Decimal(data["Longitude"]),
             "url": "https://ebird.org/region/%s" % identifier,
         }
 
@@ -95,7 +97,7 @@ class MyDataLoader:
         count: int | None
 
         if re.match(r"\d+", data["Count"]):
-            count = str2int(data["Count"])
+            count = int(data["Count"])
             if count == 0:
                 count = None
         else:
@@ -103,7 +105,7 @@ class MyDataLoader:
 
         values: dict = {
             "edited": checklist.edited,
-            "identifier": random_code(10, "OBS"),
+            "identifier": "OBS" + "".join(random.choices(string.digits, k=10)),
             "species": self._get_species(data),
             "checklist": checklist,
             "location": checklist.location,
@@ -147,7 +149,7 @@ class MyDataLoader:
             "identifier": identifier,
             "location": location,
             "observer": observer,
-            "observer_count": str2int(data["Number of Observers"]),
+            "observer_count": int(data["Number of Observers"]),
             "group": "",
             "species_count": None,
             "date": dt.datetime.strptime(data["Date"], "%Y-%m-%d").date(),
@@ -155,13 +157,22 @@ class MyDataLoader:
             "protocol": data["Protocol"],
             "protocol_code": "",
             "project_code": "",
-            "duration": str2int(data["Duration (Min)"]),
-            "distance": str2decimal(data["Distance Traveled (km)"]),
-            "area": str2decimal(data["Area Covered (ha)"]),
+            "duration": None,
+            "distance": None,
+            "area": None,
             "complete": data["All Obs Reported"] == "1",
             "comments": data["Checklist Comments"] or "",
             "url": "https://ebird.org/checklist/%s" % identifier,
         }
+
+        if duration := data["Duration (Min)"]:
+            values["duration"] = int(duration)
+
+        if distance := data["Distance Traveled (km)"]:
+            values["distance"] = Decimal(distance)
+
+        if area := data["Area Covered (ha)"]:
+            values["area"] = Decimal(area)
 
         if checklist := Checklist.objects.filter(identifier=identifier).first():
             for key, value in values.items():
