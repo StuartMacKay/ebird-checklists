@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 class MyDataLoader:
 
     @staticmethod
-    def _get_location(data: dict) -> Location:
+    def add_location(data: dict) -> Location:
         identifier: str = data["Location ID"]
         location: Location
 
@@ -48,7 +48,7 @@ class MyDataLoader:
         return location
 
     @staticmethod
-    def _get_observer(name: str) -> Observer:
+    def add_observer(name: str) -> Observer:
         observer: Observer
 
         values = {"identifier": "", "name": name}
@@ -63,7 +63,7 @@ class MyDataLoader:
         return observer
 
     @staticmethod
-    def _get_species(data: dict) -> Species:
+    def add_species(data: dict) -> Species:
         order: str = data["Taxonomic Order"]
         species: Species
 
@@ -91,14 +91,14 @@ class MyDataLoader:
 
         return species
 
-    def _get_observation(
+    def add_observation(
         self, data: dict, checklist: Checklist
     ) -> Observation:
 
         values: dict = {
             "edited": checklist.edited,
             "identifier": "OBS" + "".join(random.choices(string.digits, k=10)),
-            "species": self._get_species(data),
+            "species": self.add_species(data),
             "checklist": checklist,
             "location": checklist.location,
             "observer": checklist.observer,
@@ -128,7 +128,7 @@ class MyDataLoader:
         return Observation.objects.create(**values)
 
     @staticmethod
-    def _get_checklist(
+    def add_checklist(
         data: dict, location: Location, observer: Observer
     ) -> Checklist:
         identifier: str = data["Submission ID"]
@@ -184,11 +184,11 @@ class MyDataLoader:
         with open(path) as csvfile:
             loaded: int = 0
             reader = csv.DictReader(csvfile, delimiter=",")
-            observer: Observer = self._get_observer(observer_name)
+            observer: Observer = self.add_observer(observer_name)
             for data in reader:
-                location: Location = self._get_location(data)
-                checklist: Checklist = self._get_checklist(data, location, observer)
-                self._get_observation(data, checklist)
+                location: Location = self.add_location(data)
+                checklist: Checklist = self.add_checklist(data, location, observer)
+                self.add_observation(data, checklist)
                 loaded += 1
 
         logger.info("Loaded My eBird Data", extra={"loaded": loaded})

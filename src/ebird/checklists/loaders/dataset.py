@@ -38,7 +38,7 @@ class BasicDatasetLoader:
         return new, modified
 
     @staticmethod
-    def _get_location(data: dict[str, str]) -> Location:
+    def add_location(data: dict[str, str]) -> Location:
         identifier: str = data["LOCALITY ID"]
         location: Location
 
@@ -70,7 +70,7 @@ class BasicDatasetLoader:
         return location
 
     @staticmethod
-    def _get_observer(data: dict[str, str]) -> Observer:
+    def add_observer(data: dict[str, str]) -> Observer:
         identifier: str = data["OBSERVER ID"]
         observer: Observer
 
@@ -88,7 +88,7 @@ class BasicDatasetLoader:
         return observer
 
     @staticmethod
-    def _get_species(data: dict[str, str]) -> Species:
+    def add_species(data: dict[str, str]) -> Species:
         taxon_order = data["TAXONOMIC ORDER"]
         species: Species
 
@@ -116,7 +116,7 @@ class BasicDatasetLoader:
         return species
 
     @staticmethod
-    def _get_observation(
+    def add_observation(
         data: dict[str, str], checklist: Checklist, species: Species
     ) -> Observation:
         identifier = data["GLOBAL UNIQUE IDENTIFIER"].split(":")[-1]
@@ -155,7 +155,7 @@ class BasicDatasetLoader:
         return observation
 
     @staticmethod
-    def _get_checklist(
+    def add_checklist(
         row: dict[str, str],
         location: Location,
         observer: Observer,
@@ -228,11 +228,11 @@ class BasicDatasetLoader:
                 new, modified = self._get_observation_status(identifier, last_edited)
 
                 if new or modified:
-                    location: Location = self._get_location(row)
-                    observer: Observer = self._get_observer(row)
-                    checklist: Checklist = self._get_checklist(row, location, observer)
-                    species: Species = self._get_species(row)
-                    self._get_observation(row, checklist, species)
+                    location: Location = self.add_location(row)
+                    observer: Observer = self.add_observer(row)
+                    checklist: Checklist = self.add_checklist(row, location, observer)
+                    species: Species = self.add_species(row)
+                    self.add_observation(row, checklist, species)
 
                 if new:
                     added += 1
