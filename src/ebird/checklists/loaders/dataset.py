@@ -17,25 +17,6 @@ def str2datetime(value: str) -> dt.datetime:
 
 
 class BasicDatasetLoader:
-    @staticmethod
-    def _get_observation_status(identifier: str, last_edited: str) -> (bool, bool):
-        last_edited_date: dt.datetime = dt.datetime.fromisoformat(last_edited).replace(
-            tzinfo=get_default_timezone()
-        )
-        new: bool
-        modified: bool
-
-        if obj := Observation.objects.filter(identifier=identifier).first():
-            if obj.edited < last_edited_date:
-                new = False
-                modified = True
-            else:
-                new = False
-                modified = False
-        else:
-            new = True
-            modified = False
-        return new, modified
 
     @staticmethod
     def add_location(data: dict[str, str]) -> Location:
@@ -209,46 +190,25 @@ class BasicDatasetLoader:
         if not path.exists():
             raise IOError('File "%s" does not exist' % path)
 
-        added: int = 0
-        updated: int = 0
-        unchanged: int = 0
         loaded: int = 0
 
         logger.info("Loading eBird Basic Dataset", extra={"path": path})
 
         with open(path) as csvfile:
-            new: bool
-            modified: bool
-
             reader = csv.DictReader(csvfile, delimiter="\t")
             for row in reader:
-                identifier: str = row["GLOBAL UNIQUE IDENTIFIER"]
-                last_edited: str = row["LAST EDITED DATE"]
-
-                new, modified = self._get_observation_status(identifier, last_edited)
-
-                if new or modified:
-                    location: Location = self.add_location(row)
-                    observer: Observer = self.add_observer(row)
-                    checklist: Checklist = self.add_checklist(row, location, observer)
-                    species: Species = self.add_species(row)
-                    self.add_observation(row, checklist, species)
-
-                if new:
-                    added += 1
-                elif modified:
-                    updated += 1
-                else:
-                    unchanged += 1
+                location: Location = self.add_location(row)
+                observer: Observer = self.add_observer(row)
+                checklist: Checklist = self.add_checklist(row, location, observer)
+                species: Species = self.add_species(row)
+                self.add_observation(row, checklist, species)
 
                 loaded += 1
 
         logger.info(
             "Loaded eBird Basic Dataset",
             extra={
+                "path": path,
                 "loaded": loaded,
-                "added": added,
-                "updated": updated,
-                "unchanged": unchanged,
             },
         )
