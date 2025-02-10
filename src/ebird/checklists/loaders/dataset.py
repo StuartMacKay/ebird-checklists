@@ -12,6 +12,10 @@ from ..models import Checklist, Location, Observation, Observer, Species
 logger = logging.getLogger(__name__)
 
 
+def str2datetime(value: str) -> dt.datetime:
+    return dt.datetime.fromisoformat(value).replace(tzinfo=get_default_timezone())
+
+
 class BasicDatasetLoader:
     @staticmethod
     def _get_observation_status(identifier: str, last_edited: str) -> (bool, bool):
@@ -116,15 +120,7 @@ class BasicDatasetLoader:
         data: dict[str, str], checklist: Checklist, species: Species
     ) -> Observation:
         identifier = data["GLOBAL UNIQUE IDENTIFIER"].split(":")[-1]
-        count: int | None
         observation: Observation
-
-        if re.match(r"\d+", data["OBSERVATION COUNT"]):
-            count = int(data["OBSERVATION COUNT"])
-            if count == 0:
-                count = None
-        else:
-            count = None
 
         values: dict = {
             "edited": checklist.edited,
@@ -133,7 +129,7 @@ class BasicDatasetLoader:
             "location": checklist.location,
             "observer": checklist.observer,
             "species": species,
-            "count": count,
+            "count": None,
             "breeding_code": data["BREEDING CODE"],
             "breeding_category": data["BREEDING CATEGORY"],
             "behavior_code": data["BEHAVIOR CODE"],
@@ -145,6 +141,9 @@ class BasicDatasetLoader:
             "comments": data["SPECIES COMMENTS"] or "",
             "urn": data["GLOBAL UNIQUE IDENTIFIER"],
         }
+
+        if re.match(r"\d+", data["OBSERVATION COUNT"]):
+            values["count"] = int(data["OBSERVATION COUNT"]) or None
 
         if observation := Observation.objects.filter(identifier=identifier).first():
             for key, value in values.items():
@@ -162,16 +161,8 @@ class BasicDatasetLoader:
         observer: Observer,
     ) -> Checklist:
         identifier: str = row["SAMPLING EVENT IDENTIFIER"]
-        edited: dt.datetime = dt.datetime.fromisoformat(
-            row["LAST EDITED DATE"]
-        ).replace(tzinfo=get_default_timezone())
-        time: dt.time | None
+        edited: dt.datetime = str2datetime(row["LAST EDITED DATE"])
         checklist: Checklist
-
-        if value := row["TIME OBSERVATIONS STARTED"]:
-            time = dt.datetime.strptime(value, "%H:%M:%S").time()
-        else:
-            time = None
 
         values: dict = {
             "identifier": identifier,
@@ -181,7 +172,7 @@ class BasicDatasetLoader:
             "group": row["GROUP IDENTIFIER"],
             "observer_count": row["NUMBER OBSERVERS"],
             "date": dt.datetime.strptime(row["OBSERVATION DATE"], "%Y-%m-%d").date(),
-            "time": time,
+            "time": None,
             "protocol": row["PROTOCOL TYPE"],
             "protocol_code": row["PROTOCOL CODE"],
             "project_code": row["PROJECT CODE"],
@@ -192,6 +183,9 @@ class BasicDatasetLoader:
             "comments": row["TRIP COMMENTS"] or "",
             "url": "https://ebird.org/checklist/%s" % identifier,
         }
+
+        if time := row["TIME OBSERVATIONS STARTED"]:
+            values["time"] = dt.datetime.strptime(time, "%H:%M:%S").time()
 
         if duration := row["DURATION MINUTES"]:
             values["duration"] = Decimal(duration)

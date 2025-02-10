@@ -94,14 +94,6 @@ class MyDataLoader:
     def _get_observation(
         self, data: dict, checklist: Checklist
     ) -> Observation:
-        count: int | None
-
-        if re.match(r"\d+", data["Count"]):
-            count = int(data["Count"])
-            if count == 0:
-                count = None
-        else:
-            count = None
 
         values: dict = {
             "edited": checklist.edited,
@@ -110,7 +102,7 @@ class MyDataLoader:
             "checklist": checklist,
             "location": checklist.location,
             "observer": checklist.observer,
-            "count": count,
+            "count": None,
             "breeding_code": data["Breeding Code"] or "",
             "breeding_category": "",
             "behavior_code": "",
@@ -122,6 +114,9 @@ class MyDataLoader:
             "comments": data["Observation Details"] or "",
             "urn": "",
         }
+
+        if re.match(r"\d+", data["Count"]):
+            values["count"] = int(data["Count"]) or None
 
         # There is no unique identifier for an observation, only the
         # count, species, date, time, checklist identifier and location
@@ -137,13 +132,7 @@ class MyDataLoader:
         data: dict, location: Location, observer: Observer
     ) -> Checklist:
         identifier: str = data["Submission ID"]
-        time: dt.time | None
         checklist: Checklist
-
-        if value := data["Time"]:
-            time = dt.datetime.strptime(value, "%H:%M %p").time()
-        else:
-            time = None
 
         values: dict = {
             "identifier": identifier,
@@ -153,7 +142,7 @@ class MyDataLoader:
             "group": "",
             "species_count": None,
             "date": dt.datetime.strptime(data["Date"], "%Y-%m-%d").date(),
-            "time": time,
+            "time": None,
             "protocol": data["Protocol"],
             "protocol_code": "",
             "project_code": "",
@@ -164,6 +153,9 @@ class MyDataLoader:
             "comments": data["Checklist Comments"] or "",
             "url": "https://ebird.org/checklist/%s" % identifier,
         }
+
+        if time := data["Time"]:
+            values["time"] = dt.datetime.strptime(time, "%H:%M %p").time()
 
         if duration := data["Duration (Min)"]:
             values["duration"] = int(duration)

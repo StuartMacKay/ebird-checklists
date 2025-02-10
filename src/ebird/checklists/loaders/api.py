@@ -59,35 +59,34 @@ class APILoader:
         started: dt.datetime = str2datetime(data["obsDt"])
         checklist: Checklist
 
-        time: dt.time | None = None
-        if data["obsTimeValid"]:
-            time = started.time()
-
-        duration: int | None = None
-        if "durationHrs" in data:
-            duration = int(data["durationHrs"] * 60.0)
-
         values: dict = {
             "created": created,
             "edited": edited,
             "location": self.get_location(data),
             "observer": self.get_observer(data),
+            "observer_count": None,
             "group": "",
             "species_count": data["numSpecies"],
             "date": started.date(),
-            "time": time,
+            "time": None,
             "started": started,
             "protocol": "",
             "protocol_code": data["protocolId"],
             "project_code": data["projId"],
-            "duration": duration,
+            "duration": None,
             "complete": data["allObsReported"],
             "comments": "",
             "url": "https://ebird.org/checklist/%s" % identifier,
         }
 
+        if data["obsTimeValid"]:
+            values["time"] = started.time()
+
         if "numObservers" in data:
             values["observer_count"] = int(data["numObservers"])
+
+        if duration := data.get("durationHrs"):
+            values["duration"] = int(duration * 60.0)
 
         if data["protocolId"] == "P22":
             dist: str = data["effortDistanceKm"]
@@ -161,15 +160,7 @@ class APILoader:
 
     def add_observation(self, data: dict, checklist: Checklist) -> Observation:
         identifier: str = data["obsId"]
-        count: int | None
         observation: Observation
-
-        if re.match(r"\d+", data["howManyStr"]):
-            count = int(data["howManyStr"])
-            if count == 0:
-                count = None
-        else:
-            count = None
 
         values: dict = {
             "edited": checklist.edited,
@@ -178,7 +169,7 @@ class APILoader:
             "location": checklist.location,
             "observer": checklist.observer,
             "species": self.get_species(data),
-            "count": count,
+            "count": None,
             "breeding_code": "",
             "breeding_category": "",
             "behavior_code": "",
@@ -190,6 +181,9 @@ class APILoader:
             "comments": "",
             "urn": self.get_urn(data),
         }
+
+        if re.match(r"\d+", data["howManyStr"]):
+            values["count"] = int(data["howManyStr"]) or None
 
         if "comments" in data:
             values["comments"] = data["comments"]
