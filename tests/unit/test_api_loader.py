@@ -1,12 +1,11 @@
 import datetime as dt
 import decimal
 
+import pytest
 from dateutil.relativedelta import relativedelta
 
-import pytest
-
-from ebird.checklists.loaders import api
 from ebird.checklists.loaders import APILoader
+from ebird.checklists.loaders import api
 from ebird.checklists.loaders.api import str2datetime
 from ebird.checklists.models import Checklist, Observation, Location, Observer
 
@@ -30,18 +29,18 @@ def submitted(start):
 @pytest.fixture
 def webowl():
     return {
-         "sciName": "Tyto alba",
-         "comName": "Western Barn Owl",
-         "speciesCode": "webowl",
-         "category": "species",
-         "taxonOrder": 8516.0,
-         "bandingCodes": [],
-         "comNameCodes": ["CBOW", "EBOW", "WBOW"],
-         "sciNameCodes": ["TYAL"],
-         "order": "Strigiformes",
-         "familyCode": "tytoni1",
-         "familyComName": "Barn-Owls",
-         "familySciName": "Tytonidae",
+        "sciName": "Tyto alba",
+        "comName": "Western Barn Owl",
+        "speciesCode": "webowl",
+        "category": "species",
+        "taxonOrder": 8516.0,
+        "bandingCodes": [],
+        "comNameCodes": ["CBOW", "EBOW", "WBOW"],
+        "sciNameCodes": ["TYAL"],
+        "order": "Strigiformes",
+        "familyCode": "tytoni1",
+        "familyComName": "Barn-Owls",
+        "familySciName": "Tytonidae",
     }
 
 
@@ -59,7 +58,7 @@ def grhowl():
         "order": "Strigiformes",
         "familyCode": "strigi1",
         "familyComName": "Owls",
-        "familySciName": "Strigidae"
+        "familySciName": "Strigidae",
     }
 
 
@@ -93,8 +92,9 @@ def observations(observation):
             "present": False,
             "obsId": "OBS0000000002",
             "howManyStr": "1",
-        }
+        },
     ]
+
 
 @pytest.fixture
 def observer():
@@ -119,6 +119,7 @@ def location():
         "isHotspot": True,
     }
 
+
 @pytest.fixture
 def checklist(start, submitted, observer, observations):
     return {
@@ -139,8 +140,9 @@ def checklist(start, submitted, observer, observations):
         "userDisplayName": observer["userDisplayName"],
         "numSpecies": 1,
         "obs": observations,
-        "comments": "This is a checklist comment"
+        "comments": "This is a checklist comment",
     }
+
 
 @pytest.fixture
 def loader(settings):
@@ -149,7 +151,7 @@ def loader(settings):
 
 @pytest.fixture(autouse=True)
 def mock_api_calls(monkeypatch, species):
-    def mock_fetch_species(self, code, locale):
+    def mock_fetch_species(self, code, locale):  # pyright: ignore
         return species[code]
 
     monkeypatch.setattr(APILoader, "fetch_species", mock_fetch_species)
@@ -163,7 +165,7 @@ def test_add_checklist__checklist_added(loader, checklist):
     assert added is True
 
 
-def test_add_checklist__checklist_updated(loader, submitted, checklist):
+def test_add_checklist__checklist_updated(loader, checklist):
     """If the checklist edited, it is updated."""
     chk1, _ = loader.add_checklist(checklist)
     checklist["numObservers"] += 1
@@ -282,7 +284,7 @@ def test_add_checklist__observations_added(loader, checklist, observation):
     assert obs.checklist == chk
 
 
-def test_add_checklist__observations_updated(loader, submitted, checklist, observation):
+def test_add_checklist__observations_updated(loader, checklist, observation):
     """Observations are updated."""
     loader.add_checklist(checklist)
     observation["howManyStr"] = "2"
@@ -291,7 +293,9 @@ def test_add_checklist__observations_updated(loader, submitted, checklist, obser
     assert obs.count == 2
 
 
-def test_add_checklist__observations_deleted(loader, submitted, checklist, observations):
+def test_add_checklist__observations_deleted(
+    loader, submitted, checklist, observations
+):
     """If checklist observations are deleted, the records are removed."""
     loader.add_checklist(checklist)
     del observations[0]
@@ -350,9 +354,9 @@ def test_add_observation__observation_updated(loader, checklist, observation):
     assert obs1.count != obs2.count
 
 
-def test_add_observation__count_optional(loader, checklist, observation, location):
+def test_add_observation__count_optional(loader, checklist, observation):
     """If a count is not given, then it is None"""
-    observation["howManyStr"] = 'X'
+    observation["howManyStr"] = "X"
     loader.add_checklist(checklist)
     obs = Observation.objects.get(identifier=observation["obsId"])
     assert obs.count is None
@@ -392,141 +396,147 @@ def test_add_species__species_added(loader, webowl):
     assert obj.species_code == webowl["speciesCode"]
 
 
-@pytest.mark.parametrize("subregions, visits, expected", [
-    # A region has no subregions
-    (
-        {"AB": []},
-        {"AB": [1, 1, 1, 1], },  # included
-        4
-    ),
-    # A region has subregions, but not all visits fetched
-    (
-        {
-            "AB": ["AB-01", "AB-02"],
-            "AB-01": [],
-            "AB-02": [],
-        },
-        {
-            "AB": [1, 1, 1],  # included
-            "AB-01": [1, 1],  # not fetched
-            "AB-02": [1, 1],  # not fetched
-         },
-        3
-    ),
-    # A region with subregions, but the subregion have no sub-subregions
-    (
-        {
-            "AB": ["AB-01", "AB-02"],
-            "AB-01": [],
-            "AB-02": [],
-        },
-        {
-            "AB": [1, 1, 1, 1],  # excluded
-            "AB-01": [1, 1, 1],  # included
-            "AB-02": [1, 1, 1, 1],  # included
-        },
-        7
-    ),
-    # A region with subregions, and the subregion have sub-subregions
-    (
-        {
-            "AB": ["AB-01", "AB-02"],
-            "AB-01": ["AB-01-01", "AB-01-02"],
-            "AB-02": ["AB-02-01", "AB-02-02"],
-            "AB-01-01": [],
-            "AB-01-02": [],
-            "AB-02-01": [],
-            "AB-02-02": [],
-        },
-        {
-            "AB": [1, 1, 1, 1],  # excluded
-            "AB-01": [1, 1, 1, 1],  # included
-            "AB-02": [1, 1, 1, 1],  # included
-            "AB-01-01": [1],  # included
-            "AB-01-02": [1],  # included
-            "AB-02-01": [1],  # included
-            "AB-02-02": [],  # included, but no visits
-        },
-        3
-    ),
-    # More levels of subregion than eBird supports - only three levels are processed
-    (
-        {
-            "AB": ["AB-01", "AB-02"],
-            "AB-01": ["AB-01-01", "AB-01-02"],
-            "AB-02": ["AB-02-01", "AB-02-02"],
-            "AB-01-01": ["AB-01-01-01"],
-            "AB-01-02": ["AB-01-02-01"],
-            "AB-02-01": ["AB-02-01-01"],
-            "AB-02-02": ["AB-02-02-01"],
-            "AB-01-01-01": [],
-            "AB-01-02-01": [],
-            "AB-02-01-01": [],
-            "AB-02-02-01": [],
-        },
-        {
-            "AB": [1, 1, 1, 1],  # excluded
-            "AB-01": [1, 1, 1, 1],  # included
-            "AB-02": [1, 1, 1, 1],  # excluded
-            "AB-01-01": [1, 1, 1, 1],  # included
-            "AB-01-02": [1, 1, 1, 1],  # included
-            "AB-02-01": [1, 1, 1, 1],  # included
-            "AB-02-02": [1, 1, 1, 1],  # included
-            "AB-01-01-01": [1],  # not fetched
-            "AB-01-02-01": [1],  # not fetched
-            "AB-02-01-01": [],  # not fetched
-            "AB-02-02-01": [1],  # not fetched
-        },
-        16
-    ),
-    # A region with subregions. Not all subregions have sub-subregions
-    (
-        {
-            "AB": ["AB-01", "AB-02", "AB-03"],
-            "AB-01": ["AB-01-01", "AB-01-02"],
-            "AB-02": ["AB-02-01", "AB-02-02"],
-            "AB-03": ["AB-03-01", "AB-03-02"],
-        },
-        {
-            "AB": [1, 1, 1, 1],  # excluded
-            "AB-01": [1, 1, 1, 1],  # excluded
-            "AB-01-01": [1, 1, 1],  # included
-            "AB-01-02": [1, 1],  # included
-            "AB-02": [1, 1, 1],  # included
-            "AB-03": [1, 1, 1, 1],  # excluded
-            "AB-03-01": [1, 1, 1, 1],  # included
-            "AB-03-02": [1, 1],  # included
-        },
-        14
-    ),
-    # All regions and subregions return the maximum number of visits fetched
-    (
-        {
-            "AB": ["AB-01", "AB-02"],
-            "AB-01": ["AB-01-01", "AB-01-02"],
-            "AB-02": ["AB-02-01", "AB-02-02"],
-        },
-        {
-            "AB": [1, 1, 1, 1],  # excluded
-            "AB-01": [1, 1, 1, 1],  # excluded
-            "AB-02": [1, 1, 1, 1],  # excluded
-            "AB-01-01": [1, 1, 1, 1],  # included
-            "AB-01-02": [1, 1, 1, 1],  # included
-            "AB-02-01": [1, 1, 1, 1],  # included
-            "AB-02-02": [1, 1, 1, 1],  # included
-        },
-        16
-    )
-])
+@pytest.mark.parametrize(
+    "subregions, visits, expected",
+    [
+        # A region has no subregions
+        (
+            {"AB": []},
+            {
+                "AB": [1, 1, 1, 1],
+            },  # included
+            4,
+        ),
+        # A region has subregions, but not all visits fetched
+        (
+            {
+                "AB": ["AB-01", "AB-02"],
+                "AB-01": [],
+                "AB-02": [],
+            },
+            {
+                "AB": [1, 1, 1],  # included
+                "AB-01": [1, 1],  # not fetched
+                "AB-02": [1, 1],  # not fetched
+            },
+            3,
+        ),
+        # A region with subregions, but the subregion have no sub-subregions
+        (
+            {
+                "AB": ["AB-01", "AB-02"],
+                "AB-01": [],
+                "AB-02": [],
+            },
+            {
+                "AB": [1, 1, 1, 1],  # excluded
+                "AB-01": [1, 1, 1],  # included
+                "AB-02": [1, 1, 1, 1],  # included
+            },
+            7,
+        ),
+        # A region with subregions, and the subregion have sub-subregions
+        (
+            {
+                "AB": ["AB-01", "AB-02"],
+                "AB-01": ["AB-01-01", "AB-01-02"],
+                "AB-02": ["AB-02-01", "AB-02-02"],
+                "AB-01-01": [],
+                "AB-01-02": [],
+                "AB-02-01": [],
+                "AB-02-02": [],
+            },
+            {
+                "AB": [1, 1, 1, 1],  # excluded
+                "AB-01": [1, 1, 1, 1],  # included
+                "AB-02": [1, 1, 1, 1],  # included
+                "AB-01-01": [1],  # included
+                "AB-01-02": [1],  # included
+                "AB-02-01": [1],  # included
+                "AB-02-02": [],  # included, but no visits
+            },
+            3,
+        ),
+        # More levels of subregion than eBird supports - only three levels are processed
+        (
+            {
+                "AB": ["AB-01", "AB-02"],
+                "AB-01": ["AB-01-01", "AB-01-02"],
+                "AB-02": ["AB-02-01", "AB-02-02"],
+                "AB-01-01": ["AB-01-01-01"],
+                "AB-01-02": ["AB-01-02-01"],
+                "AB-02-01": ["AB-02-01-01"],
+                "AB-02-02": ["AB-02-02-01"],
+                "AB-01-01-01": [],
+                "AB-01-02-01": [],
+                "AB-02-01-01": [],
+                "AB-02-02-01": [],
+            },
+            {
+                "AB": [1, 1, 1, 1],  # excluded
+                "AB-01": [1, 1, 1, 1],  # included
+                "AB-02": [1, 1, 1, 1],  # excluded
+                "AB-01-01": [1, 1, 1, 1],  # included
+                "AB-01-02": [1, 1, 1, 1],  # included
+                "AB-02-01": [1, 1, 1, 1],  # included
+                "AB-02-02": [1, 1, 1, 1],  # included
+                "AB-01-01-01": [1],  # not fetched
+                "AB-01-02-01": [1],  # not fetched
+                "AB-02-01-01": [],  # not fetched
+                "AB-02-02-01": [1],  # not fetched
+            },
+            16,
+        ),
+        # A region with subregions. Not all subregions have sub-subregions
+        (
+            {
+                "AB": ["AB-01", "AB-02", "AB-03"],
+                "AB-01": ["AB-01-01", "AB-01-02"],
+                "AB-02": ["AB-02-01", "AB-02-02"],
+                "AB-03": ["AB-03-01", "AB-03-02"],
+            },
+            {
+                "AB": [1, 1, 1, 1],  # excluded
+                "AB-01": [1, 1, 1, 1],  # excluded
+                "AB-01-01": [1, 1, 1],  # included
+                "AB-01-02": [1, 1],  # included
+                "AB-02": [1, 1, 1],  # included
+                "AB-03": [1, 1, 1, 1],  # excluded
+                "AB-03-01": [1, 1, 1, 1],  # included
+                "AB-03-02": [1, 1],  # included
+            },
+            14,
+        ),
+        # All regions and subregions return the maximum number of visits fetched
+        (
+            {
+                "AB": ["AB-01", "AB-02"],
+                "AB-01": ["AB-01-01", "AB-01-02"],
+                "AB-02": ["AB-02-01", "AB-02-02"],
+            },
+            {
+                "AB": [1, 1, 1, 1],  # excluded
+                "AB-01": [1, 1, 1, 1],  # excluded
+                "AB-02": [1, 1, 1, 1],  # excluded
+                "AB-01-01": [1, 1, 1, 1],  # included
+                "AB-01-02": [1, 1, 1, 1],  # included
+                "AB-02-01": [1, 1, 1, 1],  # included
+                "AB-02-02": [1, 1, 1, 1],  # included
+            },
+            16,
+        ),
+    ],
+)
 def test__fetch_visits__subregions(monkeypatch, loader, subregions, visits, expected):
     """Confirm that if the number of visits returned for a region reaches the
     maximum number for an API call, i.e. there are more visits, then the loader
     fetches visits from the region's subregions."""
-    def mock_get_visits(api_key, region, date=None, max_results=None):
+
+    def mock_get_visits(api_key, region, date=None, max_results=None):  # pyright: ignore
         return visits[region]
 
-    def mock_get_regions(api_key, region_type, region):
-        return [ {"code": item} for item in subregions[region]]
+    def mock_get_regions(api_key, region_type, region):  # pyright: ignore
+        return [{"code": item} for item in subregions[region]]
 
     monkeypatch.setattr(api, "API_MAX_RESULTS", 4)
     monkeypatch.setattr(api, "get_visits", mock_get_visits)

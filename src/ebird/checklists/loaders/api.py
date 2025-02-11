@@ -1,7 +1,8 @@
 import datetime as dt
-from decimal import Decimal
 import logging
 import re
+from decimal import Decimal
+from typing import Tuple
 from urllib.error import HTTPError, URLError
 
 from django.utils.timezone import get_default_timezone
@@ -52,7 +53,7 @@ class APILoader:
     def is_checklist(identifier: str) -> bool:
         return Checklist.objects.filter(identifier=identifier).exists()
 
-    def add_checklist(self, data: dict) -> (Checklist, bool):
+    def add_checklist(self, data: dict) -> Tuple[Checklist, bool]:
         identifier: str = data["subId"]
         created: dt.datetime = str2datetime(data["creationDt"])
         edited: dt.datetime = str2datetime(data["lastEditedDt"])
@@ -111,7 +112,7 @@ class APILoader:
         for observation_data in data["obs"]:
             self.add_observation(observation_data, checklist)
 
-        for observation in checklist.observations.filter(edited__lt=edited):
+        for observation in checklist.observations.filter(edited__lt=edited):  # pyright: ignore [reportAttributeAccessIssue]
             logger.info(
                 "Deleting observation: %s",
                 identifier,
@@ -199,7 +200,7 @@ class APILoader:
     @staticmethod
     def add_observer(data: dict) -> Observer:
         name: str = data["userDisplayName"]
-        observer, created = Observer.objects.get_or_create(name=name)
+        observer, _ = Observer.objects.get_or_create(name=name)
         return observer
 
     @staticmethod
@@ -281,7 +282,7 @@ class APILoader:
 
         return sub_regions
 
-    def fetch_visits(self, region: str, date: dt.date = None):
+    def fetch_visits(self, region: str, date: dt.date | None = None):
         visits = []
 
         results: list = get_visits(
@@ -347,7 +348,7 @@ class APILoader:
         data: dict = self.fetch_location(identifier)
         return self.add_location(data)
 
-    def load_checklist(self, identifier: str) -> (Checklist, bool):
+    def load_checklist(self, identifier: str) -> Tuple[Checklist, bool]:
         """
         Load the checklist with the given identifier.
 
@@ -426,7 +427,7 @@ class APILoader:
                 self.add_location(data)
 
             for identifier in checklists:
-                checklist, created = self.load_checklist(identifier)
+                _, created = self.load_checklist(identifier)
                 if created:
                     added += 1
                 loaded += 1

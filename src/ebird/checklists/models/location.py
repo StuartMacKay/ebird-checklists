@@ -1,3 +1,5 @@
+# pyright: reportArgumentType=false
+
 import re
 
 from django.db import models
@@ -151,7 +153,7 @@ class Location(models.Model):
         blank=True,
     )
 
-    objects = LocationQuerySet.as_manager()
+    objects = LocationQuerySet.as_manager()  # pyright: ignore [reportCallIssue]
 
     def __str__(self):
-        return self.name
+        return str(self.name)

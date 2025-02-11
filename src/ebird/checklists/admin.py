@@ -1,3 +1,5 @@
+# pyright: reportOptionalMemberAccess=false
+
 from django.contrib import admin
 from django.db.models import TextField
 from django.forms import Textarea, TextInput
@@ -79,8 +81,8 @@ class ChecklistAdmin(admin.ModelAdmin):
         "data",
     )
 
-    def formfield_for_dbfield(self, db_field, **kwargs):
-        field = super().formfield_for_dbfield(db_field, **kwargs)
+    def formfield_for_dbfield(self, db_field, request, **kwargs):
+        field = super().formfield_for_dbfield(db_field, request, **kwargs)
 
         text_fields = (
             "observer_count",
@@ -110,8 +112,8 @@ class LocationAdmin(admin.ModelAdmin):
     }
     readonly_fields = ("identifier",)
 
-    def formfield_for_dbfield(self, db_field, **kwargs):
-        field = super().formfield_for_dbfield(db_field, **kwargs)
+    def formfield_for_dbfield(self, db_field, request, **kwargs):
+        field = super().formfield_for_dbfield(db_field, request, **kwargs)
         if db_field.name == "latitude":
             field.widget = TextInput()
         elif db_field.name == "longitude":
@@ -150,8 +152,8 @@ class ObservationAdmin(admin.ModelAdmin):
         "data",
     )
 
-    def formfield_for_dbfield(self, db_field, **kwargs):
-        field = super().formfield_for_dbfield(db_field, **kwargs)
+    def formfield_for_dbfield(self, db_field, request, **kwargs):
+        field = super().formfield_for_dbfield(db_field, request, **kwargs)
         if db_field.name == "comments":
             field.widget = Textarea(attrs={"rows": 5, "style": "width: 60%"})
         elif db_field.name == "count":

@@ -1,5 +1,6 @@
+# pyright: reportArgumentType=false
+
 import datetime
-from dateutil import relativedelta
 import re
 
 from django.core.validators import MinValueValidator
@@ -174,7 +175,7 @@ class Observation(models.Model):
         blank=True,
     )
 
-    objects = ObservationQuerySet.as_manager()
+    objects = ObservationQuerySet.as_manager()  # pyright: ignore [reportCallIssue]
 
     def __str__(self):
-        return "%s (%s)" % (self.species.common_name, self.count)
+        return "%s (%s)" % (self.species.common_name, self.count)  # pyright: ignore [reportAttributeAccessIssue]

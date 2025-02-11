@@ -1,3 +1,5 @@
+# pyright: reportArgumentType=false
+
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
@@ -14,10 +16,10 @@ SPECIES_CATEGORY = {
 }
 
 EXOTIC_CODE = {
-    "", "",  # NATIVE
-    "N", _("Naturalized"),
-    "P", _("Provisional"),
-    "X", _("Escapee"),
+    "": "",  # NATIVE
+    "N": _("Naturalized"),
+    "P": _("Provisional"),
+    "X": _("Escapee"),
 }
 
 
@@ -26,7 +28,6 @@ class SpeciesQuerySet(models.QuerySet):
 
 
 class Species(models.Model):
-
     class Meta:
         verbose_name = _("species")
         verbose_name_plural = _("species")
@@ -41,7 +42,9 @@ class Species(models.Model):
     order = models.TextField(
         blank=True,
         verbose_name=_("order"),
-        help_text=_("The order, e.g. Struthioniformes, from the eBird/Clements taxonomy."),
+        help_text=_(
+            "The order, e.g. Struthioniformes, from the eBird/Clements taxonomy."
+        ),
     )
 
     category = models.TextField(
@@ -64,36 +67,44 @@ class Species(models.Model):
 
     common_name = models.TextField(
         verbose_name=_("common name"),
-        help_text=_("The species common name in the eBird/Clements taxonomy.")
+        help_text=_("The species common name in the eBird/Clements taxonomy."),
     )
 
     scientific_name = models.TextField(
         verbose_name=_("scientific name"),
-        help_text=_("The species scientific name in the eBird/Clements taxonomy.")
+        help_text=_("The species scientific name in the eBird/Clements taxonomy."),
     )
 
     family_common_name = models.TextField(
         blank=True,
         verbose_name=_("family common name"),
-        help_text=_("The common name for the species family in the eBird/Clements taxonomy.")
+        help_text=_(
+            "The common name for the species family in the eBird/Clements taxonomy."
+        ),
     )
 
     family_scientific_name = models.TextField(
         blank=True,
         verbose_name=_("family scientific name"),
-        help_text=_("The scientific name for the species family in the eBird/Clements taxonomy.")
+        help_text=_(
+            "The scientific name for the species family in the eBird/Clements taxonomy."
+        ),
     )
 
     subspecies_common_name = models.TextField(
         blank=True,
         verbose_name=_("subspecies common name"),
-        help_text=_("The subspecies, group or form common name in the eBird/Clements taxonomy.")
+        help_text=_(
+            "The subspecies, group or form common name in the eBird/Clements taxonomy."
+        ),
     )
 
     subspecies_scientific_name = models.TextField(
         blank=True,
         verbose_name=_("Scientific name"),
-        help_text=_("The subspecies, group or form scientific name in the eBird/Clements taxonomy.")
+        help_text=_(
+            "The subspecies, group or form scientific name in the eBird/Clements taxonomy."
+        ),
     )
 
     exotic_code = models.TextField(
@@ -109,7 +120,7 @@ class Species(models.Model):
         blank=True,
     )
 
-    objects = SpeciesQuerySet.as_manager()
+    objects = SpeciesQuerySet.as_manager()  # pyright: ignore [reportCallIssue]
 
     def __str__(self):
-        return self.subspecies_common_name or self.common_name
+        return str(self.subspecies_common_name or self.common_name)

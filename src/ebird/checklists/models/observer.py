@@ -1,12 +1,14 @@
+# pyright: reportArgumentType=false
+
 from django.db import models
 from django.utils.translation import gettext_lazy as _
+
 
 class ObserverQuerySet(models.QuerySet):
     pass
 
 
 class Observer(models.Model):
-
     class Meta:
         verbose_name = _("observer")
         verbose_name_plural = _("observers")
@@ -30,7 +32,7 @@ class Observer(models.Model):
         blank=True,
     )
 
-    objects = ObserverQuerySet.as_manager()
+    objects = ObserverQuerySet.as_manager()  # pyright: ignore [reportCallIssue]
 
     def __str__(self):
-        return self.name
+        return str(self.name)

@@ -108,9 +108,7 @@ class Command(BaseCommand):
             help="Load all checklists for a given date.",
         )
         all_parser.set_defaults(method=self.all_checklists)
-        all_parser.add_argument(
-            "date", type=str, help="The checklist date"
-        )
+        all_parser.add_argument("date", type=str, help="The checklist date")
         all_parser.add_argument(
             "regions",
             nargs="+",
@@ -132,7 +130,7 @@ class Command(BaseCommand):
     def handle(self, *args, method, **options):
         method(*args, **options)
 
-    def new_checklists(self, *args, **options) -> None:
+    def new_checklists(self, **options) -> None:
         loader: APILoader = self.get_loader()
         dates: list[dt.date] = self.get_dates(options["days"])
         region: str
@@ -142,7 +140,7 @@ class Command(BaseCommand):
             for date in dates:
                 loader.load_checklists(region, date, True)
 
-    def all_checklists(self, *args, **options) -> None:
+    def all_checklists(self, **options) -> None:
         loader: APILoader = self.get_loader()
         region: str
         date: dt.date = dt.datetime.strptime(options["date"], "%Y-%m-%d").date()

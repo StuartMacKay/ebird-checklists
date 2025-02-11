@@ -1,3 +1,5 @@
+# pyright: reportArgumentType=false
+
 import datetime
 import re
 
@@ -168,7 +170,8 @@ class Checklist(models.Model):
 
     date = models.DateField(
         db_index=True,
-        verbose_name=_("date"), help_text=_("The date the checklist was started.")
+        verbose_name=_("date"),
+        help_text=_("The date the checklist was started."),
     )
 
     time = models.TimeField(
@@ -254,7 +257,7 @@ class Checklist(models.Model):
         blank=True,
     )
 
-    objects = ChecklistQuerySet.as_manager()
+    objects = ChecklistQuerySet.as_manager()  # pyright: ignore [reportCallIssue]
 
     def __str__(self):
         return "%s %s, %s" % (self.date, self.time, self.location.name)
