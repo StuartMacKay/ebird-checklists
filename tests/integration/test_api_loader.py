@@ -1,11 +1,8 @@
-import datetime
 import pytest
-
-from ebird.checklists.loaders import APILoader
+from django.core.management import call_command
 
 pytestmark = pytest.mark.django_db
 
 
-def test_load_checklists(api_key, locale, country):
-    loader = APILoader(api_key, locale)
-    loader.load_checklists(country, datetime.date.today(), True)
+def test_load_checklists(country):
+    call_command("load_api", "new", 7, country)

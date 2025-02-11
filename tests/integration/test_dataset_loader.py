@@ -1,9 +1,9 @@
 from pathlib import Path
 
 import pytest
+from django.core.management import call_command
 
 from demo.settings import DOWNLOAD_DIR
-from ebird.checklists.loaders import BasicDatasetLoader
 
 pytestmark = pytest.mark.django_db
 
@@ -14,5 +14,4 @@ def csv_file():
 
 
 def test_load_sample_dataset(csv_file):
-    loader = BasicDatasetLoader()
-    loader.load(csv_file)
+    call_command("load_dataset", csv_file)
