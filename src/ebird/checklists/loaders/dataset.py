@@ -1,8 +1,8 @@
 import csv
 import datetime as dt
-from decimal import Decimal
 import logging
 import re
+from decimal import Decimal
 from pathlib import Path
 
 from django.utils.timezone import get_default_timezone
@@ -12,12 +12,7 @@ from ..models import Checklist, Location, Observation, Observer, Species
 logger = logging.getLogger(__name__)
 
 
-def str2datetime(value: str) -> dt.datetime:
-    return dt.datetime.fromisoformat(value).replace(tzinfo=get_default_timezone())
-
-
 class BasicDatasetLoader:
-
     @staticmethod
     def add_location(data: dict[str, str]) -> Location:
         identifier: str = data["LOCALITY ID"]
@@ -142,12 +137,13 @@ class BasicDatasetLoader:
         observer: Observer,
     ) -> Checklist:
         identifier: str = row["SAMPLING EVENT IDENTIFIER"]
-        edited: dt.datetime = str2datetime(row["LAST EDITED DATE"])
         checklist: Checklist
 
         values: dict = {
             "identifier": identifier,
-            "edited": edited,
+            "edited": dt.datetime.fromisoformat(row["LAST EDITED DATE"]).replace(
+                tzinfo=get_default_timezone()
+            ),
             "location": location,
             "observer": observer,
             "group": row["GROUP IDENTIFIER"],
