@@ -107,7 +107,7 @@ Load the sample data from the eBird Basic Dataset:
 
 .. code-block:: console
 
-    python manage.py load_csv data/downloads/ebird_basic_dataset_sample.csv
+    python manage.py load_dataset data/downloads/ebird_basic_dataset_sample.csv
 
 Create a user:
 

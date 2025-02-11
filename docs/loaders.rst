@@ -19,20 +19,19 @@ files are very large so loading them is going to take a while:
 
 .. code-block:: console
 
-    python manage.py load_csv ebird_basic_dataset.csv
+    python manage.py load_dataset ebird_basic_dataset.csv
 
 
 My eBird Data
 -------------
 If you have an eBird account, you can download all your observations. Visit
 `Download My Data`_ and download the file to the ``data/downloads`` directory.
-The management command to load the data is the same one to load the eBird
-Basic Dataset:
+The data does not contain your name as the observer, so you have to specify
+it when you load the file:
 
 .. code-block:: console
 
-    python manage.py load_csv data/downloads/MyEBirdData.csv
-
+    python manage.py load_mydata data/downloads/MyEBirdData.csv "Etta Lemon"
 
 eBird API
 ---------

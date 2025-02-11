@@ -6,6 +6,8 @@ and this project adheres to `Semantic Versioning <https://semver.org/spec/v2.0.0
 
 Latest
 ------
+* Split the load_csv management command into separate commands for loading eBird
+Basic Dataset, load_dataset, and MyEBirdData, load_mydata.
 
 0.9.2 (2025-02-07)
 ------------------
