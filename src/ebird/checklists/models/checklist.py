@@ -5,6 +5,12 @@ import re
 
 from django.db import models
 from django.utils.translation import gettext_lazy as _
+from ebird.api.validation import (
+    is_country,
+    is_subnational1,
+    is_subnational2,
+    is_location,
+)
 
 # All the protocols from Appendices 2 and 3 of the eBird Basic Dataset
 # Metadata V1.14 description.
@@ -61,33 +67,33 @@ PROTOCOL_TYPE = {
 
 class ChecklistQuerySet(models.QuerySet):
     def for_country(self, code: str):
-        if not re.match(r"[A-Z]{2}", code):
+        if not is_country(code):
             raise ValueError("Unsupported country code: %s" % code)
         return self.filter(location__country_code=code)
 
     def for_state(self, code: str):
-        if not re.match(r"[A-Z]{2}-[A-Z0-9]{2,3}", code):
+        if not is_subnational1(code):
             raise ValueError("Unsupported state code: %s" % code)
         return self.filter(location__state_code=code)
 
     def for_county(self, code: str):
-        if not re.match(r"[A-Z]{2}-[A-Z0-9]{2,3}-[A-Z0-9]{2,3}", code):
+        if not is_subnational2(code):
             raise ValueError("Unsupported county code: %s" % code)
         return self.filter(location__county_code=code)
 
     def for_location(self, identifier: str):
-        if not re.match(r"L\d+", identifier):
+        if not is_location(identifier):
             raise ValueError("Unsupported location identifier: %s" % identifier)
         return self.filter(location__identifier=identifier)
 
     def for_region(self, value: str):
-        if re.match(r"[A-Z]{2}", value):
+        if is_country(value):
             return self.filter(location__country_code=value)
-        elif re.match(r"[A-Z]{2}-[A-Z0-9]{2,3}", value):
+        elif is_subnational1(value):
             return self.filter(location__state_code=value)
-        elif re.match(r"[A-Z]{2}-[A-Z0-9]{2,3}-[A-Z0-9]{2,3}", value):
+        elif is_subnational2(value):
             return self.filter(location__county_code=value)
-        elif re.match(r"L\d+", value):
+        elif is_location(value):
             return self.filter(location__identifier=value)
         else:
             raise ValueError("Unsupported region code: %s" % value)
