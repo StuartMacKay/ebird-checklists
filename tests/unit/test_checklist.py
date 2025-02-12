@@ -144,3 +144,13 @@ def test_complete__checklists_not_fetched(checklist):
     checklist.save()
     obj = Checklist.objects.complete().first()
     assert obj is None
+
+
+def test_manager_in_region_with_dates(checklist, location):
+    code = location.country_code
+    start = checklist.date
+    end = checklist.date + relativedelta(days=+1)
+    obj = Checklist.objects.in_region_with_dates(code, start, end).first()
+    assert obj.location.country_code == code
+    assert obj.date >= start
+    assert obj.date < end

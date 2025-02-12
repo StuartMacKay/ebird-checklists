@@ -6,6 +6,7 @@ and this project adheres to `Semantic Versioning <https://semver.org/spec/v2.0.0
 
 Latest
 ------
+* Added Checklist Manager for convenience queries.
 
 0.10.0 (2025-02-11)
 ------------------

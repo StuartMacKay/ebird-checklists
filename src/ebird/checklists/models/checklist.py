@@ -119,6 +119,18 @@ class ChecklistQuerySet(models.QuerySet):
         return self.filter(complete=True)
 
 
+class ChecklistManager(models.Manager):
+
+    def in_region_with_dates(self, code, start, end):
+        return (
+            self.get_queryset()
+            .for_region(code)
+            .for_dates(start, end)
+            .select_related("location", "observer")
+            .order_by("-started")
+        )
+
+
 class Checklist(models.Model):
     class Meta:
         verbose_name = _("checklist")
@@ -269,7 +281,7 @@ class Checklist(models.Model):
         blank=True,
     )
 
-    objects = ChecklistQuerySet.as_manager()  # pyright: ignore [reportCallIssue]
+    objects = ChecklistManager.from_queryset(ChecklistQuerySet)()
 
     def __str__(self):
         return "%s %s, %s" % (self.date, self.time, self.location.name)
