@@ -67,7 +67,7 @@ def checklist_url(code: str) -> str:
 def random_county_code(country_code: str) -> str:
     state_code = random_state_code(country_code)
     county_code = random_uppercase(random.randint(2, 3))
-    return f"{country_code}-{state_code}-{county_code}"
+    return f"{state_code}-{county_code}"
 
 
 class LocationFactory(DjangoModelFactory):
