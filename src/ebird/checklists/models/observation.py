@@ -29,6 +29,18 @@ class ObservationQuerySet(models.QuerySet):
             raise ValueError("Unsupported location identifier: %s" % identifier)
         return self.filter(location__identifier=identifier)
 
+    def for_region(self, value: str):
+        if re.match(r"[A-Z]{2}", value):
+            return self.filter(location__country_code=value)
+        elif re.match(r"[A-Z]{2}-[A-Z0-9]{2,3}", value):
+            return self.filter(location__state_code=value)
+        elif re.match(r"[A-Z]{2}-[A-Z0-9]{2,3}-[A-Z0-9]{2,3}", value):
+            return self.filter(location__county_code=value)
+        elif re.match(r"L\d+", value):
+           return self.filter(location__identifier=value)
+        else:
+            raise ValueError("Unsupported region code: %s" % value)
+
     def for_identifier(self, identifier: str):
         return self.get(identifier=identifier)
 
