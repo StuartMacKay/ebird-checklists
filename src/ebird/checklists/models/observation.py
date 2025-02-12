@@ -57,6 +57,18 @@ class ObservationQuerySet(models.QuerySet):
             return self.filter(observer__name__exact=value)
 
 
+class ObservationManager(models.Manager):
+
+    def in_region_with_dates(self, code, start, end):
+        return (
+            self.get_queryset()
+            .for_region(code)
+            .for_dates(start, end)
+            .select_related("checklist", "location", "observer", "species")
+            .order_by("-checklist__started")
+        )
+
+
 class Observation(models.Model):
     class Meta:
         verbose_name = _("observation")
@@ -187,7 +199,7 @@ class Observation(models.Model):
         blank=True,
     )
 
-    objects = ObservationQuerySet.as_manager()  # pyright: ignore [reportCallIssue]
+    objects = ObservationManager.from_queryset(ObservationQuerySet)()
 
     def __str__(self):
         return "%s (%s)" % (self.species.common_name, self.count)  # pyright: ignore [reportAttributeAccessIssue]

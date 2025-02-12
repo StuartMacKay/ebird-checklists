@@ -108,3 +108,13 @@ def test_for_observer__name_no_match__observations_fetched(observation):
     name = observation.observer.name
     obj = Observation.objects.for_observer(name.lower()).first()
     assert obj is None
+
+
+def test_manager_in_region_with_dates(checklist, location):
+    code = location.country_code
+    start = checklist.date
+    end = checklist.date + relativedelta(days=+1)
+    obj = Observation.objects.in_region_with_dates(code, start, end).first()
+    assert obj.location.country_code == code
+    assert obj.checklist.date >= start
+    assert obj.checklist.date < end
