@@ -20,7 +20,7 @@ dependencies = [
     "python-dateutil>=2.9.0.post0",
 ]
 classifiers = [
-    "Development Status :: 4 - Beta",
+    "Development Status :: 5 - Production/Stable",
     "Intended Audience :: Science/Research",
     "Framework :: Django",
     "Framework :: Django :: 4.2",
