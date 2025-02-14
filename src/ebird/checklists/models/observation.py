@@ -6,43 +6,43 @@ import re
 from django.core.validators import MinValueValidator
 from django.db import models
 from django.utils.translation import gettext_lazy as _
-from ebird.api.validation import (
-    is_country,
-    is_subnational1,
-    is_subnational2,
-    is_location,
+from ebird.codes.locations import (
+    is_country_code,
+    is_state_code,
+    is_county_code,
+    is_location_code,
 )
 
 
 class ObservationQuerySet(models.QuerySet):
     def for_country(self, code: str):
-        if not is_country(code):
+        if not is_country_code(code):
             raise ValueError("Unsupported country code: %s" % code)
         return self.filter(location__country_code=code)
 
     def for_state(self, code: str):
-        if not is_subnational1(code):
+        if not is_state_code(code):
             raise ValueError("Unsupported state code: %s" % code)
         return self.filter(location__state_code=code)
 
     def for_county(self, code: str):
-        if not is_subnational2(code):
+        if not is_county_code(code):
             raise ValueError("Unsupported county code: %s" % code)
         return self.filter(location__county_code=code)
 
     def for_location(self, identifier: str):
-        if not is_location(identifier):
+        if not is_location_code(identifier):
             raise ValueError("Unsupported location identifier: %s" % identifier)
         return self.filter(location__identifier=identifier)
 
     def for_region(self, value: str):
-        if is_country(value):
+        if is_country_code(value):
             return self.filter(location__country_code=value)
-        elif is_subnational1(value):
+        elif is_state_code(value):
             return self.filter(location__state_code=value)
-        elif is_subnational2(value):
+        elif is_county_code(value):
             return self.filter(location__county_code=value)
-        elif is_location(value):
+        elif is_location_code(value):
             return self.filter(location__identifier=value)
         else:
             raise ValueError("Unsupported region code: %s" % value)
