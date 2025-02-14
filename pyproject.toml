@@ -6,7 +6,7 @@ requires = ["setuptools >= 61.0"]
 name = "ebird-checklists"
 version = "0.12.0"
 description = "eBird Checklists is a reusable Django app for loading data from eBird into a database."
-keywords = ["checklists", "Django", "eBird", "models"]
+keywords = ["checklists", "Django", "eBird", "models", "database", "ebird-api", "ebird basic dataset"]
 license = { file = "LICENSE" }
 authors = [
   {name = "Stuart MacKay", email = "smackay@flagstonesoftware.com"},
@@ -151,6 +151,7 @@ deps =
     django-debug-toolbar
     python-json-logger
     django-environ
+    django-extensions
     factory-boy
 setenv =
     DJANGO_SETTINGS_MODULE = demo.settings
