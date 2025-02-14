@@ -14,7 +14,7 @@ logger = logging.getLogger(__name__)
 
 class BasicDatasetLoader:
     @staticmethod
-    def add_location(data: dict[str, str]) -> Location:
+    def add_location(data: dict) -> Location:
         identifier: str = data["LOCALITY ID"]
         location: Location
 
@@ -46,7 +46,7 @@ class BasicDatasetLoader:
         return location
 
     @staticmethod
-    def add_observer(data: dict[str, str]) -> Observer:
+    def add_observer(data: dict) -> Observer:
         identifier: str = data["OBSERVER ID"]
         observer: Observer
 
@@ -64,7 +64,7 @@ class BasicDatasetLoader:
         return observer
 
     @staticmethod
-    def add_species(data: dict[str, str]) -> Species:
+    def add_species(data: dict) -> Species:
         taxon_order = data["TAXONOMIC ORDER"]
         species: Species
 
@@ -93,7 +93,7 @@ class BasicDatasetLoader:
 
     @staticmethod
     def add_observation(
-        data: dict[str, str], checklist: Checklist, species: Species
+        data: dict, checklist: Checklist, species: Species
     ) -> Observation:
         identifier = data["GLOBAL UNIQUE IDENTIFIER"].split(":")[-1]
         observation: Observation
@@ -132,7 +132,7 @@ class BasicDatasetLoader:
 
     @staticmethod
     def add_checklist(
-        row: dict[str, str],
+        row: dict,
         location: Location,
         observer: Observer,
     ) -> Checklist:

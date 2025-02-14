@@ -2,7 +2,7 @@ import datetime as dt
 import logging
 import re
 from decimal import Decimal
-from typing import Tuple
+from typing import List, Optional, Tuple
 from urllib.error import HTTPError, URLError
 
 from django.utils.timezone import get_default_timezone
@@ -232,7 +232,7 @@ class APILoader:
         return species
 
     @staticmethod
-    def get_urn(row: dict[str, str]) -> str:
+    def get_urn(row: dict) -> str:
         return f"URN:CornellLabOfOrnithology:{row['projId']}:{row['obsId']}"
 
     def get_location(self, data: dict) -> Location:
@@ -264,7 +264,7 @@ class APILoader:
     def fetch_species(self, code: str, locale: str) -> dict:
         return get_taxonomy(self.api_key, locale=locale, species=code)[0]
 
-    def fetch_subregions(self, region: str) -> list[str]:
+    def fetch_subregions(self, region: str) -> List[str]:
         logger.info(
             "Fetching sub-regions: %s",
             region,
@@ -272,7 +272,7 @@ class APILoader:
         )
         region_types: list = ["subnational1", "subnational2", None]
         levels: int = len(region.split("-", 2))
-        region_type: str | None = region_types[levels - 1]
+        region_type: Optional[str] = region_types[levels - 1]
 
         if region_type:
             items: list = get_regions(self.api_key, region_type, region)
@@ -282,7 +282,7 @@ class APILoader:
 
         return sub_regions
 
-    def fetch_visits(self, region: str, date: dt.date | None = None):
+    def fetch_visits(self, region: str, date: Optional[dt.date] = None):
         visits = []
 
         results: list = get_visits(
@@ -400,7 +400,7 @@ class APILoader:
         visits: list[dict]
         number_of_visits: int = 0
         locations: dict = {}
-        checklists: list[str] = []
+        checklists: List[str] = []
         added: int = 0
         loaded: int = 0
 
