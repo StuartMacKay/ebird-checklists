@@ -7,6 +7,7 @@ and this project adheres to `Semantic Versioning <https://semver.org/spec/v2.0.0
 Latest
 ------
 * Add ebird-codes for managing codes used by eBird.
+* Removed PROTOCOL_TYPES from the Checklist model. ebird-codes provides it.
 
 0.11.0 (2025-02-12)
 ------------------
