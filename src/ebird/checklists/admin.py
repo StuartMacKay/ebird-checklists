@@ -123,7 +123,14 @@ class LocationAdmin(admin.ModelAdmin):
 
 @admin.register(models.Observation)
 class ObservationAdmin(admin.ModelAdmin):
-    list_display = ("species", "count", "comments")
+    list_display = (
+        "species__common_name",
+        "count",
+        "checklist__date",
+        "checklist__time",
+        "location",
+        "observer",
+    )
     search_fields = ("species__common_name", "species__scientific_name")
     ordering = ("-checklist__date",)
     formfield_overrides = {
