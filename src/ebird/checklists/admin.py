@@ -15,6 +15,7 @@ class ObservationInline(admin.TabularInline):
     fields = ("common_name", "scientific_name", "count", "comments")
     ordering = ("species__order",)
     readonly_fields = ("common_name", "scientific_name", "count", "comments")
+    extra = 0
 
     class Media:
         css = {"all": ("css/hide_admin_original.css",)}
