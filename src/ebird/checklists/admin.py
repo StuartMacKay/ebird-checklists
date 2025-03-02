@@ -183,7 +183,13 @@ class ObserverAdmin(admin.ModelAdmin):
 
 @admin.register(models.Species)
 class SpeciesAdmin(admin.ModelAdmin):
-    list_display = ("common_name", "scientific_name", "order")
+    list_display = (
+        "common_name",
+        "scientific_name",
+        "family_common_name",
+        "family_scientific_name",
+        "order",
+    )
     ordering = ("order",)
     search_fields = ("common_name", "scientific_name")
     formfield_overrides = {
