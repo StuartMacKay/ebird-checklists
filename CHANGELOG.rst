@@ -6,6 +6,7 @@ and this project adheres to `Semantic Versioning <https://semver.org/spec/v2.0.0
 
 Latest
 ------
+* Update display and search fields in Django admin.
 
 1.0.1 (2025-02-22)
 ------------------
