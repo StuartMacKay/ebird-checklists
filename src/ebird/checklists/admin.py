@@ -175,7 +175,7 @@ class ObservationAdmin(admin.ModelAdmin):
 
 @admin.register(models.Observer)
 class ObserverAdmin(admin.ModelAdmin):
-    list_display = ("name",)
+    list_display = ("name", "identifier")
     ordering = ("name",)
     search_fields = ("name",)
     formfield_overrides = {TextField: {"widget": TextInput}}
