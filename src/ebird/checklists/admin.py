@@ -132,7 +132,11 @@ class ObservationAdmin(admin.ModelAdmin):
         "location",
         "observer",
     )
-    search_fields = ("species__common_name", "species__scientific_name")
+    search_fields = (
+        "species__common_name",
+        "species__scientific_name",
+        "observer__name",
+    )
     ordering = ("-checklist__started",)
     formfield_overrides = {
         TextField: {
