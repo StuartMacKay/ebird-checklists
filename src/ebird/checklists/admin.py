@@ -54,7 +54,7 @@ class ChecklistAdmin(admin.ModelAdmin):
         "location",
         "observer",
     )
-    ordering = ("-date", "-time")
+    ordering = ("-started",)
     search_fields = ("location__name", "observer__name")
     autocomplete_fields = ("location", "observer")
     inlines = [ObservationInline]
@@ -133,7 +133,7 @@ class ObservationAdmin(admin.ModelAdmin):
         "observer",
     )
     search_fields = ("species__common_name", "species__scientific_name")
-    ordering = ("-checklist__date",)
+    ordering = ("-checklist__started",)
     formfield_overrides = {
         TextField: {
             "widget": TextInput(attrs={"style": "width: 30%"}),
