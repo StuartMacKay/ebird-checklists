@@ -17,6 +17,7 @@ from ..models import (
     Observer,
     Region,
     Species,
+    District,
 )
 
 logger = logging.getLogger(__name__)
@@ -172,6 +173,26 @@ class APILoader:
 
         return region
 
+    @staticmethod
+    def add_district(data: dict) -> District:
+        code: str = data["subnational2Code"]
+        district: District
+
+        values: dict = {
+            "name": data["subnational2Name"],
+            "place": "%s, %s, %s"
+            % (data["subnational2Name"], data["subnational1Name"], data["countryName"]),
+        }
+
+        if district := District.objects.filter(code=code).first():
+            for key, value in values.items():
+                setattr(district, key, value)
+            district.save()
+        else:
+            district = District.objects.create(code=code, **values)
+
+        return district
+
     def add_location(self, data: dict) -> Location:
         identifier: str = data["locId"]
         location: Location
@@ -180,8 +201,7 @@ class APILoader:
             "identifier": identifier,
             "type": "",
             "name": data["name"],
-            "county": data.get("subnational2Name", ""),
-            "county_code": data.get("subnational2Code", ""),
+            "district": None,
             "region": self.add_region(data),
             "country": self.add_country(data),
             "iba_code": "",
@@ -192,6 +212,9 @@ class APILoader:
             "longitude": Decimal(data["longitude"]),
             "url": "https://ebird.org/region/%s" % identifier,
         }
+
+        if "subnational2Code" in data:
+            values["district"] = self.add_district(data)
 
         if location := Location.objects.filter(identifier=identifier).first():
             for key, value in values.items():

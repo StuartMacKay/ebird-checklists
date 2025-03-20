@@ -15,6 +15,7 @@ from ..models import (
     Observer,
     Region,
     Species,
+    District,
 )
 
 logger = logging.getLogger(__name__)
@@ -59,6 +60,25 @@ class MyDataLoader:
 
         return region
 
+    @staticmethod
+    def add_district(data: dict) -> District:
+        name: str = data["County"]
+        district: District
+
+        values: dict = {
+            "code": "",
+            "place": "",
+        }
+
+        if district := District.objects.filter(name=name).first():
+            for key, value in values.items():
+                setattr(district, key, value)
+            district.save()
+        else:
+            district = District.objects.create(name=name, **values)
+
+        return district
+
     def add_location(self, data: dict) -> Location:
         identifier: str = data["Location ID"]
         location: Location
@@ -67,8 +87,6 @@ class MyDataLoader:
             "identifier": identifier,
             "type": "",
             "name": data["Location"],
-            "county": data["County"],
-            "county_code": "",
             "region": self.add_region(data),
             "country": self.add_country(data),
             "iba_code": "",
@@ -79,6 +97,9 @@ class MyDataLoader:
             "longitude": Decimal(data["Longitude"]),
             "url": "https://ebird.org/region/%s" % identifier,
         }
+
+        if "County" in data and data["County"]:
+            values["district"] = self.add_district(data)
 
         if location := Location.objects.filter(identifier=identifier).first():
             for key, value in values.items():

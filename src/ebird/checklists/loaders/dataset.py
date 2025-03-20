@@ -15,6 +15,7 @@ from ..models import (
     Observer,
     Region,
     Species,
+    District,
 )
 
 logger = logging.getLogger(__name__)
@@ -57,6 +58,24 @@ class BasicDatasetLoader:
             region = Region.objects.create(code=code, **values)
         return region
 
+    @staticmethod
+    def add_district(data: dict) -> District:
+        code: str = data["COUNTY CODE"]
+        district: District
+
+        values: dict = {
+            "name": data["COUNTY"],
+            "place": "%s, %s, %s" % (data["COUNTY"], data["STATE"], data["COUNTRY"]),
+        }
+
+        if district := District.objects.filter(code=code).first():
+            for key, value in values.items():
+                setattr(district, key, value)
+            district.save()
+        else:
+            district = District.objects.create(code=code, **values)
+        return district
+
     def add_location(self, data: dict) -> Location:
         identifier: str = data["LOCALITY ID"]
         location: Location
@@ -65,8 +84,7 @@ class BasicDatasetLoader:
             "identifier": identifier,
             "type": data["LOCALITY TYPE"],
             "name": data["LOCALITY"],
-            "county": data["COUNTY"],
-            "county_code": data["COUNTY CODE"],
+            "district": None,
             "region": self.add_region(data),
             "country": self.add_country(data),
             "latitude": Decimal(data["LATITUDE"]),
@@ -77,6 +95,9 @@ class BasicDatasetLoader:
             "atlas_block": data["ATLAS BLOCK"],
             "url": "https://ebird.org/region/%s" % identifier,
         }
+
+        if "COUNTY CODE" in data and data["COUNTY CODE"]:
+            values["district"] = self.add_district(data)
 
         if location := Location.objects.filter(identifier=identifier).first():
             for key, value in values.items():

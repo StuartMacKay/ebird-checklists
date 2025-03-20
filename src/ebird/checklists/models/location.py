@@ -56,19 +56,6 @@ class Location(models.Model):
         verbose_name=_("name"), help_text=_("The name of the location")
     )
 
-    county = models.TextField(
-        blank=True,
-        verbose_name=_("county"),
-        help_text=_("The name of the county (subnational2)."),
-    )
-
-    county_code = models.TextField(
-        blank=True,
-        db_index=True,
-        verbose_name=_("county code"),
-        help_text=_("The code used to identify the county."),
-    )
-
     country = models.ForeignKey(
         "checklists.Country",
         related_name="locations",
@@ -83,6 +70,16 @@ class Location(models.Model):
         on_delete=models.PROTECT,
         verbose_name=_("region"),
         help_text=_("The region for the location."),
+    )
+
+    district = models.ForeignKey(
+        "checklists.District",
+        blank=True,
+        null=True,
+        related_name="locations",
+        on_delete=models.PROTECT,
+        verbose_name=_("district"),
+        help_text=_("The district for the location."),
     )
 
     iba_code = models.TextField(
