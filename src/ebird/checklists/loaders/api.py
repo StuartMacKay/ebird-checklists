@@ -9,7 +9,15 @@ from django.utils.timezone import get_default_timezone
 from ebird.api import get_checklist, get_location, get_regions, get_visits, get_taxonomy
 from ebird.api.constants import API_MAX_RESULTS
 
-from ..models import Checklist, Country, Location, Observation, Observer, Species
+from ..models import (
+    Checklist,
+    Country,
+    Location,
+    Observation,
+    Observer,
+    Region,
+    Species,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -145,6 +153,25 @@ class APILoader:
 
         return country
 
+    @staticmethod
+    def add_region(data: dict) -> Region:
+        code: str = data["subnational1Code"]
+        region: Region
+
+        values: dict = {
+            "name": data["subnational1Name"],
+            "place": "%s, %s" % (data["subnational1Name"], data["countryName"]),
+        }
+
+        if region := Region.objects.filter(code=code).first():
+            for key, value in values.items():
+                setattr(region, key, value)
+            region.save()
+        else:
+            region = Region.objects.create(code=code, **values)
+
+        return region
+
     def add_location(self, data: dict) -> Location:
         identifier: str = data["locId"]
         location: Location
@@ -155,8 +182,7 @@ class APILoader:
             "name": data["name"],
             "county": data.get("subnational2Name", ""),
             "county_code": data.get("subnational2Code", ""),
-            "state": data["subnational1Name"],
-            "state_code": data["subnational1Code"],
+            "region": self.add_region(data),
             "country": self.add_country(data),
             "iba_code": "",
             "bcr_code": "",

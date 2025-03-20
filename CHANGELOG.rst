@@ -8,6 +8,7 @@ Latest
 ------
 * Add date to Observation to simplify queries.
 * Create separate Country model from Location.
+* Create separate Region (state) model from Location.
 
 1.0.3 (2025-03-20)
 ------------------

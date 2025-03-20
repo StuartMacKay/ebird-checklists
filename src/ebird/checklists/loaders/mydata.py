@@ -1,19 +1,26 @@
 import csv
 import datetime as dt
-from decimal import Decimal
 import logging
 import random
 import re
 import string
+from decimal import Decimal
 from pathlib import Path
 
-from ..models import Checklist, Country, Location, Observation, Observer, Species
+from ..models import (
+    Checklist,
+    Country,
+    Location,
+    Observation,
+    Observer,
+    Region,
+    Species,
+)
 
 logger = logging.getLogger(__name__)
 
 
 class MyDataLoader:
-
     @staticmethod
     def add_country(data: dict) -> Country:
         code: str = data["State/Province"].split("-")[0]
@@ -33,6 +40,25 @@ class MyDataLoader:
 
         return country
 
+    @staticmethod
+    def add_region(data: dict) -> Region:
+        code: str = data["State/Province"]
+        region: Region
+
+        values: dict = {
+            "name": "",
+            "place": "",
+        }
+
+        if region := Region.objects.filter(code=code).first():
+            for key, value in values.items():
+                setattr(region, key, value)
+            region.save()
+        else:
+            region = Region.objects.create(code=code, **values)
+
+        return region
+
     def add_location(self, data: dict) -> Location:
         identifier: str = data["Location ID"]
         location: Location
@@ -43,8 +69,7 @@ class MyDataLoader:
             "name": data["Location"],
             "county": data["County"],
             "county_code": "",
-            "state": data["State/Province"],
-            "state_code": "",
+            "region": self.add_region(data),
             "country": self.add_country(data),
             "iba_code": "",
             "bcr_code": "",
@@ -108,10 +133,7 @@ class MyDataLoader:
 
         return species
 
-    def add_observation(
-        self, data: dict, checklist: Checklist
-    ) -> Observation:
-
+    def add_observation(self, data: dict, checklist: Checklist) -> Observation:
         values: dict = {
             "edited": checklist.edited,
             "identifier": "OBS" + "".join(random.choices(string.digits, k=10)),
@@ -146,9 +168,7 @@ class MyDataLoader:
         return Observation.objects.create(**values)
 
     @staticmethod
-    def add_checklist(
-        data: dict, location: Location, observer: Observer
-    ) -> Checklist:
+    def add_checklist(data: dict, location: Location, observer: Observer) -> Checklist:
         identifier: str = data["Submission ID"]
         checklist: Checklist
 

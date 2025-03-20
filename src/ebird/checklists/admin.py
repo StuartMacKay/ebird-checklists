@@ -108,11 +108,18 @@ class CountryAdmin(admin.ModelAdmin):
     readonly_fields = ("code",)
 
 
+@admin.register(models.Region)
+class RegionAdmin(admin.ModelAdmin):
+    list_display = ("code", "name")
+    ordering = ("code",)
+    readonly_fields = ("code",)
+
+
 @admin.register(models.Location)
 class LocationAdmin(admin.ModelAdmin):
-    list_display = ("identifier", "name", "county", "state", "country")
+    list_display = ("identifier", "name", "county", "region", "country")
     ordering = ("-identifier",)
-    search_fields = ("name", "county", "state", "country__name")
+    search_fields = ("name", "county", "region__name", "country__name")
     formfield_overrides = {
         TextField: {
             "widget": TextInput(attrs={"style": "width: 30%"}),
