@@ -1,3 +1,4 @@
+from .area import Area
 from .checklist import Checklist
 from .country import Country
 from .location import Location
@@ -8,6 +9,7 @@ from .species import Species
 from .district import District
 
 __all__ = (
+    "Area",
     "Checklist",
     "Country",
     "District",

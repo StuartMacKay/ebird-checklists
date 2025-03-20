@@ -122,6 +122,13 @@ class DistrictAdmin(admin.ModelAdmin):
     readonly_fields = ("code",)
 
 
+@admin.register(models.Area)
+class AreaAdmin(admin.ModelAdmin):
+    list_display = ("code", "name")
+    ordering = ("code",)
+    readonly_fields = ("code",)
+
+
 @admin.register(models.Location)
 class LocationAdmin(admin.ModelAdmin):
     list_display = ("identifier", "name", "district", "region", "country")

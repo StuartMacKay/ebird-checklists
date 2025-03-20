@@ -82,6 +82,16 @@ class Location(models.Model):
         help_text=_("The district for the location."),
     )
 
+    area = models.ForeignKey(
+        "checklists.Area",
+        blank=True,
+        null=True,
+        related_name="locations",
+        on_delete=models.PROTECT,
+        verbose_name=_("area"),
+        help_text=_("The area for the location."),
+    )
+
     iba_code = models.TextField(
         blank=True,
         verbose_name=_("IBA code"),
