@@ -6,6 +6,7 @@ and this project adheres to `Semantic Versioning <https://semver.org/spec/v2.0.0
 
 Latest
 ------
+* Fix for eBird removing the project code from the observation data.
 
 1.0.2 (2025-03-02)
 ------------------

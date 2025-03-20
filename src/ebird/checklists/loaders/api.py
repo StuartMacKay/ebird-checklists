@@ -180,7 +180,7 @@ class APILoader:
             "reviewed": None,
             "reason": "",
             "comments": "",
-            "urn": self.get_urn(data),
+            "urn": self.get_urn(checklist.project_code, data),
         }
 
         if re.match(r"\d+", data["howManyStr"]):
@@ -232,8 +232,8 @@ class APILoader:
         return species
 
     @staticmethod
-    def get_urn(row: dict) -> str:
-        return f"URN:CornellLabOfOrnithology:{row['projId']}:{row['obsId']}"
+    def get_urn(project_id, row: dict) -> str:
+        return f"URN:CornellLabOfOrnithology:{project_id}:{row['obsId']}"
 
     def get_location(self, data: dict) -> Location:
         identifier: str = data["locId"]
