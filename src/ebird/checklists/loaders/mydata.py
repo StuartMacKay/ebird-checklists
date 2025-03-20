@@ -7,7 +7,7 @@ import re
 import string
 from pathlib import Path
 
-from ..models import Checklist, Location, Observation, Observer, Species
+from ..models import Checklist, Country, Location, Observation, Observer, Species
 
 logger = logging.getLogger(__name__)
 
@@ -15,7 +15,25 @@ logger = logging.getLogger(__name__)
 class MyDataLoader:
 
     @staticmethod
-    def add_location(data: dict) -> Location:
+    def add_country(data: dict) -> Country:
+        code: str = data["State/Province"].split("-")[0]
+        country: Country
+
+        values: dict = {
+            "name": "",
+            "place": "",
+        }
+
+        if country := Country.objects.filter(code=code).first():
+            for key, value in values.items():
+                setattr(country, key, value)
+            country.save()
+        else:
+            country = Country.objects.create(code=code, **values)
+
+        return country
+
+    def add_location(self, data: dict) -> Location:
         identifier: str = data["Location ID"]
         location: Location
 
@@ -27,8 +45,7 @@ class MyDataLoader:
             "county_code": "",
             "state": data["State/Province"],
             "state_code": "",
-            "country": "",
-            "country_code": data["County"].split("-")[0],
+            "country": self.add_country(data),
             "iba_code": "",
             "bcr_code": "",
             "usfws_code": "",

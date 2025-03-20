@@ -79,14 +79,12 @@ class Location(models.Model):
         help_text=_("The code used to identify the state."),
     )
 
-    country = models.TextField(
-        verbose_name=_("country"), help_text=_("The name of the country.")
-    )
-
-    country_code = models.TextField(
-        db_index=True,
-        verbose_name=_("country code"),
-        help_text=_("The code used to identify the country."),
+    country = models.ForeignKey(
+        "checklists.Country",
+        related_name="locations",
+        on_delete=models.PROTECT,
+        verbose_name=_("country"),
+        help_text=_("The country for the location."),
     )
 
     iba_code = models.TextField(

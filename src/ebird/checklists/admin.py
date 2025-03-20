@@ -101,11 +101,18 @@ class ChecklistAdmin(admin.ModelAdmin):
         return field
 
 
+@admin.register(models.Country)
+class CountryAdmin(admin.ModelAdmin):
+    list_display = ("code", "name")
+    ordering = ("code",)
+    readonly_fields = ("code",)
+
+
 @admin.register(models.Location)
 class LocationAdmin(admin.ModelAdmin):
     list_display = ("identifier", "name", "county", "state", "country")
     ordering = ("-identifier",)
-    search_fields = ("name", "county", "state", "country")
+    search_fields = ("name", "county", "state", "country__name")
     formfield_overrides = {
         TextField: {
             "widget": TextInput(attrs={"style": "width: 30%"}),

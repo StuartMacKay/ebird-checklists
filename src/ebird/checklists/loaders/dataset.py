@@ -7,14 +7,31 @@ from pathlib import Path
 
 from django.utils.timezone import get_default_timezone
 
-from ..models import Checklist, Location, Observation, Observer, Species
+from ..models import Checklist, Country, Location, Observation, Observer, Species
 
 logger = logging.getLogger(__name__)
 
 
 class BasicDatasetLoader:
     @staticmethod
-    def add_location(data: dict) -> Location:
+    def add_country(data: dict) -> Country:
+        code: str = data["COUNTRY CODE"]
+        country: Country
+
+        values: dict = {
+            "name": data["COUNTRY"],
+            "place": data["COUNTRY"],
+        }
+
+        if country := Country.objects.filter(code=code).first():
+            for key, value in values.items():
+                setattr(country, key, value)
+            country.save()
+        else:
+            country = Country.objects.create(code=code, **values)
+        return country
+
+    def add_location(self, data: dict) -> Location:
         identifier: str = data["LOCALITY ID"]
         location: Location
 
@@ -26,8 +43,7 @@ class BasicDatasetLoader:
             "county_code": data["COUNTY CODE"],
             "state": data["STATE"],
             "state_code": data["STATE CODE"],
-            "country": data["COUNTRY"],
-            "country_code": data["COUNTRY CODE"],
+            "country": self.add_country(data),
             "latitude": Decimal(data["LATITUDE"]),
             "longitude": Decimal(data["LONGITUDE"]),
             "iba_code": data["IBA CODE"],
