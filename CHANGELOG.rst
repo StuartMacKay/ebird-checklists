@@ -6,6 +6,7 @@ and this project adheres to `Semantic Versioning <https://semver.org/spec/v2.0.0
 
 Latest
 ------
+* Add date to Observation to simplify queries.
 
 1.0.3 (2025-03-20)
 ------------------

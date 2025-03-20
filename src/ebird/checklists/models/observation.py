@@ -124,6 +124,12 @@ class Observation(models.Model):
         help_text=_("The location where the observation was made."),
     )
 
+    date = models.DateField(
+        db_index=True,
+        verbose_name=_("date"),
+        help_text=_("The date the observation was made."),
+    )
+
     count = models.IntegerField(
         blank=True,
         null=True,

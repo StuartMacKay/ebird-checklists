@@ -170,6 +170,7 @@ class APILoader:
             "location": checklist.location,
             "observer": checklist.observer,
             "species": self.get_species(data),
+            "date": checklist.date,
             "count": None,
             "breeding_code": "",
             "breeding_category": "",

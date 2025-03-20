@@ -105,6 +105,7 @@ class BasicDatasetLoader:
             "location": checklist.location,
             "observer": checklist.observer,
             "species": species,
+            "date": checklist.date,
             "count": None,
             "breeding_code": data["BREEDING CODE"],
             "breeding_category": data["BREEDING CATEGORY"],

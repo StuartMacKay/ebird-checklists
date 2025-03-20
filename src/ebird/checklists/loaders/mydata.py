@@ -102,6 +102,7 @@ class MyDataLoader:
             "checklist": checklist,
             "location": checklist.location,
             "observer": checklist.observer,
+            "date": checklist.date,
             "count": None,
             "breeding_code": data["Breeding Code"] or "",
             "breeding_category": "",
