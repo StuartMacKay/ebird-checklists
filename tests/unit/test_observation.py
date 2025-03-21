@@ -24,36 +24,36 @@ def checklist(observation):
 
 
 def test_for_country__checklists_fetched(location):
-    code = location.country_code
+    code = location.country.code
     obj = Observation.objects.for_country(code).first()
-    assert obj.location.country_code == code
+    assert obj.location.country.code == code
 
 
 def test_for_country__unsupported_code(location):
     with pytest.raises(ValueError):
-        Observation.objects.for_country(location.country_code.lower())
+        Observation.objects.for_country(location.country.code.lower())
 
 
-def test_for_state__observations_fetched(location):
-    code = location.state_code
-    obj = Observation.objects.for_state(code).first()
-    assert obj.location.state_code == code
+def test_for_region__observations_fetched(location):
+    code = location.region.code
+    obj = Observation.objects.for_region(code).first()
+    assert obj.location.region.code == code
 
 
-def test_for_state__unsupported_code(location):
+def test_for_region__unsupported_code(location):
     with pytest.raises(ValueError):
-        Observation.objects.for_state(location.state_code.lower())
+        Observation.objects.for_region(location.region.code.lower())
 
 
-def test_for_county__observations_fetched(location):
-    code = location.county_code
-    obj = Observation.objects.for_county(code).first()
-    assert obj.location.county_code == code
+def test_for_district__observations_fetched(location):
+    code = location.district.code
+    obj = Observation.objects.for_district(code).first()
+    assert obj.location.district.code == code
 
 
-def test_for_county__unsupported_code(location):
+def test_for_district__unsupported_code(location):
     with pytest.raises(ValueError):
-        Observation.objects.for_county(location.county_code.lower())
+        Observation.objects.for_district(location.district.code.lower())
 
 
 def test_for_location__observations_fetched(location):
@@ -111,10 +111,10 @@ def test_for_observer__name_no_match__observations_fetched(observation):
 
 
 def test_manager_in_region_with_dates(checklist, location):
-    code = location.country_code
+    code = location.region.code
     start = checklist.date
     end = checklist.date + relativedelta(days=+1)
     obj = Observation.objects.in_region_with_dates(code, start, end).first()
-    assert obj.location.country_code == code
+    assert obj.location.region.code == code
     assert obj.checklist.date >= start
     assert obj.checklist.date < end

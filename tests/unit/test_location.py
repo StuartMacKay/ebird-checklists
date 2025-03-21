@@ -13,36 +13,36 @@ def location():
 
 
 def test_for_country__locations_fetched(location):
-    code = location.country_code
+    code = location.country.code
     obj = Location.objects.for_country(code).first()
-    assert obj.country_code == code
+    assert obj.country.code == code
 
 
 def test_for_country__unsupported_code(location):
     with pytest.raises(ValueError):
-        Location.objects.for_country(location.country_code.lower())
+        Location.objects.for_country(location.country.code.lower())
 
 
-def test_for_state__locations_fetched(location):
-    code = location.state_code
-    obj = Location.objects.for_state(code).first()
-    assert obj.state_code == code
+def test_for_region_locations_fetched(location):
+    code = location.region.code
+    obj = Location.objects.for_region(code).first()
+    assert obj.region.code == code
 
 
-def test_for_state__unsupported_code(location):
+def test_for_region__unsupported_code(location):
     with pytest.raises(ValueError):
-        Location.objects.for_state(location.state_code.lower())
+        Location.objects.for_region(location.region.code.lower())
 
 
-def test_for_county__locations_fetched(location):
-    code = location.county_code
-    obj = Location.objects.for_county(code).first()
-    assert obj.county_code == code
+def test_for_district__locations_fetched(location):
+    code = location.district.code
+    obj = Location.objects.for_district(code).first()
+    assert obj.district.code == code
 
 
-def test_for_county__unsupported_code(location):
+def test_for_district__unsupported_code(location):
     with pytest.raises(ValueError):
-        Location.objects.for_county(location.county_code.lower())
+        Location.objects.for_district(location.district.code.lower())
 
 
 def test_for_identifier__location_fetched(location):

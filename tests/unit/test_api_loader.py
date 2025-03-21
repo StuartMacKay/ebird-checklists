@@ -239,14 +239,14 @@ def test_add_checklist__distance_optional(loader, checklist):
     assert chk.distance is None
 
 
-def test_add_checklist__area_rounded(loader, checklist):
+def test_add_checklist__coverage_rounded(loader, checklist):
     """Ensure floats are converted to Decimal and rounded to three places.
     Decimal(1.1999) actually generates Decimal('1.199899999999999966604...')
     """
     checklist["protocolId"] = "P23"
     checklist["effortAreaHa"] = 1.1999
     chk, _ = loader.add_checklist(checklist)
-    assert chk.area == decimal.Decimal("1.200")
+    assert chk.coverage == decimal.Decimal("1.200")
 
 
 def test_add_checklist__area_required(loader, checklist):

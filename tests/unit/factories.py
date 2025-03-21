@@ -3,12 +3,21 @@
 import random
 import string
 
+from django.utils.timezone import get_default_timezone
 from factory import Faker, LazyAttribute, SubFactory
 from factory.django import DjangoModelFactory
 
-from django.utils.timezone import get_default_timezone
-
-from ebird.checklists.models import Checklist, Location, Observation, Observer, Species
+from ebird.checklists.models import (
+    Area,
+    Checklist,
+    Country,
+    District,
+    Location,
+    Observation,
+    Observer,
+    Region,
+    Species,
+)
 
 PROJECTS = [
     "EBIRD",
@@ -48,7 +57,12 @@ def random_uppercase(length: int, prefix: str = ""):
     return prefix + "".join(random.choices(string.ascii_uppercase, k=length))
 
 
-def random_state_code(country_code: str) -> str:
+def random_country_code() -> str:
+    return random_uppercase(2)
+
+
+def random_region_code() -> str:
+    country_code = random_country_code()
     return random_uppercase(2, f"{country_code}-")
 
 
@@ -64,10 +78,37 @@ def checklist_url(code: str) -> str:
     return url("checklist", code)
 
 
-def random_county_code(country_code: str) -> str:
-    state_code = random_state_code(country_code)
-    county_code = random_uppercase(random.randint(2, 3))
-    return f"{state_code}-{county_code}"
+def random_district_code() -> str:
+    region_code = random_region_code()
+    district_code = random_uppercase(random.randint(2, 3))
+    return f"{region_code}-{district_code}"
+
+
+class CountryFactory(DjangoModelFactory):
+    class Meta:
+        model = Country
+        django_get_or_create = ("code",)
+
+    code = Faker("country_code")
+    name = Faker("country")
+
+
+class RegionFactory(DjangoModelFactory):
+    class Meta:
+        model = Region
+        django_get_or_create = ("code",)
+
+    code = LazyAttribute(lambda x: random_region_code())
+    name = Faker("city")  # OK for now
+
+
+class DistrictFactory(DjangoModelFactory):
+    class Meta:
+        model = District
+        django_get_or_create = ("code",)
+
+    code = LazyAttribute(lambda x: random_district_code())
+    name = Faker("city")  # OK for now
 
 
 class LocationFactory(DjangoModelFactory):
@@ -78,12 +119,9 @@ class LocationFactory(DjangoModelFactory):
     identifier = LazyAttribute(lambda _: random_code(6, "L"))
     type = ""
     name = Faker("street_name")
-    county = Faker("city")  # OK for now
-    county_code = LazyAttribute(lambda o: random_county_code(o.country_code))
-    state = Faker("city")  # OK for now
-    state_code = LazyAttribute(lambda o: random_state_code(o.country_code))
-    country = Faker("country")
-    country_code = Faker("country_code")
+    country = SubFactory(CountryFactory)
+    region = SubFactory(RegionFactory)
+    district = SubFactory(DistrictFactory)
     iba_code = ""
     bcr_code = ""
     usfws_code = ""
@@ -129,6 +167,10 @@ class ChecklistFactory(DjangoModelFactory):
     edited = Faker("date_time", tzinfo=get_default_timezone())
     identifier = LazyAttribute(lambda _: random_code(9, "S"))
     location = SubFactory(LocationFactory)
+    country = LazyAttribute(lambda obj: obj.location.country)
+    region = LazyAttribute(lambda obj: obj.location.region)
+    district = LazyAttribute(lambda obj: obj.location.district)
+    area = LazyAttribute(lambda obj: obj.location.area)
     observer = SubFactory(ObserverFactory)
     observer_count = random.randint(1, 5)
     date = Faker("date_object")
@@ -147,9 +189,15 @@ class ObservationFactory(DjangoModelFactory):
         model = Observation
 
     identifier = LazyAttribute(lambda _: random_code(10, "OBS"))
+    date = LazyAttribute(lambda obj: obj.checklist.date)
     species = SubFactory(SpeciesFactory)
+    identified = LazyAttribute(lambda obj: obj.species.is_identified())
     checklist = SubFactory(ChecklistFactory)
     location = SubFactory(LocationFactory)
+    country = LazyAttribute(lambda obj: obj.location.country)
+    region = LazyAttribute(lambda obj: obj.location.region)
+    district = LazyAttribute(lambda obj: obj.location.district)
+    area = LazyAttribute(lambda obj: obj.location.area)
     observer = SubFactory(ObserverFactory)
     count = Faker("pyint")
     breeding_code = ""

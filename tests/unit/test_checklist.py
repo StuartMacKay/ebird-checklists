@@ -21,36 +21,36 @@ def location(checklist):
 
 
 def test_for_country_code__checklists_fetched(location):
-    code = location.country_code
+    code = location.country.code
     obj = Checklist.objects.for_country(code).first()
-    assert obj.location.country_code == code
+    assert obj.location.country.code == code
 
 
 def test_for_country__unsupported_code(location):
     with pytest.raises(ValueError):
-        Checklist.objects.for_country(location.country_code.lower())
+        Checklist.objects.for_country(location.country.code.lower())
 
 
-def test_for_state_code__checklists_fetched(location):
-    code = location.state_code
-    obj = Checklist.objects.for_state(code).first()
-    assert obj.location.state_code == code
+def test_for_region_code__checklists_fetched(location):
+    code = location.region.code
+    obj = Checklist.objects.for_region(code).first()
+    assert obj.location.region.code == code
 
 
-def test_for_state__unsupported_code(location):
+def test_for_region__unsupported_code(location):
     with pytest.raises(ValueError):
-        Checklist.objects.for_state(location.state_code.lower())
+        Checklist.objects.for_region(location.region.code.lower())
 
 
-def test_for_county_code__checklists_fetched(location):
-    code = location.county_code
-    obj = Checklist.objects.for_county(code).first()
-    assert obj.location.county_code == code
+def test_for_district_code__checklists_fetched(location):
+    code = location.district.code
+    obj = Checklist.objects.for_district(code).first()
+    assert obj.location.district.code == code
 
 
-def test_for_county__unsupported_code(location):
+def test_for_district__unsupported_code(location):
     with pytest.raises(ValueError):
-        Checklist.objects.for_county(location.county_code.lower())
+        Checklist.objects.for_district(location.district.code.lower())
 
 
 def test_for_location__checklists_fetched(location):
@@ -147,10 +147,10 @@ def test_complete__checklists_not_fetched(checklist):
 
 
 def test_manager_in_region_with_dates(checklist, location):
-    code = location.country_code
+    code = location.region.code
     start = checklist.date
     end = checklist.date + relativedelta(days=+1)
     obj = Checklist.objects.in_region_with_dates(code, start, end).first()
-    assert obj.location.country_code == code
+    assert obj.location.region.code == code
     assert obj.date >= start
     assert obj.date < end
