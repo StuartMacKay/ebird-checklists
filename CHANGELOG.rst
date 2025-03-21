@@ -6,6 +6,9 @@ and this project adheres to `Semantic Versioning <https://semver.org/spec/v2.0.0
 
 Latest
 ------
+
+1.1.0 (2025-03-21)
+------------------
 * Add date to Observation to simplify queries.
 * Create separate Country model from Location.
 * Create separate Region (state) model from Location.

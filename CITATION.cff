@@ -4,7 +4,7 @@ abstract:
 authors:
   - name: Stuart MacKay
 cff-version: 1.2.0
-date-released: 2025-03-20
+date-released: 2025-03-21
 keywords:
   - checklists
   - Django
@@ -14,4 +14,4 @@ license: MIT License
 message: If you use this software, please cite it using the metadata from this file.
 repository-code: "https://github.com/StuartMacKay/ebird-checklists"
 title: eBird Checklists
-version: 1.0.3
+version: 1.1.0
