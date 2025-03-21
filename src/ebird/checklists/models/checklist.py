@@ -110,6 +110,42 @@ class Checklist(models.Model):
         help_text=_("The unique identifier for the checklist."),
     )
 
+    country = models.ForeignKey(
+        "checklists.Country",
+        related_name="checklists",
+        on_delete=models.PROTECT,
+        verbose_name=_("country"),
+        help_text=_("The country where the checklist was made."),
+    )
+
+    region = models.ForeignKey(
+        "checklists.Region",
+        related_name="checklists",
+        on_delete=models.PROTECT,
+        verbose_name=_("region"),
+        help_text=_("The region where the checklist was made."),
+    )
+
+    district = models.ForeignKey(
+        "checklists.District",
+        blank=True,
+        null=True,
+        related_name="checklists",
+        on_delete=models.PROTECT,
+        verbose_name=_("district"),
+        help_text=_("The district where the checklist was made."),
+    )
+
+    area = models.ForeignKey(
+        "checklists.Area",
+        blank=True,
+        null=True,
+        related_name="checklists",
+        on_delete=models.PROTECT,
+        verbose_name=_("area"),
+        help_text=_("The area where the checklist was made."),
+    )
+
     location = models.ForeignKey(
         "checklists.Location",
         related_name="checklists",
@@ -201,7 +237,7 @@ class Checklist(models.Model):
         help_text=_("The distance, in metres, covered while travelling."),
     )
 
-    area = models.DecimalField(
+    coverage = models.DecimalField(
         blank=True,
         null=True,
         decimal_places=3,

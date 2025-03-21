@@ -160,6 +160,10 @@ class MyDataLoader:
             "identifier": "OBS" + "".join(random.choices(string.digits, k=10)),
             "species": self.add_species(data),
             "checklist": checklist,
+            "country": checklist.country,
+            "region": checklist.region,
+            "district": checklist.district,
+            "area": checklist.area,
             "location": checklist.location,
             "observer": checklist.observer,
             "date": checklist.date,
@@ -195,6 +199,10 @@ class MyDataLoader:
 
         values: dict = {
             "identifier": identifier,
+            "country": location.country,
+            "region": location.region,
+            "district": location.district,
+            "area": location.area,
             "location": location,
             "observer": observer,
             "observer_count": int(data["Number of Observers"]),
@@ -207,7 +215,7 @@ class MyDataLoader:
             "project_code": "",
             "duration": None,
             "distance": None,
-            "area": None,
+            "coverage": None,
             "complete": data["All Obs Reported"] == "1",
             "comments": data["Checklist Comments"] or "",
             "url": "https://ebird.org/checklist/%s" % identifier,
@@ -222,8 +230,8 @@ class MyDataLoader:
         if distance := data["Distance Traveled (km)"]:
             values["distance"] = Decimal(distance)
 
-        if area := data["Area Covered (ha)"]:
-            values["area"] = Decimal(area)
+        if coverage := data["Area Covered (ha)"]:
+            values["coverage"] = Decimal(coverage)
 
         if checklist := Checklist.objects.filter(identifier=identifier).first():
             for key, value in values.items():

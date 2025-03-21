@@ -164,6 +164,10 @@ class BasicDatasetLoader:
             "edited": checklist.edited,
             "identifier": identifier,
             "checklist": checklist,
+            "country": checklist.country,
+            "region": checklist.region,
+            "district": checklist.district,
+            "area": checklist.area,
             "location": checklist.location,
             "observer": checklist.observer,
             "species": species,
@@ -207,6 +211,10 @@ class BasicDatasetLoader:
             "edited": dt.datetime.fromisoformat(row["LAST EDITED DATE"]).replace(
                 tzinfo=get_default_timezone()
             ),
+            "country": location.country,
+            "region": location.region,
+            "district": location.district,
+            "area": location.area,
             "location": location,
             "observer": observer,
             "group": row["GROUP IDENTIFIER"],
@@ -218,7 +226,7 @@ class BasicDatasetLoader:
             "project_code": row["PROJECT CODE"],
             "duration": None,
             "distance": None,
-            "area": None,
+            "coverage": None,
             "complete": bool(row["ALL SPECIES REPORTED"]),
             "comments": row["TRIP COMMENTS"] or "",
             "url": "https://ebird.org/checklist/%s" % identifier,
@@ -233,8 +241,8 @@ class BasicDatasetLoader:
         if distance := row["EFFORT DISTANCE KM"]:
             values["distance"] = Decimal(distance)
 
-        if area := row["EFFORT AREA HA"]:
-            values["area"] = Decimal(area)
+        if coverage := row["EFFORT AREA HA"]:
+            values["coverage"] = Decimal(coverage)
 
         if checklist := Checklist.objects.filter(identifier=identifier).first():
             for key, value in values.items():

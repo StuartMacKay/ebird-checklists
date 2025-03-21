@@ -67,12 +67,17 @@ class APILoader:
         created: dt.datetime = str2datetime(data["creationDt"])
         edited: dt.datetime = str2datetime(data["lastEditedDt"])
         started: dt.datetime = str2datetime(data["obsDt"])
+        location: Location = self.get_location(data)
         checklist: Checklist
 
         values: dict = {
             "created": created,
             "edited": edited,
-            "location": self.get_location(data),
+            "country": location.country,
+            "region": location.region,
+            "district": location.district,
+            "area": location.area,
+            "location": location,
             "observer": self.get_observer(data),
             "observer_count": None,
             "group": "",
@@ -102,8 +107,8 @@ class APILoader:
             dist: str = data["effortDistanceKm"]
             values["distance"] = round(Decimal(dist), 3)
         elif data["protocolId"] == "P23":
-            area: str = data["effortAreaHa"]
-            values["area"] = round(Decimal(area), 3)
+            coverage: str = data["effortAreaHa"]
+            values["coverage"] = round(Decimal(coverage), 3)
 
         if "comments" in data:
             values["comments"] = data["comments"]
@@ -233,6 +238,10 @@ class APILoader:
             "edited": checklist.edited,
             "identifier": identifier,
             "checklist": checklist,
+            "country": checklist.country,
+            "region": checklist.region,
+            "district": checklist.district,
+            "area": checklist.area,
             "location": checklist.location,
             "observer": checklist.observer,
             "species": self.get_species(data),

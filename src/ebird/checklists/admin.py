@@ -100,6 +100,15 @@ class ChecklistAdmin(admin.ModelAdmin):
 
         return field
 
+    def save_model(self, request, obj, form, change):
+        if 'location' in form.changed_data:
+            location = obj.location
+            obj.country = location.country
+            obj.region = location.region
+            obj.district = location.district
+            obj.area = location.area
+        super().save_model(request,obj, form, change)
+
 
 @admin.register(models.Country)
 class CountryAdmin(admin.ModelAdmin):
@@ -148,6 +157,21 @@ class LocationAdmin(admin.ModelAdmin):
         elif db_field.name == "longitude":
             field.widget = TextInput()
         return field
+
+    def save_model(self, request, obj, form, change):
+        super().save_model(request,obj, form, change)
+        if 'country' in form.changed_data:
+            models.Checklist.objects.filter(location=obj).update(country=obj.country)
+            models.Observation.objects.filter(location=obj).update(country=obj.country)
+        if 'region' in form.changed_data:
+            models.Checklist.objects.filter(location=obj).update(region=obj.region)
+            models.Observation.objects.filter(location=obj).update(region=obj.region)
+        if 'district' in form.changed_data:
+            models.Checklist.objects.filter(location=obj).update(district=obj.district)
+            models.Observation.objects.filter(location=obj).update(district=obj.district)
+        if 'area' in form.changed_data:
+            models.Checklist.objects.filter(location=obj).update(area=obj.area)
+            models.Observation.objects.filter(location=obj).update(area=obj.area)
 
 
 @admin.register(models.Observation)
@@ -199,6 +223,15 @@ class ObservationAdmin(admin.ModelAdmin):
         elif db_field.name == "count":
             field.widget = TextInput()
         return field
+
+    def save_model(self, request, obj, form, change):
+        if 'location' in form.changed_data:
+            location = obj.location
+            obj.country = location.country
+            obj.region = location.region
+            obj.district = location.district
+            obj.area = location.area
+        super().save_model(request,obj, form, change)
 
 
 @admin.register(models.Observer)

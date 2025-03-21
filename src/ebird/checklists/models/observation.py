@@ -116,6 +116,42 @@ class Observation(models.Model):
         help_text=_("The person who made the observation."),
     )
 
+    country = models.ForeignKey(
+        "checklists.Country",
+        related_name="observations",
+        on_delete=models.PROTECT,
+        verbose_name=_("country"),
+        help_text=_("The country where the observation was made."),
+    )
+
+    region = models.ForeignKey(
+        "checklists.Region",
+        related_name="observations",
+        on_delete=models.PROTECT,
+        verbose_name=_("region"),
+        help_text=_("The region where the observation was made."),
+    )
+
+    district = models.ForeignKey(
+        "checklists.District",
+        blank=True,
+        null=True,
+        related_name="observations",
+        on_delete=models.PROTECT,
+        verbose_name=_("district"),
+        help_text=_("The district where the observation was made."),
+    )
+
+    area = models.ForeignKey(
+        "checklists.Area",
+        blank=True,
+        null=True,
+        related_name="observations",
+        on_delete=models.PROTECT,
+        verbose_name=_("area"),
+        help_text=_("The area where the observation was made."),
+    )
+
     location = models.ForeignKey(
         "checklists.Location",
         related_name="observations",
