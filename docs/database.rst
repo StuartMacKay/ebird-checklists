@@ -10,27 +10,41 @@ The lightning tour in 15 seconds:
 
 * A Checklist has a Location.
 * A Checklist has an Observer.
-* A Checklist has a Location.
-* A Checklist has a list of Observations.
-* An Observation belongs to a Checklist.
 * An Observation has a Species.
-* An Observation has a Location.
+* An Observation has a Checklist.
+* A Location has a Country.
+* A Location has a Region (eBird's subnational1).
+* A Location has a District (eBird's subnational2).
+* A Location has a Area (so Locations can be grouped).
+
+Performance optimisations to make queries faster, and statistics easier:
+
+* A Checklist has a Country, Region, District, and Area.
+* An Observation has a Country, Region, District, Area, and Location.
 * An Observation has an Observer.
+* An Observation has a date.
 
 Notes
 -----
-1. Location and Observer are duplicated on Observation to make queries easy.
+1. Area is not supported by eBird. However it's immensely useful for grouping
+   nearby locations together, particularly in isolated locations like islands,
+   since eBird's subnational1 and subnational2 codes are based on administrative
+   boundaries.
 
-2. The models use TextField as it works equally well with SQLite3 and PostgreSQL
+2. Using tables for locations, rather than adding the country, subnational1 and
+   subnational2 codes to Checklist and Observation means the database filters
+   on integer primary keys, rather than matching strings.
+
+3. The models use TextField as it works equally well with SQLite3 and PostgreSQL
    as CharField. This means there will not be a problem if the size of strings
    from eBird get longer.
 
-3. The Observer is the person who submitted the checklist to eBird. If the checklist
+4. The Observer is the person who submitted the checklist to eBird. If the checklist
    was shared or other people in the group also submitted a checklist then the `group`
    attribute on `Checklist` will contain an identifier which can be used to link
    them together.
 
-4. Each models has a JSONField for adding features without having to extend the
+5. Each models has a JSONField for adding features without having to extend the
    models. Some examples:
 
    * On the Species model you can store a table of translations for the species
