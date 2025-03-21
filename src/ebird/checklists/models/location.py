@@ -19,17 +19,17 @@ class LocationQuerySet(models.QuerySet):
     def for_country(self, code: str):
         if not re.match(r"[A-Z]{2}", code):
             raise ValueError("Unsupported country code: %s" % code)
-        return self.filter(country_code=code)
+        return self.filter(country__code=code)
 
-    def for_state(self, code: str):
+    def for_region(self, code: str):
         if not re.match(r"[A-Z]{2}-[A-Z0-9]{2,3}", code):
             raise ValueError("Unsupported state code: %s" % code)
-        return self.filter(state_code=code)
+        return self.filter(region__code=code)
 
-    def for_county(self, code: str):
+    def for_district(self, code: str):
         if not re.match(r"[A-Z]{2}-[A-Z0-9]{2,3}-[A-Z0-9]{2,3}", code):
             raise ValueError("Unsupported county code: %s" % code)
-        return self.filter(county_code=code)
+        return self.filter(district__code=code)
 
     def for_identifier(self, identifier: str):
         return self.get(identifier=identifier)

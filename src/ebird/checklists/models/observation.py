@@ -18,43 +18,31 @@ class ObservationQuerySet(models.QuerySet):
     def for_country(self, code: str):
         if not is_country_code(code):
             raise ValueError("Unsupported country code: %s" % code)
-        return self.filter(location__country_code=code)
+        return self.filter(country__code=code)
 
-    def for_state(self, code: str):
+    def for_region(self, code: str):
         if not is_state_code(code):
             raise ValueError("Unsupported state code: %s" % code)
-        return self.filter(location__state_code=code)
+        return self.filter(region__code=code)
 
-    def for_county(self, code: str):
+    def for_district(self, code: str):
         if not is_county_code(code):
             raise ValueError("Unsupported county code: %s" % code)
-        return self.filter(location__county_code=code)
+        return self.filter(district__code=code)
 
     def for_location(self, identifier: str):
         if not is_location_code(identifier):
             raise ValueError("Unsupported location identifier: %s" % identifier)
         return self.filter(location__identifier=identifier)
 
-    def for_region(self, value: str):
-        if is_country_code(value):
-            return self.filter(location__country_code=value)
-        elif is_state_code(value):
-            return self.filter(location__state_code=value)
-        elif is_county_code(value):
-            return self.filter(location__county_code=value)
-        elif is_location_code(value):
-            return self.filter(location__identifier=value)
-        else:
-            raise ValueError("Unsupported region code: %s" % value)
-
     def for_identifier(self, identifier: str):
         return self.get(identifier=identifier)
 
     def for_date(self, date: datetime.date):
-        return self.filter(checklist__date=date)
+        return self.filter(date=date)
 
     def for_dates(self, start: datetime.date, end: datetime.date):
-        return self.filter(checklist__date__gte=start).filter(checklist__date__lt=end)
+        return self.filter(date__gte=start).filter(date__lt=end)
 
     def for_observer(self, value: str):
         if re.match(r"obsr\d+", value):
