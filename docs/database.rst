@@ -79,3 +79,15 @@ Notes
         }
 
      The task pf processing the name is left as an exercise for the reader.
+
+6. The is_identified() method on Species is used to count the number of species
+   seen by an Observer or seen in an area or Location. It is mirrored as a flag
+   on Observation to speed up the queries that perform the counts.
+
+   IMPORTANT: If you look through the code for the Django Admin you will see
+   that when the Country, Region, District or Area is changed for a Location,
+   or the Location is changed, then the foreign keys on Checklist and Observation
+   are updated also. A species status changes regularly (eBird release taxonomic
+   updates around once a year), but the identified attribute on Observation is
+   not updated as it represents the status of the species at the time the
+   observation was made.

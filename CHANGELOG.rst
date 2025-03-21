@@ -13,6 +13,7 @@ Latest
 * Add Area model for defining groups of Locations.
 * Mirror Country, Region, District and Area on Checklist and Observation
   to speed up queries.
+* Add Observation.identified for speeding up generating species lists.
 
 1.0.3 (2025-03-20)
 ------------------

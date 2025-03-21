@@ -233,6 +233,7 @@ class APILoader:
     def add_observation(self, data: dict, checklist: Checklist) -> Observation:
         identifier: str = data["obsId"]
         observation: Observation
+        species: Species = self.get_species(data)
 
         values: dict = {
             "edited": checklist.edited,
@@ -244,7 +245,8 @@ class APILoader:
             "area": checklist.area,
             "location": checklist.location,
             "observer": checklist.observer,
-            "species": self.get_species(data),
+            "species": species,
+            "identified": species.is_identified(),
             "date": checklist.date,
             "count": None,
             "breeding_code": "",

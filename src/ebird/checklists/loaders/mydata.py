@@ -155,10 +155,13 @@ class MyDataLoader:
         return species
 
     def add_observation(self, data: dict, checklist: Checklist) -> Observation:
+        species: Species = self.add_species(data)
+
         values: dict = {
             "edited": checklist.edited,
             "identifier": "OBS" + "".join(random.choices(string.digits, k=10)),
-            "species": self.add_species(data),
+            "species": species,
+            "identified": species.is_identified(),
             "checklist": checklist,
             "country": checklist.country,
             "region": checklist.region,
